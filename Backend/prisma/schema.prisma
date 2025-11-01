@@ -1,0 +1,203 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  PATIENT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  PENDING
+}
+
+enum ReminderStatus {
+  ACTIVE
+  COMPLETED
+  SNOOZED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String    @unique
+  phone         String
+  password      String
+  dateOfBirth   DateTime
+  role          Role
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  patient       Patient?
+  doctor        Doctor?
+  admin         Admin?
+}
+
+model Patient {
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  bloodGroup      String
+  gender          Gender
+  emergencyContact String
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments    Appointment[]
+  prescriptions   Prescription[]   @relation("PatientPrescriptions")
+  healthRecords   HealthMonitoring[]
+  medicalHistory  MedicalHistory[]
+  labTests        LabTest[]
+  reminders       Reminder[]
+}
+
+model Doctor {
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  specialization  String
+  licenseNumber   String    @unique
+  consultationFee Decimal
+  availableDays   String    // JSON string of available days
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments    Appointment[]
+  prescriptions   Prescription[]    @relation("DoctorPrescriptions")
+  medicalHistory  MedicalHistory[]
+  labTests        LabTest[]
+}
+
+model Admin {
+  id        String    @id @default(uuid())
+  userId    String    @unique
+  
+  // Relations
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id              String    @id @default(uuid())
+  patientId       String
+  doctorId        String
+  appointmentDate DateTime
+  appointmentType String
+  status          AppointmentStatus
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id])
+  doctor          Doctor    @relation(fields: [doctorId], references: [id])
+  prescription    Prescription?
+}
+
+model Prescription {
+  id              String    @id @default(uuid())
+  appointmentId   String    @unique
+  doctorId        String
+  patientId       String
+  prescriptionDate DateTime
+  diagnosis       String
+  description     String    @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  appointment     Appointment @relation(fields: [appointmentId], references: [id])
+  doctor          Doctor    @relation("DoctorPrescriptions", fields: [doctorId], references: [id])
+  patient         Patient   @relation("PatientPrescriptions", fields: [patientId], references: [id])
+  medications     MedicationTracking[]
+}
+
+model MedicationTracking {
+  id              String    @id @default(uuid())
+  prescriptionId  String
+  medicationName  String
+  dosage          String
+  frequency       String
+  duration        String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  prescription    Prescription @relation(fields: [prescriptionId], references: [id])
+  reminders       Reminder[]
+}
+
+model Reminder {
+  id              String    @id @default(uuid())
+  patientId       String
+  medicationId    String
+  status          ReminderStatus
+  time            DateTime
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id])
+  medication      MedicationTracking @relation(fields: [medicationId], references: [id])
+}
+
+model HealthMonitoring {
+  id              String    @id @default(uuid())
+  patientId       String
+  heartRate       Int?
+  temperature     Decimal?
+  weight          Decimal?
+  bloodPressure   String?
+  recordDate      DateTime
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id])
+}
+
+model MedicalHistory {
+  id              String    @id @default(uuid())
+  patientId       String
+  doctorId        String
+  diagnosis       String
+  treatment       String    @db.Text
+  allergies       String?   @db.Text
+  symptoms        String    @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id])
+  doctor          Doctor    @relation(fields: [doctorId], references: [id])
+}
+
+model LabTest {
+  id              String    @id @default(uuid())
+  patientId       String
+  doctorId        String
+  testName        String
+  testDate        DateTime
+  description     String    @db.Text
+  filePath        String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id])
+  doctor          Doctor    @relation(fields: [doctorId], references: [id])
+}
