@@ -1,0 +1,21 @@
+.register-page {
+  background-color: #fff;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.register-container {
+  max-width: 400px;
+  margin: 60px auto;
+  text-align: left;
+  padding: 30px;
+}
+
+.register-container h1 {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+}

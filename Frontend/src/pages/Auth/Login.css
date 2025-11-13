@@ -1,0 +1,112 @@
+/* --- Overall Page Layout --- */
+.login-page {
+  background-color: #fff;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Center the login form --- */
+.login-container {
+  max-width: 400px;
+  margin: 60px auto;
+  text-align: left;
+  padding: 30px;
+}
+
+.login-container h1 {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+}
+
+/* --- Form Styling --- */
+.login-form label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #1a237e;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 40px 12px 14px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+.input-group input:focus {
+  border-color: #6a1b9a;
+}
+
+.input-group .icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  cursor: pointer;
+}
+
+/* --- Forgot password --- */
+.forgot {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.forgot a {
+  text-decoration: none;
+  font-size: 0.9rem;
+  color: #1a237e;
+  transition: color 0.3s ease;
+}
+
+.forgot a:hover {
+  color: #6a1b9a;
+}
+
+/* --- Login Button --- */
+.login-btn {
+    align-self: center;
+  width: 100%;
+  padding: 12px;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  }
+
+.login-btn:hover {
+  background-color: #222;
+}
+
+/* --- Signup Text --- */
+.signup-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+
+.signup-link {
+  color: #6a1b9a;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
