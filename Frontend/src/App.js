@@ -4,8 +4,10 @@ import Navbar from "./components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
+import LandingPage from "./pages/Landing";
 import PatientDashboard from "./pages/Patient/Dashboard";
 import DoctorDashboard from "./pages/Doctor/Dashboard";
 import AdminDashboard from "./pages/Admin/Dashboard";
@@ -16,9 +18,12 @@ export default function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route path="/" element={<PatientDashboard />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/patient" element={<PatientDashboard/>}/>
+          <Route path="/doctor" element={<DoctorDashboard />} />
+          <Route path="/admin" element={<AdminDashboard/>}/>
 
           <Route
             path="/patient/dashboard"

@@ -1,130 +1,154 @@
-/* Global Dashboard Layout */
-.dashboard {
+/* --- Overall Layout --- */
+.Ldashboard {
+  background-color: #f9fafb;
   font-family: "Segoe UI", sans-serif;
-  color: #1a237e;
+  min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* --- HERO SECTION --- */
-.hero {
-  background: linear-gradient(to right, #f4f6fb, #e3f2fd);
+.Ldashboard-layout {
+  display: flex;
+}
+
+.Ldashboard-content {
+  flex: 1;
+  padding: 0;
+  margin-left: 150px; /* sidebar width */
+}
+
+/* --- Hero Section --- */
+.Lhero {
+  background: linear-gradient(90deg, #004d40, #00796b);
+  color: #fff;
   text-align: center;
-  padding: 100px 40px 60px 40px;
+  padding: 100px 20px;
 }
 
-.hero-content h1 {
-  font-size: 2.8rem;
-  margin: 5px 0;
+.Lhero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
 }
 
-.hero-content p {
-  font-size: 1.2rem;
-  color: #3f51b5;
-  margin-top: 20px;
+.Lhero-subtext {
+  font-size: 1.1rem;
+  margin-top: 8px;
+  color: #c8e6c9;
 }
 
-.hero-buttons {
+.Lhero-buttons {
   margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
-.hero-buttons button {
-  background-color: #0d47a1;
-  color: white;
-  border: none;
-  padding: 12px 30px;
-  border-radius: 25px;
+/* --- Reusable Buttons --- */
+.Lbtn-primary,
+.Lbtn-secondary {
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 600;
   font-size: 1rem;
-  margin: 0 10px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
 }
 
-.hero-buttons button:hover {
-  background-color: #1565c0;
+.Lbtn-primary {
+  background-color: #ffffff;
+  color: #004d40;
+  border: none;
 }
 
-/* --- CHAIRMAN SECTION --- */
-.chairman {
-  background-color: #ede7f6;
-  padding: 60px 20px;
+.Lbtn-primary:hover {
+  background-color: #e0f2f1;
+}
+
+.Lbtn-secondary {
+  background-color: transparent;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+.Lbtn-secondary:hover {
+  background-color: #ffffff;
+  color: #004d40;
+}
+
+/* --- Chairman Section --- */
+.Lchairman {
+  padding: 60px 40px;
+  background-color: #fff;
   text-align: center;
 }
 
-.chairman-content {
+.Lchairman-content {
   max-width: 800px;
-  margin: 0 auto;
+  margin: auto;
 }
 
-.chairman-content h2 {
-  margin-bottom: 15px;
+.Lchairman h2 {
+  color: #004d40;
+  margin-bottom: 20px;
   font-size: 1.8rem;
-  color: #283593;
 }
 
-.chairman-content p {
+.Lchairman p {
   color: #333;
   line-height: 1.6;
   font-size: 1rem;
 }
 
-/* --- DEPARTMENTS SECTION --- */
-.departments {
-  background-color: #f9fafc;
-  padding: 70px 60px;
+/* --- Departments Section --- */
+.Ldepartments {
+  padding: 60px 40px;
+  background-color: #f5f7f8;
   text-align: center;
 }
 
-.departments h2 {
+.Ldepartments h2 {
+  color: #004d40;
   margin-bottom: 40px;
-  color: #1a237e;
-  font-size: 2rem;
+  font-size: 1.8rem;
 }
 
-.dept-grid {
+.Ldept-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 30px;
-  justify-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
+  max-width: 1100px;
+  margin: auto;
 }
 
-.dept-card {
-  background-color: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  width: 100%;
-  max-width: 320px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
-}
-
-.dept-card:hover {
-  transform: translateY(-5px);
-}
-
-.dept-img {
-  background-color: #cfd8dc;
-  height: 160px;
-}
-
-.dept-text {
+.Ldept-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
   padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.dept-text h3 {
-  color: #1a237e;
+.Ldept-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.Ldept-text h3 {
+  color: #004d40;
   margin-bottom: 10px;
 }
 
-.dept-text p {
-  color: #444;
+.Ldept-text p {
+  color: #555;
   font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-/* --- FOOTER --- */
-.footer {
-  background-color: #e8eaf6;
-  padding: 20px 0;
+/* --- Footer --- */
+.Lfooter {
   text-align: center;
-  color: #1a237e;
+  padding: 25px;
+  background-color: #004d40;
+  color: #fff;
   font-size: 0.9rem;
+  margin-top: 60px;
 }

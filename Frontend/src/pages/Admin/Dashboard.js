@@ -1,25 +1,48 @@
-import React, { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
+import React from "react";
 import Sidebar from "../../components/Sidebar";
-import DashboardCards from "../../components/DashboardCards";
+import Navbar from "../../components/Navbar";
+import "./Dashboard.css";
 
 export default function AdminDashboard() {
-  const { user } = useContext(AuthContext);
-
-  const cards = [
-    { title: "Registered Users", description: "Total 132 users in the system." },
-    { title: "Active Doctors", description: "24 active doctors." },
-    { title: "Reports Generated", description: "5 reports in the last week." },
-  ];
-
   return (
-    <div style={{ display: "flex" }}>
-      <Sidebar role={user?.role} />
-      <main style={{ marginLeft: "240px", padding: "20px", flexGrow: 1 }}>
-        <h2>Welcome, {user?.email}</h2>
-        <p>Administrative control panel overview.</p>
-        <DashboardCards cards={cards} />
-      </main>
+    <div className="admin-dashboard">
+
+      <div className="dashboard-layout">
+        <Sidebar role="Admin" />
+
+        <main className="dashboard-content">
+          <section className="welcome-section">
+            <h1>Welcome, System Admin 🏥</h1>
+            <p>Manage users, clinics, and monitor overall system performance.</p>
+          </section>
+
+          <section className="cards-section">
+            <div className="info-card">
+              <h3>Total Users</h3>
+              <p>243 active</p>
+            </div>
+
+            <div className="info-card">
+              <h3>Registered Doctors</h3>
+              <p>45</p>
+            </div>
+
+            <div className="info-card">
+              <h3>New Reports</h3>
+              <p>8 pending</p>
+            </div>
+          </section>
+
+          <section className="reports-section">
+            <h2>System Analytics</h2>
+            <ul>
+              <li>📈 User engagement up by <b>12%</b> this week.</li>
+              <li>⚙️ Database maintenance completed successfully.</li>
+              <li>🧾 3 new clinic registrations approved.</li>
+            </ul>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }

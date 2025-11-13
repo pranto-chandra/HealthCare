@@ -1,25 +1,50 @@
-import React, { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
+import React from "react";
 import Sidebar from "../../components/Sidebar";
-import DashboardCards from "../../components/DashboardCards";
+import Navbar from "../../components/Navbar";
+import "./Dashboard.css";
 
 export default function DoctorDashboard() {
-  const { user } = useContext(AuthContext);
-
-  const cards = [
-    { title: "Today’s Appointments", description: "5 appointments scheduled today." },
-    { title: "Pending Prescriptions", description: "2 prescriptions awaiting approval." },
-    { title: "Patients Monitored", description: "8 active patients this month." },
-  ];
-
   return (
-    <div style={{ display: "flex" }}>
-      <Sidebar role={user?.role} />
-      <main style={{ marginLeft: "240px", padding: "20px", flexGrow: 1 }}>
-        <h2>Welcome, Dr. {user?.email}</h2>
-        <p>Manage your patients and appointments efficiently.</p>
-        <DashboardCards cards={cards} />
-      </main>
+    <div className="doctor-dashboard">
+      
+
+      <div className="dashboard-layout">
+        <Sidebar role="Doctor" />
+
+        <main className="dashboard-content">
+          <section className="welcome-section">
+            <h1>Welcome, Dr. Rahman 👨‍⚕️</h1>
+            <p>Your patients are waiting for expert care today.</p>
+          </section>
+
+          <section className="cards-section">
+            <div className="info-card">
+              <h3>Today's Appointments</h3>
+              <p>12 scheduled</p>
+            </div>
+
+            <div className="info-card">
+              <h3>Pending Prescriptions</h3>
+              <p>5 to review</p>
+            </div>
+
+            <div className="info-card">
+              <h3>New Patient Records</h3>
+              <p>3 updated</p>
+            </div>
+          </section>
+
+          <section className="reports-section">
+            <h2>Recent Activities</h2>
+            <ul>
+              <li>✅ Appointment with <b>Mr. Ahmed</b> completed.</li>
+              <li>💊 Prescription updated for <b>Ms. Nabila</b>.</li>
+              <li>🩺 Health report submitted for <b>Mr. Karim</b>.</li>
+            </ul>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
+
