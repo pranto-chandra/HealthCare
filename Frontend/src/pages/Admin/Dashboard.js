@@ -1,14 +1,21 @@
-import React from "react";
+import React, {useState} from "react";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
 import "./Dashboard.css";
 
 export default function AdminDashboard() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   return (
     <div className="admin-dashboard">
-
-      <div className="dashboard-layout">
-        <Sidebar role="Admin" />
+       {/* Toggle Button */}
+      <button
+        className="sidebar-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
+      <div className={`dashboard-layout ${isSidebarOpen ? "" : "collapsed"}`}>
+        {isSidebarOpen && <Sidebar role="Admin" />}
 
         <main className="dashboard-content">
           <section className="welcome-section">

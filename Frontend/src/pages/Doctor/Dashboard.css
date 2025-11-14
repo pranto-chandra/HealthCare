@@ -79,3 +79,26 @@
   padding: 10px 0;
   border-bottom: 1px solid #eee;
 }
+
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  font-size: 22px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}
+
+.sidebar-open .sidebar-toggle {
+  left: 170px; /* Stay visible when sidebar is open */
+}

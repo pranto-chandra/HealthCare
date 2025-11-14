@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "./Sidebar.css";
 
-export default function Sidebar({ role }) {
+export default function Sidebar({ role, isOpen }) {
   const links = {
     Patient: [
       { path: "/patient/dashboard", label: "Dashboard" },
@@ -26,31 +27,14 @@ export default function Sidebar({ role }) {
   const roleLinks = links[role] || [];
 
   return (
-    <aside
-      style={{
-        width: "150px",
-        backgroundColor: "#004d40",
-        color: "white",
-        height: "100vh",
-        padding: "20px",
-        position: "fixed",
-      }}
-    >
-      <h3 style={{ color: "#80cbc4", marginBottom: "20px" }}>
-        {role} Menu
-      </h3>
+    <aside className={`sidebar ${isOpen ? "open" : "closed"}`}>
+      <h3 className="sidebar-title">{role} Menu</h3>
+
       <nav>
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <ul className="sidebar-list">
           {roleLinks.map((item) => (
-            <li key={item.path} style={{ marginBottom: "12px" }}>
-              <Link
-                to={item.path}
-                style={{
-                  color: "white",
-                  textDecoration: "none",
-                  fontSize: "15px",
-                }}
-              >
+            <li key={item.path}>
+              <Link to={item.path} className="sidebar-link">
                 {item.label}
               </Link>
             </li>

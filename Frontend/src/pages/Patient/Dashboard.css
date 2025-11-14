@@ -1,154 +1,154 @@
-/* --- Overall Layout --- */
-.Ldashboard {
+/* =========================================================
+   PATIENT DASHBOARD (After Login)
+   ========================================================= */
+
+.patient-dashboard {
   background-color: #f9fafb;
-  font-family: "Segoe UI", sans-serif;
   min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
   overflow-x: hidden;
 }
 
-.Ldashboard-layout {
+/* Layout wrapper */
+.dashboard-layout {
   display: flex;
+  transition: margin-left 0.3s ease;
 }
 
-.Ldashboard-content {
+/* Main content */
+.dashboard-content {
   flex: 1;
-  padding: 0;
-  margin-left: 150px; /* sidebar width */
+  padding: 30px;
+  margin-left: 160px; /* width of sidebar */
+  transition: margin-left 0.3s ease;
 }
 
-/* --- Hero Section --- */
-.Lhero {
-  background: linear-gradient(90deg, #004d40, #00796b);
-  color: #fff;
-  text-align: center;
-  padding: 100px 20px;
+/* When collapsed (sidebar hidden) */
+.dashboard-layout.collapsed .dashboard-content {
+  margin-left: 0 !important;
 }
 
-.Lhero h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-}
+/* =========================================================
+   SIDEBAR TOGGLE BUTTON
+   ========================================================= */
 
-.Lhero-subtext {
-  font-size: 1.1rem;
-  margin-top: 8px;
-  color: #c8e6c9;
-}
-
-.Lhero-buttons {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-/* --- Reusable Buttons --- */
-.Lbtn-primary,
-.Lbtn-secondary {
-  padding: 12px 28px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.Lbtn-primary {
-  background-color: #ffffff;
-  color: #004d40;
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
   border: none;
+  font-size: 22px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
 }
 
-.Lbtn-primary:hover {
-  background-color: #e0f2f1;
+.sidebar-toggle:hover {
+  background-color: #00695c;
 }
 
-.Lbtn-secondary {
-  background-color: transparent;
-  color: #ffffff;
-  border: 2px solid #ffffff;
+.sidebar-open .sidebar-toggle {
+  left: 170px; /* Stay visible when sidebar is open */
 }
 
-.Lbtn-secondary:hover {
-  background-color: #ffffff;
-  color: #004d40;
-}
+/* =========================================================
+   WELCOME SECTION
+   ========================================================= */
 
-/* --- Chairman Section --- */
-.Lchairman {
-  padding: 60px 40px;
-  background-color: #fff;
-  text-align: center;
-}
-
-.Lchairman-content {
-  max-width: 800px;
-  margin: auto;
-}
-
-.Lchairman h2 {
-  color: #004d40;
-  margin-bottom: 20px;
-  font-size: 1.8rem;
-}
-
-.Lchairman p {
-  color: #333;
-  line-height: 1.6;
-  font-size: 1rem;
-}
-
-/* --- Departments Section --- */
-.Ldepartments {
-  padding: 60px 40px;
-  background-color: #f5f7f8;
-  text-align: center;
-}
-
-.Ldepartments h2 {
-  color: #004d40;
-  margin-bottom: 40px;
-  font-size: 1.8rem;
-}
-
-.Ldept-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 25px;
-  max-width: 1100px;
-  margin: auto;
-}
-
-.Ldept-card {
-  background-color: #ffffff;
+.welcome-section {
+  background: linear-gradient(90deg, #00796b, #004d40);
+  color: #fff;
+  padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.Ldept-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-}
-
-.Ldept-text h3 {
-  color: #004d40;
+.welcome-section h1 {
   margin-bottom: 10px;
+  font-size: 1.9rem;
+  text-align: center;
 }
 
-.Ldept-text p {
+.welcome-section p {
+  text-align: center;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* =========================================================
+   DASHBOARD CARDS
+   ========================================================= */
+
+.cards-section {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.info-card {
+  flex: 1;
+  min-width: 240px;
+  background: white;
+  padding: 22px;
+  border-radius: 12px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+  transition: 0.25s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+}
+
+.info-card h3 {
+  text-align: center;
+  color: #004d40;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+}
+
+.info-card p {
+  text-align: center;
   color: #555;
   font-size: 0.95rem;
-  line-height: 1.5;
 }
 
-/* --- Footer --- */
-.Lfooter {
-  text-align: center;
+/* =========================================================
+   RECENT UPDATES SECTION
+   ========================================================= */
+
+.reports-section {
+  background: white;
   padding: 25px;
-  background-color: #004d40;
-  color: #fff;
-  font-size: 0.9rem;
-  margin-top: 60px;
+  border-radius: 12px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+  margin-bottom: 40px;
+}
+
+.reports-section h2 {
+  color: #004d40;
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+}
+
+.reports-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.reports-section li {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.reports-section li:last-child {
+  border-bottom: none;
 }
