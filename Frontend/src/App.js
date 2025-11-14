@@ -11,6 +11,7 @@ import LandingPage from "./pages/Landing";
 import PatientDashboard from "./pages/Patient/Dashboard";
 import DoctorDashboard from "./pages/Doctor/Dashboard";
 import AdminDashboard from "./pages/Admin/Dashboard";
+import PatientAppointment from "./pages/Patient/Appointments";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/patient" element={<PatientDashboard/>}/>
           <Route path="/doctor" element={<DoctorDashboard />} />
           <Route path="/admin" element={<AdminDashboard/>}/>
+          <Route path="/patient/appointments" element={<PatientAppointment/>}/>
 
           <Route
             path="/patient/dashboard"

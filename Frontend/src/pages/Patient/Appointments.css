@@ -1,0 +1,148 @@
+/* =========================================================
+   PATIENT APPOINTMENTS PAGE
+   ========================================================= */
+
+.appointments-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.appointments-layout {
+  display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.appointments-content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 150px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Collapsed mode */
+.appointments-layout.collapsed .appointments-content {
+  margin-left: 0 !important;
+}
+
+/* Sidebar toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}
+
+/* =========================================================
+   PAGE HEADING
+   ========================================================= */
+
+.page-title {
+  color: #004d40;
+  font-size: 1.8rem;
+  margin-top: 30px;
+  margin-bottom: 25px;
+  margin-left: 20px;
+}
+
+/* =========================================================
+   UPCOMING APPOINTMENT CARD
+   ========================================================= */
+
+.upcoming-section {
+    margin-left: 20px;
+  margin-bottom: 40px;
+}
+
+.upcoming-section h2 {
+  color: #004d40;
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+}
+
+.upcoming-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+  max-width: 450px;
+}
+
+.upcoming-card p {
+  margin-bottom: 6px;
+  color: #444;
+}
+
+/* Status color tags */
+.status {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status.confirmed {
+  background-color: #c8e6c9;
+  color: #256029;
+}
+
+.status.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status.completed {
+  background-color: #bbdefb;
+  color: #0d47a1;
+}
+
+/* =========================================================
+   APPOINTMENTS TABLE
+   ========================================================= */
+
+.table-section h2 {
+    margin-left: 20px;
+  color: #004d40;
+  margin-bottom: 15px;
+}
+
+.appointments-table {
+    margin-left: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+}
+
+.appointments-table th,
+.appointments-table td {
+    margin-left: 20px;
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.appointments-table th {
+    margin-left: 20px;
+  background-color: #e0f2f1;
+  color: #004d40;
+}
+
+.appointments-table tr:hover {
+    margin-left: 20px;
+  background-color: #f5fffd;
+}
