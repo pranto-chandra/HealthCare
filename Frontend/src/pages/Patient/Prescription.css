@@ -1,0 +1,112 @@
+/* =========================================================
+   PRESCRIPTION PAGE STYLES
+   ========================================================= */
+
+.prescription-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.prescription-layout {
+  display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.prescription-content {
+  flex: 1;
+  padding: 0px;
+  margin-left: 160px;
+  transition: margin-left 0.3s ease;
+}
+
+.prescription-layout.collapsed .prescription-content {
+  margin-left: 0 !important;
+}
+/* =========================================================
+   HEADER SECTION
+   ========================================================= */
+
+.prescription-header {
+  background: linear-gradient(90deg, #00796b, #004d40);
+  color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  margin-top: -30px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.prescription-header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.prescription-header p {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* =========================================================
+   PRESCRIPTION LIST
+   ========================================================= */
+
+.prescription-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.prescription-card {
+  background: white;
+  padding: 22px;
+  margin-left: 30px;
+  border-radius: 12px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+  transition: 0.25s ease;
+}
+
+.prescription-layout.collapsed .prescription-card {
+  margin-left: 0 !important;
+}
+
+
+
+
+.prescription-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+}
+
+.prescription-card h3 {
+  color: #004d40;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+}
+
+.prescription-card p {
+  color: #555;
+  font-size: 0.95rem;
+  margin: 4px 0;
+}
+
+/* Sidebar toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}

@@ -1,0 +1,111 @@
+.prescription-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  overflow-x: hidden;
+}
+
+.prescription-layout {
+  display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.prescription-layout.collapsed .prescription-content {
+  margin-left: 0 !important;
+}
+
+.prescription-content {
+  flex: 1;
+  padding: 0px;
+  margin-left: 160px;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}
+
+.prescription-header {
+  background: linear-gradient(90deg, #00796b, #004d40);
+  color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.prescription-form {
+  background: white;
+  padding: 25px;
+  margin-left: 30px;
+  border-radius: 12px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+  margin-bottom: 30px;
+}
+
+.prescription-form h2 {
+  color: #004d40;
+  margin-bottom: 15px;
+}
+
+.prescription-layout.collapsed .prescription-form {
+  margin-left: 10px !important;
+}
+
+.prescription-form input,
+.prescription-form textarea {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+.prescription-form button {
+  margin-top: 10px;
+  padding: 10px 16px;
+  background-color: #00796b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.prescription-list {
+  margin-left: 30px;
+  margin-bottom: 40px;
+}
+
+.prescription-layout.collapsed .prescription-list {
+  margin-left: 10px !important;
+}
+
+.prescription-card {
+  background: white;
+  padding: 22px;
+  margin-left: -7px;
+  border-radius: 12px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+}
+
+.prescription-layout.collapsed .prescription-card {
+  margin-left: 10px !important;
+}

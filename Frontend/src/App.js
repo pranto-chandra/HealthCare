@@ -12,6 +12,11 @@ import PatientDashboard from "./pages/Patient/Dashboard";
 import DoctorDashboard from "./pages/Doctor/Dashboard";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import PatientAppointment from "./pages/Patient/Appointments";
+import PatientPrescriptions from "./pages/Patient/Prescriptions";
+import HealthMonitoring from "./pages/Patient/HealthMonitoring";
+import DoctorAppointment from "./pages/Doctor/Appointments";
+import PatientRecords from "./pages/Doctor/PatientRecords";
+import PrescriptionPage from "./pages/Doctor/Prescriptions";
 
 export default function App() {
   return (
@@ -26,6 +31,12 @@ export default function App() {
           <Route path="/doctor" element={<DoctorDashboard />} />
           <Route path="/admin" element={<AdminDashboard/>}/>
           <Route path="/patient/appointments" element={<PatientAppointment/>}/>
+          <Route path="/patient/prescriptions" element={<PatientPrescriptions/>}/>
+          <Route path="/patient/health" element={<HealthMonitoring/>}/>
+          <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
+          <Route path="/doctor/patients" element={<PatientRecords/>}/>
+          <Route path="/doctor/prescriptions" element={<PrescriptionPage/>}/>
+
 
           <Route
             path="/patient/dashboard"

@@ -49,7 +49,9 @@ export default function Appointments() {
 
         {/* MAIN CONTENT */}
         <main className="appointments-content">
-          <h1 className="page-title">Your Appointments</h1>
+          <section className="appointment-header">
+          <h1>Your Appointments</h1>
+          </section>
 
           {/* --- Upcoming Card Section --- */}
           <section className="upcoming-section">

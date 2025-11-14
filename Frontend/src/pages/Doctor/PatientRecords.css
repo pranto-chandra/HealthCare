@@ -1,0 +1,139 @@
+.patient-record-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  overflow-x: hidden;
+}
+
+.patient-record-layout {
+  display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.patient-record-content {
+  flex: 1;
+  padding: 0px;
+  margin-left: 160px;
+  transition: margin-left 0.3s ease;
+}
+
+.patient-record-layout.collapsed .patient-record-content {
+  margin-left: 0 !important;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}
+
+/* Header */
+.record-header {
+  background: linear-gradient(90deg, #00796b, #004d40);
+  color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.record-header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.record-header p {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Sections */
+.profile-section,
+.history-section,
+.prescriptions-section,
+.activity-section {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+  margin-bottom: 30px;
+  margin-left: 30px;
+}
+
+.patient-record-layout.collapsed .profile-section,
+.patient-record-layout.collapsed .history-section,
+.patient-record-layout.collapsed .prescriptions-section,
+.patient-record-layout.collapsed .activity-section {
+  margin-left: 10px !important;
+}
+
+.profile-section h2,
+.history-section h2,
+.prescriptions-section h2,
+.activity-section h2 {
+  color: #004d40;
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+}
+
+.profile-section p {
+  font-size: 0.95rem;
+  color: #444;
+  margin: 6px 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+.edit-toggle {
+  margin-top: 15px;
+  padding: 8px 16px;
+  background-color: #00796b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.edit-toggle:hover {
+  background-color: #004d40;
+}
+
+.profile-section input {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
