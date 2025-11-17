@@ -1,0 +1,172 @@
+/* =========================================================
+   ADMIN → MANAGE USERS PAGE
+   ========================================================= */
+
+.admin-users-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.admin-users-layout {
+  display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.admin-users-content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 150px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Collapsed */
+.admin-users-layout.collapsed .admin-users-content {
+  margin-left: 0 !important;
+}
+
+/* Sidebar Toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}
+
+/* =========================================================
+   PAGE HEADING
+   ========================================================= */
+
+.page-title {
+  color: #004d40;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+/* =========================================================
+   ADD USER BUTTON
+   ========================================================= */
+
+.add-user-container {
+  margin-bottom: 20px;
+}
+
+.add-user-btn {
+  background-color: #00695c;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: 0.3s ease;
+}
+
+.add-user-btn:hover {
+  background-color: #004d40;
+}
+
+/* =========================================================
+   USERS TABLE
+   ========================================================= */
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+}
+
+.users-table th,
+.users-table td {
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.users-table th {
+  background-color: #e0f2f1;
+  color: #004d40;
+}
+
+/* Rows hover */
+.users-table tr:hover {
+  background-color: #f8fffd;
+}
+
+/* =========================================================
+   STATUS TAGS
+   ========================================================= */
+
+.status {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status.active {
+  background-color: #c8e6c9;
+  color: #256029;
+}
+
+.status.inactive {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-weight: 600;
+}
+
+/* Edit button */
+.edit-btn {
+  background-color: #81c784;
+  color: #1b5e20;
+}
+
+.edit-btn:hover {
+  background-color: #66bb6a;
+}
+
+/* Delete button */
+.delete-btn {
+  background-color: #ef9a9a;
+  color: #b71c1c;
+}
+
+.delete-btn:hover {
+  background-color: #e57373;
+}
