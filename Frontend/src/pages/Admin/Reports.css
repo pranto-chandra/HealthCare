@@ -1,0 +1,148 @@
+/* =========================================================
+   ADMIN → REPORTS PAGE
+   ========================================================= */
+
+.admin-reports-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.admin-reports-layout {
+  display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.admin-reports-content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 150px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Collapsed Sidebar */
+.admin-reports-layout.collapsed .admin-reports-content {
+  margin-left: 0 !important;
+}
+
+/* Sidebar Toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}
+
+/* =========================================================
+   PAGE TITLE
+   ========================================================= */
+
+.page-title {
+  color: #004d40;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+}
+
+/* =========================================================
+   STATISTICS SECTION
+   ========================================================= */
+
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card h3 {
+  color: #00695c;
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.stat-card p {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* =========================================================
+   REPORT LIST
+   ========================================================= */
+
+.reports-section {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.08);
+}
+
+.reports-section h2 {
+  color: #004d40;
+  margin-bottom: 20px;
+}
+
+.report-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.report-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.report-item:last-child {
+  border-bottom: none;
+}
+
+.report-item h4 {
+  margin: 0;
+  color: #333;
+}
+
+.report-item span {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+/* =========================================================
+   DOWNLOAD BUTTON
+   ========================================================= */
+
+.download-btn {
+  background-color: #00695c;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.download-btn:hover {
+  background-color: #004d40;
+}

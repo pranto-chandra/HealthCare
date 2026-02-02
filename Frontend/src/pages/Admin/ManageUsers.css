@@ -5,6 +5,7 @@
 .admin-users-page {
   background-color: #f9fafb;
   min-height: 100vh;
+  
   font-family: "Segoe UI", sans-serif;
 }
 
@@ -52,7 +53,9 @@
 .page-title {
   color: #004d40;
   font-size: 1.8rem;
-  margin-bottom: 20px;
+  margin-top: -15px;
+  margin-left: 50px;
+  margin-bottom: 40px;
 }
 
 /* =========================================================

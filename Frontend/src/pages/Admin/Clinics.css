@@ -1,0 +1,150 @@
+/* =========================================================
+   ADMIN → CLINICS MANAGEMENT
+   ========================================================= */
+
+.admin-clinics-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.admin-clinics-layout {
+  display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.admin-clinics-content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 150px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Sidebar collapsed */
+.admin-clinics-layout.collapsed .admin-clinics-content {
+  margin-left: 0 !important;
+}
+
+/* Sidebar toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}
+
+/* Page title */
+.page-title {
+  color: #004d40;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+/* Add clinic button */
+.add-clinic-container {
+  margin-bottom: 20px;
+}
+
+.add-clinic-btn {
+  background-color: #00695c;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.add-clinic-btn:hover {
+  background-color: #004d40;
+}
+
+/* Clinics table */
+.clinics-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+}
+
+.clinics-table th,
+.clinics-table td {
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.clinics-table th {
+  background-color: #e0f2f1;
+  color: #004d40;
+}
+
+.clinics-table tr:hover {
+  background-color: #f8fffd;
+}
+
+/* Status badges */
+.status {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status.active {
+  background-color: #c8e6c9;
+  color: #256029;
+}
+
+.status.inactive {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+/* Action buttons */
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.edit-btn {
+  background-color: #81c784;
+  color: #1b5e20;
+}
+
+.edit-btn:hover {
+  background-color: #66bb6a;
+}
+
+.delete-btn {
+  background-color: #ef9a9a;
+  color: #b71c1c;
+}
+
+.delete-btn:hover {
+  background-color: #e57373;
+}

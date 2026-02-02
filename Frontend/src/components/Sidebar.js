@@ -18,7 +18,7 @@ export default function Sidebar({ role, isOpen }) {
     ],
     Admin: [
       { path: "/admin", label: "Dashboard" },
-      { path: "/admin/users", label: "Manage Users" },
+      { path: "/admin/manage", label: "Manage Users" },
       { path: "/admin/reports", label: "Reports" },
       { path: "/admin/clinics", label: "Clinics" },
     ],

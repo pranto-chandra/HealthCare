@@ -18,6 +18,8 @@ import DoctorAppointment from "./pages/Doctor/Appointments";
 import PatientRecords from "./pages/Doctor/PatientRecords";
 import PrescriptionPage from "./pages/Doctor/Prescriptions";
 import ManageUsers from "./pages/Admin/ManageUsers";
+import Reports from "./pages/Admin/Reports";
+import Clinics from "./pages/Admin/Clinics";
 
 export default function App() {
   return (
@@ -38,6 +40,8 @@ export default function App() {
           <Route path="/doctor/patients" element={<PatientRecords/>}/>
           <Route path="/doctor/prescriptions" element={<PrescriptionPage/>}/>
           <Route path="/admin/manage" element={<ManageUsers/>}/>
+          <Route path="/admin/reports" element={<Reports/>}/>
+          <Route path="/admin/clinics" element={<Clinics/>}/>
 
 
           <Route
