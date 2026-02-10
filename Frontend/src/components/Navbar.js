@@ -13,24 +13,24 @@ export default function Navbar() {
   };
 
   return (
-    <header className="navbar">
+    <header className="navbar font-semibold">
       <div className="navbar__logo">
         <h2>ORGANIC<span> HEALTHCARE</span></h2>
       </div>
 
-      <nav className="navbar__links">
-        <Link to="/">About Us</Link>
-        <Link to="/">Location</Link>
-        <Link to="/">Blogs</Link>
-        <Link to="/">Contact</Link>
+      <nav className="navbar__links hover:no-underline">
+        <Link to="/about" className="hover:no-underline">About Us</Link>
+        <Link to="/location" className="hover:no-underline">Location</Link>
+        <Link to="/blogs" className="hover:no-underline">Blogs</Link>
+        <Link to="/contact" className="hover:no-underline">Contact</Link>
         {user ? (
-          <button className="login-link" onClick={handleLogout}>Logout</button>
+          <button className="login-link hover:no-underline" onClick={handleLogout}>Logout</button>
         ) : (
-          <Link to="/login" className="login-link">Login</Link>
+          <Link to="/login" className="login-link hover:no-underline">Login</Link>
         )}
       </nav>
 
-      <button className="navbar__button">Book Appointment</button>
+      <button className="navbar__button font-semibold">Book Appointment</button>
     </header>
   );
 }

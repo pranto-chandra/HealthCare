@@ -24,6 +24,10 @@ import NotFound from "./pages/NotFound";
 import PatientEdit from "./pages/Patient/EditProfile";
 import DoctorEdit from "./pages/Doctor/EditProfile";
 import AdminEdit from "./pages/Admin/EditProfile";
+import Contact  from './pages/contact';
+import Blogs from "./pages/Blogs";
+import AboutUs from "./pages/AboutUs";
+import Location from "./pages/Location";
 
 export default function App() {
   return (
@@ -34,9 +38,6 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/patient" element={<PatientDashboard/>}/>
-          <Route path="/doctor" element={<DoctorDashboard />} />
-          <Route path="/admin" element={<AdminDashboard/>}/>
           <Route path="/patient/appointments" element={<PatientAppointment/>}/>
           <Route path="/patient/prescriptions" element={<PatientPrescriptions/>}/>
           <Route path="/patient/health" element={<HealthMonitoring/>}/>
@@ -49,6 +50,11 @@ export default function App() {
           <Route path="/patient/editprofile" element={<PatientEdit/>}/>
           <Route path="/doctor/editprofile" element={<DoctorEdit/>}/>
           <Route path="/admin/editprofile" element={<AdminEdit/>}/>
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/location" element={<Location />} />
+
 
           <Route
             path="/patient/dashboard"

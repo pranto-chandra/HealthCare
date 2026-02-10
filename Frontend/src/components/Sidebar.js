@@ -33,7 +33,7 @@ export default function Sidebar({ role, isOpen }) {
     <aside className={`sidebar ${isOpen ? "open" : "closed"}`}>
       <h3 className="sidebar-title">{role} Menu</h3>
 
-      <nav>
+      <nav >
         <ul className="sidebar-list">
           {roleLinks.map((item) => (
             <li key={item.path}>
@@ -42,10 +42,8 @@ export default function Sidebar({ role, isOpen }) {
               </Link>
             </li>
           ))}
-          <li>
-            <Link to="/profile/edit" className="sidebar-link">Edit Profile</Link>
-          </li>
         </ul>
+        
       </nav>
     </aside>
   );

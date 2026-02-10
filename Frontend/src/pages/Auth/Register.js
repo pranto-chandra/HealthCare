@@ -17,15 +17,16 @@ export default function Register() {
       const res = await register({ email, password, role });
       setLoading(false);
       if (res && res.status === 201) {
-        alert('Registration successful. Please login.');
-        navigate('/login');
+        alert("Registration successful. Please login.");
+        navigate("/login");
       } else {
-        alert('Registration submitted. Check backend response.');
+        alert("Registration submitted. Check backend response.");
       }
     } catch (err) {
       setLoading(false);
       const data = err?.response?.data || {};
-      const msg = data?.error || data?.message || err.message || 'Registration failed';
+      const msg =
+        data?.error || data?.message || err.message || "Registration failed";
       alert(`Error: ${msg}`);
     }
   };
@@ -34,7 +35,7 @@ export default function Register() {
     <div className="register-page">
       <div className="register-container">
         <h1>Create Account</h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center">
           <input
             type="email"
             placeholder="Email"
@@ -51,13 +52,38 @@ export default function Register() {
             required
           />
           <br />
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="
+            px-4 py-2
+            rounded-lg
+            border border-gray-300
+            bg-white
+            text-gray-700
+            focus:outline-none
+            focus:ring-2 focus:ring-purple-500
+            focus:border-purple-500
+            transition
+            duration-200
+            cursor-pointer
+            padding-2
+            flex
+            justify-center items-center
+            hover:bg-purple-100
+            w-4/12
+            font-semibold
+        "
+          >
             <option value="PATIENT">Patient</option>
             <option value="DOCTOR">Doctor</option>
             <option value="ADMIN">Admin</option>
           </select>
+
           <br />
-          <button type="submit" disabled={loading}>{loading ? 'Registering...' : 'Register'}</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Registering..." : "Register"}
+          </button>
         </form>
       </div>
     </div>
