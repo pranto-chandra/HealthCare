@@ -5,6 +5,9 @@ import { AuthContext } from "../context/AuthContext";
 export default function ProtectedRoute({ children, role }) {
   const { user } = useContext(AuthContext);
   if (!user) return <Navigate to="/login" replace />;
-  if (role && user.role !== role) return <Navigate to="/" replace />;
+  // Case-insensitive role check
+  if (role && user.role?.toUpperCase() !== role?.toUpperCase()) {
+    return <Navigate to="/" replace />;
+  }
   return children;
 }

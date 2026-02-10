@@ -20,6 +20,7 @@ import PrescriptionPage from "./pages/Doctor/Prescriptions";
 import ManageUsers from "./pages/Admin/ManageUsers";
 import Reports from "./pages/Admin/Reports";
 import Clinics from "./pages/Admin/Clinics";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
@@ -68,6 +69,9 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          
+          {/* Catch-all route for 404 - MUST be last */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
