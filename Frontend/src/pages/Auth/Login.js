@@ -12,8 +12,31 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password); // from AuthContext
-    navigate("/patient/dashboard");
+    try {
+      const ok = await login(email, password); // from AuthContext
+      if (ok) {
+        // Get user from localStorage to check role
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        const role = user?.role?.toUpperCase();
+        
+        // Redirect based on role
+        if (role === 'PATIENT') {
+          navigate('/patient/dashboard');
+        } else if (role === 'DOCTOR') {
+          navigate('/doctor/dashboard');
+        } else if (role === 'ADMIN') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/patient/dashboard'); // default fallback
+        }
+      } else {
+        alert('Login failed: invalid credentials');
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.error || err?.response?.data?.message || err.message || 'Login failed';
+      alert(`Error: ${msg}`);
+    }
   };
 
   return (

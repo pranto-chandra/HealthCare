@@ -1,4 +1,5 @@
 import './src/config/env.js';
+import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,7 +7,7 @@ import morgan from 'morgan';
 import { rateLimit } from 'express-rate-limit';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { prisma } from './src/config/db.js';
+import { prisma, connectDB } from './src/config/db.js';
 import { errorHandler } from './src/middlewares/errorHandler.js';
 import { logger } from './src/middlewares/logger.js';
 import routes from './src/routes/index.js';
@@ -37,6 +38,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API Routes
 app.use('/api', routes);
+
+// Health check
+app.get('/api/health', (req, res) => res.status(200).json({ status: 'ok' }));
+
+// Connect to database before starting server
+try {
+  await connectDB();
+} catch (err) {
+  console.error('Failed to connect to DB at startup:', err);
+  process.exit(1);
+}
 
 // Error Handler
 app.use(errorHandler);

@@ -11,14 +11,10 @@ export const validate = (req, res, next) => {
 
 export const userValidation = {
   register: [
-    body('firstName').trim().notEmpty().withMessage('First name is required'),
-    body('lastName').trim().notEmpty().withMessage('Last name is required'),
     body('email').isEmail().withMessage('Please provide a valid email'),
     body('password')
       .isLength({ min: 6 })
       .withMessage('Password must be at least 6 characters long'),
-    body('phone').trim().notEmpty().withMessage('Phone number is required'),
-    body('dateOfBirth').isISO8601().withMessage('Invalid date of birth'),
     body('role').isIn(['ADMIN', 'DOCTOR', 'PATIENT']).withMessage('Invalid role')
   ],
   

@@ -4,7 +4,7 @@ import { generateToken, generateRefreshToken } from '../utils/jwt.js';
 import { BadRequestError, UnauthorizedError } from '../utils/errors.js';
 
 export const register = async (req, res) => {
-  const { firstName, lastName, email, password, phone, dateOfBirth, role } = req.body;
+  const { email, password, role } = req.body;
 
   // Check if user exists
   const userExists = await prisma.user.findUnique({ where: { email } });
@@ -15,18 +15,46 @@ export const register = async (req, res) => {
   // Hash password
   const hashedPassword = await hashPassword(password);
 
-  // Create user
+  // Create user with default values for required fields
   const user = await prisma.user.create({
     data: {
-      firstName,
-      lastName,
+      firstName: 'User',
+      lastName: 'Account',
       email,
       password: hashedPassword,
-      phone,
-      dateOfBirth: new Date(dateOfBirth),
+      phone: 'N/A',
+      dateOfBirth: new Date('2000-01-01'),
       role
     }
   });
+
+  // Create role-specific entry
+  if (role === 'PATIENT') {
+    await prisma.patient.create({
+      data: {
+        userId: user.id,
+        bloodGroup: 'N/A',
+        gender: 'OTHER',
+        emergencyContact: 'N/A'
+      }
+    });
+  } else if (role === 'DOCTOR') {
+    await prisma.doctor.create({
+      data: {
+        userId: user.id,
+        specialization: 'General',
+        licenseNumber: 'N/A',
+        consultationFee: 0,
+        availableDays: '[]'
+      }
+    });
+  } else if (role === 'ADMIN') {
+    await prisma.admin.create({
+      data: {
+        userId: user.id
+      }
+    });
+  }
 
   // Generate tokens
   const accessToken = generateToken(user.id);

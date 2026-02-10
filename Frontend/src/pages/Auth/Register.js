@@ -1,13 +1,33 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Register.css";
+import { register } from "../../api/authApi";
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("PATIENT");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Registration submitted — connect backend later.");
+    setLoading(true);
+    try {
+      const res = await register({ email, password, role });
+      setLoading(false);
+      if (res && res.status === 201) {
+        alert('Registration successful. Please login.');
+        navigate('/login');
+      } else {
+        alert('Registration submitted. Check backend response.');
+      }
+    } catch (err) {
+      setLoading(false);
+      const data = err?.response?.data || {};
+      const msg = data?.error || data?.message || err.message || 'Registration failed';
+      alert(`Error: ${msg}`);
+    }
   };
 
   return (
@@ -31,7 +51,13 @@ export default function Register() {
             required
           />
           <br />
-          <button type="submit">Register</button>
+          <select value={role} onChange={(e) => setRole(e.target.value)}>
+            <option value="PATIENT">Patient</option>
+            <option value="DOCTOR">Doctor</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+          <br />
+          <button type="submit" disabled={loading}>{loading ? 'Registering...' : 'Register'}</button>
         </form>
       </div>
     </div>

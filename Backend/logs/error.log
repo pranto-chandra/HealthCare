@@ -1,0 +1,4 @@
+{"level":"error","message":"Error: Invalid credentials\n    at login (file:///D:/Web%20Engineering/HealthCare/Backend/src/controllers/authController.js:65:11)","timestamp":"2026-02-09T08:28:45.928Z"}
+{"level":"error","message":"Error: Invalid credentials\n    at login (file:///D:/Web%20Engineering/HealthCare/Backend/src/controllers/authController.js:65:11)","timestamp":"2026-02-09T08:28:56.047Z"}
+{"level":"error","message":"Error: Invalid credentials\n    at login (file:///D:/Web%20Engineering/HealthCare/Backend/src/controllers/authController.js:59:11)","timestamp":"2026-02-10T01:55:37.540Z"}
+{"level":"error","message":"Error: Invalid credentials\n    at login (file:///D:/Web%20Engineering/HealthCare/Backend/src/controllers/authController.js:93:11)","timestamp":"2026-02-10T02:29:25.375Z"}
