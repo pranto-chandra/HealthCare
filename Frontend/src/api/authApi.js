@@ -13,4 +13,8 @@ export async function login(payload) {
   return API.post('/auth/login', payload);
 }
 
-export default { register, login };
+export async function logout() {
+  return API.post('/auth/logout');
+}
+
+export default { register, login, logout };

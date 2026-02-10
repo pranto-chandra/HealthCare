@@ -1,8 +1,17 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import "./Navbar.css";
 
 export default function Navbar() {
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
+
   return (
     <header className="navbar">
       <div className="navbar__logo">
@@ -14,7 +23,11 @@ export default function Navbar() {
         <Link to="/">Location</Link>
         <Link to="/">Blogs</Link>
         <Link to="/">Contact</Link>
-        <Link to="/login" className="login-link">Login</Link>
+        {user ? (
+          <button className="login-link" onClick={handleLogout}>Logout</button>
+        ) : (
+          <Link to="/login" className="login-link">Login</Link>
+        )}
       </nav>
 
       <button className="navbar__button">Book Appointment</button>

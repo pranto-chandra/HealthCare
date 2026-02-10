@@ -1,5 +1,5 @@
 import React, { createContext, useState } from "react";
-import { login as apiLogin } from "../api/authApi";
+import { login as apiLogin, logout as apiLogout } from "../api/authApi";
 
 export const AuthContext = createContext();
 
@@ -34,15 +34,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await apiLogout();
+    } catch (err) {
+      // ignore network errors — still clear client state
+    }
+
     setUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
   };
 
+  const updateUser = (newUser) => {
+    setUser(newUser);
+    if (newUser) {
+      localStorage.setItem("user", JSON.stringify(newUser));
+    } else {
+      localStorage.removeItem("user");
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

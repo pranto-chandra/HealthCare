@@ -1,5 +1,6 @@
 import express from 'express';
 import authRoutes from './authRoutes.js';
+import userRoutes from './userRoutes.js';
 import patientRoutes from './patientRoutes.js';
 import doctorRoutes from './doctorRoutes.js';
 import adminRoutes from './adminRoutes.js';
@@ -9,6 +10,7 @@ import labTestRoutes from './labTestRoutes.js';
 const router = express.Router();
 
 router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
 router.use('/patients', patientRoutes);
 router.use('/doctors', doctorRoutes);
 router.use('/admin', adminRoutes);

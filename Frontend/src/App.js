@@ -21,6 +21,9 @@ import ManageUsers from "./pages/Admin/ManageUsers";
 import Reports from "./pages/Admin/Reports";
 import Clinics from "./pages/Admin/Clinics";
 import NotFound from "./pages/NotFound";
+import PatientEdit from "./pages/Patient/EditProfile";
+import DoctorEdit from "./pages/Doctor/EditProfile";
+import AdminEdit from "./pages/Admin/EditProfile";
 
 export default function App() {
   return (
@@ -43,7 +46,9 @@ export default function App() {
           <Route path="/admin/manage" element={<ManageUsers/>}/>
           <Route path="/admin/reports" element={<Reports/>}/>
           <Route path="/admin/clinics" element={<Clinics/>}/>
-
+          <Route path="/patient/editprofile" element={<PatientEdit/>}/>
+          <Route path="/doctor/editprofile" element={<DoctorEdit/>}/>
+          <Route path="/admin/editprofile" element={<AdminEdit/>}/>
 
           <Route
             path="/patient/dashboard"

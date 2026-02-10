@@ -9,18 +9,21 @@ export default function Sidebar({ role, isOpen }) {
       { path: "/patient/appointments", label: "Appointments" },
       { path: "/patient/prescriptions", label: "Prescriptions" },
       { path: "/patient/health", label: "Health Monitoring" },
+      { path: "/patient/editprofile", label: "Edit Profile" },
     ],
     Doctor: [
       { path: "/doctor", label: "Dashboard" },
       { path: "/doctor/appointments", label: "Appointments" },
       { path: "/doctor/patients", label: "Patient Records" },
       { path: "/doctor/prescriptions", label: "Prescriptions" },
+      { path: "/doctor/editprofile", label: "Edit Profile" }, 
     ],
     Admin: [
       { path: "/admin", label: "Dashboard" },
       { path: "/admin/manage", label: "Manage Users" },
       { path: "/admin/reports", label: "Reports" },
       { path: "/admin/clinics", label: "Clinics" },
+      { path: "/admin/editprofile", label: "Edit Profile" },
     ],
   };
 
@@ -39,6 +42,9 @@ export default function Sidebar({ role, isOpen }) {
               </Link>
             </li>
           ))}
+          <li>
+            <Link to="/profile/edit" className="sidebar-link">Edit Profile</Link>
+          </li>
         </ul>
       </nav>
     </aside>
