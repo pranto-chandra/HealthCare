@@ -19,6 +19,7 @@ export default function Navbar() {
       </div>
 
       <nav className="navbar__links hover:no-underline">
+        <Link to="/" className="hover:no-underline">Home</Link>
         <Link to="/about" className="hover:no-underline">About Us</Link>
         <Link to="/location" className="hover:no-underline">Location</Link>
         <Link to="/blogs" className="hover:no-underline">Blogs</Link>

@@ -1,9 +1,9 @@
 import React from "react";
 
 // Example images (replace paths with your actual image imports if needed)
-// import blog1 from "../images/blog-heart.jpg";
-// import blog2 from "../images/blog-brain.jpg";
-// import blog3 from "../images/blog-lifestyle.jpg";
+import blog1 from "./images/blog-heart.jpg";
+import blog2 from "./images/blog-brain.jpg";
+import blog3 from "./images/blog-lifestyle.jpg";
 
 export default function Blogs() {
   const blogs = [
@@ -11,25 +11,25 @@ export default function Blogs() {
       title: "Heart Health: Tips for a Stronger Life",
       description:
         "Learn how daily habits, diet, and exercise can significantly improve your heart health.",
-      //image: blog1,
-      date: "March 5, 2026",
+      image: blog1,
+      date: "January 15, 2026",
       link: "https://www.uclahealth.org/news/article/10-tips-better-heart-health",
     },
     {
       title: "Understanding Brain Health",
       description:
         "Explore how sleep, mental exercises, and stress management impact brain function.",
-      // image: blog2,
-      date: "February 20, 2026",
-      link: "https://www.health.harvard.edu/mind-and-mood/ways-to-protect-your-brain-health",
+       image: blog2,
+      date: "March 16, 2023",
+      link: "https://cmha.ca/news/understanding-brain-health-and-its-connection-to-mental-well-being/",
     },
     {
       title: "Healthy Lifestyle for a Better Tomorrow",
       description:
         "Small lifestyle changes that can lead to long-term health benefits.",
-      // image: blog3,
-      date: "February 10, 2026",
-      link: "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+      image: blog3,
+      date: "September 24, 2014",
+      link: "https://www.health.harvard.edu/staying-healthy/7-easy-things-you-can-do-today-for-a-healthier-tomorrow",
     },
   ];
 
@@ -56,11 +56,11 @@ export default function Blogs() {
             >
               {/* Image */}
               <div className="h-48 bg-gray-200">
-                {/* <img
+                <img
                   src={blog.image}
                   alt={blog.title}
                   className="w-full h-full object-cover"
-                /> */}
+                />
               </div>
 
               {/* Content */}
