@@ -15,23 +15,47 @@ export default function Navbar() {
   return (
     <header className="navbar font-semibold">
       <div className="navbar__logo">
-        <h2>ORGANIC<span> HEALTHCARE</span></h2>
+        <h2>
+          ORGANIC<span> HEALTHCARE</span>
+        </h2>
       </div>
 
       <nav className="navbar__links hover:no-underline">
-        <Link to="/" className="hover:no-underline">Home</Link>
-        <Link to="/about" className="hover:no-underline">About Us</Link>
-        <Link to="/location" className="hover:no-underline">Location</Link>
-        <Link to="/blogs" className="hover:no-underline">Blogs</Link>
-        <Link to="/contact" className="hover:no-underline">Contact</Link>
+        <Link to="/" className="hover:no-underline">
+          Home
+        </Link>
+        <Link to="/about" className="hover:no-underline">
+          About Us
+        </Link>
+        <Link to="/location" className="hover:no-underline">
+          Location
+        </Link>
+        <Link to="/blogs" className="hover:no-underline">
+          Blogs
+        </Link>
+        <Link to="/contact" className="hover:no-underline">
+          Contact
+        </Link>
         {user ? (
-          <button className="login-link hover:no-underline" onClick={handleLogout}>Logout</button>
+          <button
+            className="login-link hover:no-underline"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
         ) : (
-          <Link to="/login" className="login-link hover:no-underline">Login</Link>
+          <Link to="/login" className="login-link hover:no-underline">
+            Login
+          </Link>
         )}
       </nav>
 
-      <button className="navbar__button font-semibold">Book Appointment</button>
+      <Link
+        to="/book-appointment"
+        className="navbar__button font-semibold hover:no-underline"
+      >
+        Book Appointment
+      </Link>
     </header>
   );
 }

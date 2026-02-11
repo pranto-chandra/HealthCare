@@ -12,7 +12,7 @@ export default function Sidebar({ role, isOpen }) {
       { path: "/patient/editprofile", label: "Edit Profile" },
     ],
     Doctor: [
-      { path: "/doctor", label: "Dashboard" },
+      { path: "/doctor/dashboard", label: "Dashboard" },
       { path: "/doctor/appointments", label: "Appointments" },
       { path: "/doctor/patients", label: "Patient Records" },
       { path: "/doctor/prescriptions", label: "Prescriptions" },

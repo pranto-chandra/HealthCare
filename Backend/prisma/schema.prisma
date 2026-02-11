@@ -73,6 +73,8 @@ model Doctor {
   userId          String    @unique
   specialization  String
   licenseNumber   String    @unique
+  qualifications  String    @default("[]")  // JSON string of qualifications
+  experience      Int       @default(0)      // Years of experience
   consultationFee Decimal
   availableDays   String    // JSON string of available days
 

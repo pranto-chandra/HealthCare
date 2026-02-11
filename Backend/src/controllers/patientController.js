@@ -9,7 +9,7 @@ export const createPatient = async (req, res) => {
       userId: req.user.id,
       bloodGroup,
       gender,
-      emergencyContact
+      emergencyContact,
     },
     include: {
       user: {
@@ -18,15 +18,15 @@ export const createPatient = async (req, res) => {
           lastName: true,
           email: true,
           phone: true,
-          dateOfBirth: true
-        }
-      }
-    }
+          dateOfBirth: true,
+        },
+      },
+    },
   });
 
   res.status(201).json({
     success: true,
-    data: patient
+    data: patient,
   });
 };
 
@@ -40,10 +40,10 @@ export const getPatient = async (req, res) => {
           lastName: true,
           email: true,
           phone: true,
-          dateOfBirth: true
-        }
-      }
-    }
+          dateOfBirth: true,
+        },
+      },
+    },
   });
 
   if (!patient) {
@@ -52,7 +52,33 @@ export const getPatient = async (req, res) => {
 
   res.json({
     success: true,
-    data: patient
+    data: patient,
+  });
+};
+
+export const getPatientByUserId = async (req, res) => {
+  const patient = await prisma.patient.findUnique({
+    where: { userId: req.params.userId },
+    include: {
+      user: {
+        select: {
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          dateOfBirth: true,
+        },
+      },
+    },
+  });
+
+  if (!patient) {
+    throw new NotFoundError('Patient not found');
+  }
+
+  res.json({
+    success: true,
+    data: patient,
   });
 };
 
@@ -64,7 +90,7 @@ export const updatePatient = async (req, res) => {
     data: {
       bloodGroup,
       gender,
-      emergencyContact
+      emergencyContact,
     },
     include: {
       user: {
@@ -73,15 +99,15 @@ export const updatePatient = async (req, res) => {
           lastName: true,
           email: true,
           phone: true,
-          dateOfBirth: true
-        }
-      }
-    }
+          dateOfBirth: true,
+        },
+      },
+    },
   });
 
   res.json({
     success: true,
-    data: patient
+    data: patient,
   });
 };
 
@@ -94,18 +120,18 @@ export const getPatientHistory = async (req, res) => {
           user: {
             select: {
               firstName: true,
-              lastName: true
-            }
-          }
-        }
-      }
+              lastName: true,
+            },
+          },
+        },
+      },
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
   });
 
   res.json({
     success: true,
-    data: history
+    data: history,
   });
 };
 
@@ -114,7 +140,7 @@ export const createAppointment = async (req, res) => {
 
   // Check if doctor exists
   const doctor = await prisma.doctor.findUnique({
-    where: { id: doctorId }
+    where: { id: doctorId },
   });
 
   if (!doctor) {
@@ -127,7 +153,7 @@ export const createAppointment = async (req, res) => {
       doctorId,
       appointmentDate: new Date(appointmentDate),
       appointmentType,
-      status
+      status,
     },
     include: {
       doctor: {
@@ -135,17 +161,17 @@ export const createAppointment = async (req, res) => {
           user: {
             select: {
               firstName: true,
-              lastName: true
-            }
-          }
-        }
-      }
-    }
+              lastName: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   res.status(201).json({
     success: true,
-    data: appointment
+    data: appointment,
   });
 };
 
@@ -158,17 +184,17 @@ export const getAppointments = async (req, res) => {
           user: {
             select: {
               firstName: true,
-              lastName: true
-            }
-          }
-        }
-      }
+              lastName: true,
+            },
+          },
+        },
+      },
     },
-    orderBy: { appointmentDate: 'desc' }
+    orderBy: { appointmentDate: 'desc' },
   });
 
   res.json({
     success: true,
-    data: appointments
+    data: appointments,
   });
 };

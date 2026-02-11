@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./Landing.css";
 import chairmanImage from "./images/Chairman-removebg-preview.png";
 import cardiacImage from "./images/Cardiac.jpg";
@@ -9,6 +10,18 @@ import dermaImage from "./images/Dermatology.jpg";
 import peditricImage from "./images/pediatrics.jpg";
 
 export default function Landing() {
+  const navigate = useNavigate();
+  const [showDermatologyOptions, setShowDermatologyOptions] = React.useState(false);
+
+  const handleDermatologyClick = () => {
+    setShowDermatologyOptions(!showDermatologyOptions);
+  };
+
+  const navigateToDermatology = (specialization) => {
+    navigate(`/doctors/${encodeURIComponent(specialization)}`);
+    setShowDermatologyOptions(false);
+  };
+
   return (
     <div className="dashboard">
       {/* --- Hero Section --- */}
@@ -50,46 +63,165 @@ export default function Landing() {
         <div className="dept-grid">
           {[
             {
-              title: "Cardiac",
-              text: "We've been at the forefront of heart care for 24+ years, combining advanced technology with expert treatment.",
-              img: cardiacImage,
-            },
-            {
-              title: "Neurology",
-              text: "Expert neurological treatment and brain diagnostics with cutting-edge imaging systems.",
-              img: neuroImage,
-
-            },
-            {
-              title: "Orthopedics",
-              text: "Comprehensive joint and bone care from trusted specialists.",
-              img: orthoImage,
-            },
-            {
-              title: "Pediatrics",
-              text: "Holistic healthcare for children of all ages with compassion and precision.",
-              img: peditricImage,
-            },
-            {
-              title: "Dental",
-              text: "Modern dental care and cosmetic treatments ensuring perfect smiles.",
-              img: dentalImage,
-            },
-            {
-              title: "Dermatology",
-              text: "Skin health and aesthetic care using the latest dermatological advances.",
-              img: dermaImage,
-            },
+    title: "Cardiology",
+    text: "Advanced cardiac care with modern diagnostics and experienced cardiologists.",
+    img: cardiacImage,
+  },
+  {
+    title: "Neurosurgery",
+    text: "Expert neurological treatment and brain diagnostics with cutting-edge imaging systems.",
+    img: neuroImage,
+  },
+  {
+    title: "Orthopaedics",
+    text: "Comprehensive joint and bone care from trusted specialists.",
+    img: orthoImage,
+  },
+  {
+    title: "Pediatrics",
+    text: "Holistic healthcare for children of all ages with compassion and precision.",
+    img: peditricImage,
+  },
+  {
+    title: "Dentistry",
+    text: "Modern dental care and cosmetic treatments ensuring perfect smiles.",
+    img: dentalImage,
+  },
+  {
+    title: "Dermatology and Venerology",
+    text: "Advanced skin health and aesthetic dermatological and venereal treatments.",
+    img: dermaImage,
+    subSpecializations: [
+      "Skin-V.D-Allergy-Dermato-Laser-Dermato-Surgery and Cosmetic Dermatology",
+      "Skin & Venereal Diseases"
+    ]
+  },
+  {
+    title: "ENT",
+    text: "Specialized care for ear, nose, and throat disorders.",
+    //img: entImage,
+  },
+  {
+    title: "Gynaecology & Obstetrics",
+    text: "Comprehensive women’s health and maternity care services.",
+    //img: gynaeImage,
+  },
+  {
+    title: "Oncology",
+    text: "Integrated cancer care with modern diagnostic and treatment facilities.",
+    //img: oncologyImage,
+  },
+  {
+    title: "Nephrology",
+    text: "Specialized kidney care including dialysis and transplant support.",
+    //img: nephroImage,
+  },
+  {
+    title: "Urology",
+    text: "Diagnosis and treatment of urinary tract and male reproductive conditions.",
+    //img: urologyImage,
+  },
+  {
+    title: "Psychiatry",
+    text: "Comprehensive mental health care with confidentiality and compassion.",
+    //img: psychImage,
+  },
+  {
+    title: "Hepatology",
+    text: "Expert diagnosis and treatment of liver-related diseases.",
+    //img: gastroImage,
+  },
+  {
+    title: "Rheumatology",
+    text: "Specialized care for arthritis and autoimmune disorders.",
+    //img: rheumaImage,
+  },
+  {
+    title: "Respiratory Medicine",
+    text: "Advanced treatment for lung and breathing disorders.",
+    //img: respiratoryImage,
+  },
+  {
+    title: "General Surgery",
+    text: "Safe and effective surgical procedures across multiple specialties.",
+    //img: surgeryImage,
+  },
+  {
+    title: "Burn & Plastic Surgery",
+    text: "Reconstructive and cosmetic surgery with advanced techniques.",
+    //img: plasticImage,
+  },
+  {
+    title: "Colorectal Surgery",
+    text: "Specialized surgical care for colorectal diseases.",
+    //img: colorectalImage,
+  },
+  {
+    title: "Laparoscopic Surgery",
+    text: "Minimally invasive surgeries for faster recovery.",
+    //img: laparoscopicImage,
+  },
+  {
+    title: "Endocrinology",
+    text: "Diagnosis and treatment of hormonal and metabolic disorders.",
+    //img: endocrineImage,
+  },
+  {
+    title: "Physical Medicine",
+    text: "Rehabilitation services for recovery and mobility improvement.",
+    //img: physicalImage,
+  },
+  {
+    title: "Surgical Oncology",
+    text: "Surgical treatment and management of cancer cases.",
+    //img: surgicalOncologyImage,
+  },
           ].map((item, i) => (
-            <div className="dept-card" key={i}>
-              <div className="dept-img">
-                <img src={item.img} alt={item.title} />
+            item.subSpecializations ? (
+              <div key={i} className="dept-card-container">
+                <div 
+                  className="dept-card"
+                  onClick={handleDermatologyClick}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="dept-img">
+                    <img src={item.img} alt={item.title} />
+                  </div>
+                  <div className="dept-text">
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                  </div>
+                </div>
+                {showDermatologyOptions && (
+                  <div className="sub-specializations">
+                    {item.subSpecializations.map((spec, idx) => (
+                      <button
+                        key={idx}
+                        className="sub-spec-btn"
+                        onClick={() => navigateToDermatology(spec)}
+                      >
+                        {spec}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="dept-text">
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
+            ) : (
+              <div 
+                className="dept-card" 
+                key={i}
+                onClick={() => navigate(`/doctors/${encodeURIComponent(item.title)}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="dept-img">
+                  <img src={item.img} alt={item.title} />
+                </div>
+                <div className="dept-text">
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
               </div>
-            </div>
+            )
           ))}
         </div>
       </section>
