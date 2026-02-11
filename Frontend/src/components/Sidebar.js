@@ -5,7 +5,7 @@ import "./Sidebar.css";
 export default function Sidebar({ role, isOpen }) {
   const links = {
     Patient: [
-      { path: "/patient", label: "Dashboard" },
+      { path: "/patient/dashboard", label: "Dashboard" },
       { path: "/patient/appointments", label: "Appointments" },
       { path: "/patient/prescriptions", label: "Prescriptions" },
       { path: "/patient/health", label: "Health Monitoring" },
@@ -19,7 +19,7 @@ export default function Sidebar({ role, isOpen }) {
       { path: "/doctor/editprofile", label: "Edit Profile" }, 
     ],
     Admin: [
-      { path: "/admin", label: "Dashboard" },
+      { path: "/admin/dashboard", label: "Dashboard" },
       { path: "/admin/manage", label: "Manage Users" },
       { path: "/admin/reports", label: "Reports" },
       { path: "/admin/clinics", label: "Clinics" },
