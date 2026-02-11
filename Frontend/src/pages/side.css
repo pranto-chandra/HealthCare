@@ -1,0 +1,18 @@
+/* Sidebar toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}

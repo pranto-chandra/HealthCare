@@ -1,13 +1,37 @@
-import React from "react";
+import React, { useState, useContext} from "react";
+import Sidebar from "../components/Sidebar";
+import { AuthContext } from "../context/AuthContext";
+
 import facebookImage from "./images/facebook.png";
 import instaImage from "./images/insta.png";
 import twitterImage from "./images/x.png";
 import linkedinImage from "./images/linkedin.png";
 
 export default function Contact() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { user } = useContext(AuthContext);
+  const role = user?.role; // Patient | Doctor | Admin
+  const normalizedRole = user?.role
+  ? user.role.toLowerCase().charAt(0).toUpperCase() +
+    user.role.toLowerCase().slice(1)
+  : null;
+
+  console.log("User role:", user?.role);
+  console.log("Normalized role:", normalizedRole);
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="border border-gray-200 rounded-lg shadow-lg p-6 w-full max-w-4xl flex flex-col justify-center items-center">
+      
+      {/* Toggle Button */}
+      <button
+        className="sidebar-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
+      
+
+      <div className={`border border-gray-200 rounded-lg shadow-lg p-6 w-full max-w-4xl flex flex-col justify-center items-center ${isSidebarOpen ? "" : "collapsed"}`}>
+        {isSidebarOpen && <Sidebar role={normalizedRole} />}
         <div>
             <h1 className="text-3xl font-bold text-center text-teal-800 mb-2">
                 Contact Us
