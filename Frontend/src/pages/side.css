@@ -1,4 +1,24 @@
-/* Sidebar toggle */
+.side-layout{
+   display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.side-content {
+  flex: 1;
+  padding: 0px;
+  margin-left: 170px;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar-open .side-content {
+  margin-left: 300px; /* Adjust based on sidebar width */
+}
+
+.side-layout.collapsed .side-content {
+  margin-left: 0 !important;
+}
+
+
 .sidebar-toggle {
   position: fixed;
   top: 80px;
@@ -7,12 +27,17 @@
   background-color: #004d40;
   color: white;
   border: none;
-  padding: 8px 12px;
   font-size: 22px;
+  padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
+  transition: 0.3s ease;
 }
 
 .sidebar-toggle:hover {
   background-color: #00695c;
+}
+
+.sidebar-open .sidebar-toggle {
+  left: 170px; /* Stay visible when sidebar is open */
 }

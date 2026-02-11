@@ -5,6 +5,50 @@
   padding: 20px;
 }
 
+.book-layout{
+   display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.book-content {
+  flex: 1;
+  padding: 0px;
+  margin-left: 170px;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar-open .book-content {
+  margin-left: 300px; /* Adjust based on sidebar width */
+}
+
+.book-layout.collapsed .book-content {
+  margin-left: 0 !important;
+}
+
+
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  font-size: 22px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}
+
+.sidebar-open .sidebar-toggle {
+  left: 170px; /* Stay visible when sidebar is open */
+}
+
 /* Header */
 .ba-header {
   text-align: center;

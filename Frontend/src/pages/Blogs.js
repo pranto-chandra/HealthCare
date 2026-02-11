@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState, useContext} from "react";
+import Sidebar from "../components/Sidebar";
+import { AuthContext } from "../context/AuthContext";
 
 // Example images (replace paths with your actual image imports if needed)
 import blog1 from "./images/blog-heart.jpg";
@@ -6,6 +8,13 @@ import blog2 from "./images/blog-brain.jpg";
 import blog3 from "./images/blog-lifestyle.jpg";
 
 export default function Blogs() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const { user } = useContext(AuthContext);
+    const role = user?.role; // Patient | Doctor | Admin
+    const normalizedRole = user?.role
+    ? user.role.toLowerCase().charAt(0).toUpperCase() +
+      user.role.toLowerCase().slice(1)
+    : null;
   const blogs = [
     {
       title: "Heart Health: Tips for a Stronger Life",
@@ -35,7 +44,15 @@ export default function Blogs() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-6">
-      <div className="max-w-6xl mx-auto">
+       {/* Toggle Button */}
+      <button
+        className="sidebar-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
+      <div className={`max-w-6xl mx-auto ${isSidebarOpen ? "" : "collapsed"}`}>
+        {isSidebarOpen && <Sidebar role={normalizedRole} />}
         {/* Page Header */}
         <h1 className="text-4xl font-bold text-center text-teal-800 mb-4">
           Health Blogs

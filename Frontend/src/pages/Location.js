@@ -1,9 +1,30 @@
-import React from "react";
+import React, { useState, useContext} from "react";
+import Sidebar from "../components/Sidebar";
+import { AuthContext } from "../context/AuthContext";
+import "./side.css";
 
 export default function Location() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { user } = useContext(AuthContext);
+  const role = user?.role; // Patient | Doctor | Admin
+  const normalizedRole = user?.role
+  ? user.role.toLowerCase().charAt(0).toUpperCase() +
+    user.role.toLowerCase().slice(1)
+  : null;
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Header */}
+       {/* Toggle Button */}
+      <button
+        className="sidebar-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
+    <div className={`side-layout ${isSidebarOpen ? "" : "collapsed"}`}>
+      {isSidebarOpen && <Sidebar role={normalizedRole} />}
+      
+      <main className="side-content">
+        {/* Header */}
       <section className="bg-teal-700 text-white py-20 text-center">
         <h1 className="text-4xl font-bold mb-4">Our Location</h1>
         <p className="text-teal-100">
@@ -50,6 +71,9 @@ export default function Location() {
           ></iframe>
         </div>
       </section>
+      </main>
+    </div>
+      
     </div>
   );
 }

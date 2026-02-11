@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState, useContext} from "react";
+import Sidebar from "../components/Sidebar";
+import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./Landing.css";
 import chairmanImage from "./images/Chairman-removebg-preview.png";
@@ -10,6 +12,13 @@ import dermaImage from "./images/Dermatology.jpg";
 import peditricImage from "./images/pediatrics.jpg";
 
 export default function Landing() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { user } = useContext(AuthContext);
+  const role = user?.role; // Patient | Doctor | Admin
+  const normalizedRole = user?.role
+  ? user.role.toLowerCase().charAt(0).toUpperCase() +
+    user.role.toLowerCase().slice(1)
+  : null;
   const navigate = useNavigate();
   const [showDermatologyOptions, setShowDermatologyOptions] = React.useState(false);
 
@@ -24,6 +33,14 @@ export default function Landing() {
 
   return (
     <div className="dashboard">
+       {/* Toggle Button */}
+      <button
+        className="sidebar-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
+       {isSidebarOpen && <Sidebar role={normalizedRole} />}
       {/* --- Hero Section --- */}
       <section className="hero">
         <div className="hero-content">

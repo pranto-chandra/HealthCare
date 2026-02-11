@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext, useEffect} from "react";
+import Sidebar from "../../components/Sidebar";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import appointmentApi from "../../api/appointmentApi";
@@ -12,8 +13,14 @@ import {
 import "./BookAppointment.css";
 
 export default function BookAppointment() {
-  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { user } = useContext(AuthContext);
+  const role = user?.role; // Patient | Doctor | Admin
+  const normalizedRole = user?.role
+  ? user.role.toLowerCase().charAt(0).toUpperCase() +
+    user.role.toLowerCase().slice(1)
+  : null;
+  const navigate = useNavigate();
 
   // State for filters and search
   const [searchTerm, setSearchTerm] = useState("");
@@ -247,7 +254,19 @@ export default function BookAppointment() {
 
   return (
     <div className="book-appointment-page">
-      {/* Header */}
+       {/* Toggle Button */}
+      <button
+        className="sidebar-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
+
+      <div className={`book-layout ${isSidebarOpen ? "" : "collapsed"}`}>
+        {isSidebarOpen && <Sidebar role={normalizedRole} />}
+
+        <main className="book-content">
+           {/* Header */}
       <div className="ba-header">
         <h1>Book an Appointment</h1>
         <p>Find and book an appointment with our healthcare professionals</p>
@@ -456,6 +475,10 @@ export default function BookAppointment() {
           </div>
         </div>
       )}
+        </main>
+       
+      </div>  
+      
     </div>
   );
 }
