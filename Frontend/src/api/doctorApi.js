@@ -45,6 +45,10 @@ export const doctorApi = {
       `/doctors/specialization/${encodeURIComponent(specialization)}`,
     );
   },
+  // Get all doctors (public)
+  getAllDoctors: () => {
+    return apiClient.get(`/doctors`);
+  },
 };
 
 export default doctorApi;

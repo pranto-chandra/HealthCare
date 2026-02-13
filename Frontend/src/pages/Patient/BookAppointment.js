@@ -7,8 +7,6 @@ import doctorApi from "../../api/doctorApi";
 import patientApi from "../../api/patientApi";
 import {
   getErrorMessage,
-  parseQualifications,
-  parseAvailableDays,
 } from "../../utils/helpers";
 import "./BookAppointment.css";
 
@@ -43,7 +41,7 @@ export default function BookAppointment() {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentType, setAppointmentType] = useState(
-    "General Consultation",
+    "ONLINE",
   );
   const [isBooking, setIsBooking] = useState(false);
 
@@ -85,81 +83,27 @@ export default function BookAppointment() {
         setLoading(true);
         setError("");
 
-        // Fetch all doctors from the public endpoint (available per specialization)
-        const specializations = [
-          "Cardiology",
-          "Neurosurgery",
-          "Orthopaedics",
-          "Pediatrics",
-          "Dentistry",
-          "Dermatology and Venerology",
-          "Skin-V.D-Allergy-Dermato-Laser-Dermato-Surgery and Cosmetic Dermatology",
-          "Skin & Venereal Diseases",
-          "ENT",
-          "Gynaecology & Obstetrics",
-          "Oncology",
-          "Nephrology",
-          "Urology",
-          "Psychiatry",
-          "Hepatology",
-          "Rheumatology",
-          "Respiratory Medicine",
-          "General Surgery",
-          "Burn & Plastic Surgery",
-          "Colorectal Surgery",
-          "Laparoscopic Surgery",
-          "Endocrinology",
-          "Physical Medicine",
-          "Surgical Oncology",
-        ];
+        // Primary source: get all doctors from public endpoint
+        const res = await doctorApi.getAllDoctors();
+        const allDoctors = res?.data?.data || [];
 
-        let allDoctors = [];
-        const qualSet = new Set();
+        // Build sets for specialties and degrees for filters
+        const specialitySet = new Set();
+        const degreeSet = new Set();
 
-        for (const spec of specializations) {
-          try {
-            const res = await doctorApi.getDoctorsBySpecialization(spec);
-            if (res?.data?.data) {
-              const docsWithSpec = res.data.data.map((doc) => ({
-                ...doc,
-                specialization: spec,
-              }));
-              allDoctors = [...allDoctors, ...docsWithSpec];
-
-              // Extract qualifications
-              if (res.data.data.length > 0) {
-                res.data.data.forEach((doc) => {
-                  if (doc.qualifications) {
-                    const quals = parseQualifications(doc.qualifications);
-                    quals.forEach((q) => qualSet.add(q));
-                  }
-                });
-              }
-            }
-          } catch (err) {
-            // Continue with next specialization if one fails
-          }
-        }
-
-        // Remove duplicates based on userId
-        const uniqueDoctors = [];
-        const seenUserIds = new Set();
         allDoctors.forEach((doc) => {
-          if (!seenUserIds.has(doc.userId)) {
-            uniqueDoctors.push(doc);
-            seenUserIds.add(doc.userId);
+          if (doc.specialties && Array.isArray(doc.specialties)) {
+            doc.specialties.forEach((s) => s?.name && specialitySet.add(s.name));
+          }
+          if (doc.degrees && Array.isArray(doc.degrees)) {
+            doc.degrees.forEach((d) => d?.name && degreeSet.add(d.name));
           }
         });
 
-        setDoctors(uniqueDoctors);
-        setFilteredDoctors(uniqueDoctors);
-        setQualifications(Array.from(qualSet).sort());
-
-        // Extract unique specializations
-        const uniqueSpecs = [
-          ...new Set(uniqueDoctors.map((d) => d.specialization)),
-        ].sort();
-        setSpecializations(uniqueSpecs);
+        setDoctors(allDoctors);
+        setFilteredDoctors(allDoctors);
+        setQualifications(Array.from(degreeSet).sort());
+        setSpecializations(Array.from(specialitySet).sort());
       } catch (err) {
         setError(getErrorMessage(err));
         console.error("Error fetching doctors:", err);
@@ -184,18 +128,19 @@ export default function BookAppointment() {
       });
     }
 
-    // Filter by specialization
+    // Filter by specialization - check if any of doctor's specialties match
     if (specializationFilter) {
-      filtered = filtered.filter(
-        (doc) => doc.specialization === specializationFilter,
-      );
+      filtered = filtered.filter((doc) => {
+        if (!doc.specialties || !Array.isArray(doc.specialties)) return false;
+        return doc.specialties.some(spec => spec.name === specializationFilter);
+      });
     }
 
-    // Filter by qualification
+    // Filter by qualification/degree
     if (qualificationFilter) {
       filtered = filtered.filter((doc) => {
-        const quals = parseQualifications(doc.qualifications);
-        return quals.includes(qualificationFilter);
+        if (!doc.degrees || !Array.isArray(doc.degrees)) return false;
+        return doc.degrees.some(deg => deg.name === qualificationFilter);
       });
     }
 
@@ -235,7 +180,7 @@ export default function BookAppointment() {
   const closeModal = () => {
     setSelectedDoctor(null);
     setAppointmentDate("");
-    setAppointmentType("General Consultation");
+    setAppointmentType("ONLINE");
     setBookingError("");
   };
 
@@ -361,39 +306,44 @@ export default function BookAppointment() {
               <div key={doctor.id} className="doctor-card">
                 <div className="doctor-info">
                   <h3>{`Dr. ${doctor.name}`}</h3>
-                  <p className="specialization">{doctor.specialization}</p>
 
-                  {doctor.qualifications && (
+                  {doctor.specialties && doctor.specialties.length > 0 && (
+                    <p className="specialization">
+                      {doctor.specialties.map(s => s.name).join(", ")}
+                    </p>
+                  )}
+
+                  {doctor.degrees && doctor.degrees.length > 0 && (
                     <div className="qualifications">
-                      <strong>Qualifications:</strong>
+                      <strong>Degrees:</strong>
                       <ul>
-                        {parseQualifications(doctor.qualifications).map(
-                          (qual, idx) => (
-                            <li key={idx}>{qual}</li>
-                          ),
-                        )}
+                        {doctor.degrees.map((deg, idx) => (
+                          <li key={idx}>
+                            {deg.name}
+                            {deg.passingYear && ` (${deg.passingYear})`}
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   )}
 
-                  {doctor.experience && (
+                  {doctor.experienceYears !== undefined && (
                     <p className="experience">
-                      <strong>Experience:</strong> {doctor.experience} years
+                      <strong>Experience:</strong> {doctor.experienceYears} years
                     </p>
                   )}
 
-                  <p className="fee">
-                    <strong>Consultation Fee:</strong> Rs.{" "}
-                    {doctor.consultationFee}
-                  </p>
+                  {doctor.consultationFee !== undefined && (
+                    <p className="fee">
+                      <strong>Consultation Fee:</strong> Rs.{" "}
+                      {doctor.consultationFee}
+                    </p>
+                  )}
 
-                  {doctor.availableDays && (
-                    <div className="available-days">
-                      <strong>Available:</strong>
-                      <p>
-                        {parseAvailableDays(doctor.availableDays).join(", ")}
-                      </p>
-                    </div>
+                  {doctor.locationDiv && (
+                    <p className="location">
+                      <strong>Location:</strong> {doctor.locationDiv}
+                    </p>
                   )}
                 </div>
 
@@ -419,7 +369,7 @@ export default function BookAppointment() {
 
             <h2>Book Appointment</h2>
             <p>
-              with Dr. {selectedDoctor.firstName} {selectedDoctor.lastName}
+              with Dr. {selectedDoctor.name}
             </p>
 
             {bookingError && (
@@ -446,11 +396,8 @@ export default function BookAppointment() {
                 onChange={(e) => setAppointmentType(e.target.value)}
                 className="form-select"
               >
-                <option value="General Consultation">
-                  General Consultation
-                </option>
-                <option value="Follow-up">Follow-up</option>
-                <option value="Emergency">Emergency</option>
+                <option value="ONLINE">Online</option>
+                <option value="OFFLINE">Offline</option>
               </select>
             </div>
 
