@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
 import "./Dashboard.css";
 
 export default function PatientDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
+  const { user } = useContext(AuthContext);
+  
+  const getPatientName = () => {
+    if (user && user.patientProfile && user.patientProfile.name) {
+      return user.patientProfile.name;
+    }
+    return "Patient";
+  };
   return (
     <div className="patient-dashboard">
 
@@ -23,7 +31,7 @@ export default function PatientDashboard() {
         <main className="dashboard-content">
           {/* --- Welcome Section --- */}
           <section className="welcome-section">
-            <h1>Welcome back, Patient 👋</h1>
+            <h1>Welcome back, {getPatientName()} 👋</h1>
             <p>Your health records, appointments and more.</p>
           </section>
 

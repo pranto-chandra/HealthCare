@@ -13,17 +13,14 @@ export default function EditProfile() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
+    name: "",
     phone: "",
     dateOfBirth: "",
-    specialization: "",
+    locationDiv: "",
     licenseNumber: "",
-    qualifications: "",
-    experience: "",
     consultationFee: "",
-    availableDays: "",
+    experienceYears: "",
+    specialties: [],
   });
 
   const [error, setError] = useState("");
@@ -45,36 +42,30 @@ export default function EditProfile() {
         const profile = res?.data?.data;
         if (mounted && profile) {
           setFormData({
-            firstName: profile.firstName || "",
-            lastName: profile.lastName || "",
-            email: profile.email || "",
+            name: profile.name || "",
             phone: profile.phone || "",
             dateOfBirth: profile.dateOfBirth
               ? profile.dateOfBirth.split("T")[0]
               : "",
-            specialization: profile.specialization || "",
+            locationDiv: profile.locationDiv || "",
             licenseNumber: profile.licenseNumber || "",
-            qualifications: profile.qualifications || "",
-            experience: profile.experience || "",
             consultationFee: profile.consultationFee || "",
-            availableDays: profile.availableDays || "",
+            experienceYears: profile.experienceYears || "",
+            specialties: profile.specialties?.map(s => s.id) || [],
           });
         }
       } catch (err) {
         // fallback to context user if API fails
         if (mounted) {
           setFormData({
-            firstName: user.firstName || "",
-            lastName: user.lastName || "",
-            email: user.email || "",
-            phone: user.phone || "",
-            dateOfBirth: user.dateOfBirth || "",
-            specialization: "",
-            licenseNumber: "",
-            qualifications: "",
-            experience: "",
-            consultationFee: "",
-            availableDays: "",
+            name: user.doctorProfile?.name || "",
+            phone: user.doctorProfile?.phone || "",
+            dateOfBirth: user.doctorProfile?.dateOfBirth || "",
+            locationDiv: user.doctorProfile?.locationDiv || "",
+            licenseNumber: user.doctorProfile?.licenseNumber || "",
+            consultationFee: user.doctorProfile?.consultationFee || "",
+            experienceYears: user.doctorProfile?.experienceYears || "",
+            specialties: user.doctorProfile?.specialties?.map(s => s.id) || [],
           });
         }
       }
@@ -129,17 +120,14 @@ export default function EditProfile() {
 
     try {
       const res = await doctorApi.updateDoctorProfile(user.id, formData);
-      const updated = res?.data?.data;
+      const updatedUser = res?.data?.data;
       setSuccess("Profile updated successfully!");
       setIsEditing(false);
 
-      const updatedUser = {
-        ...user,
-        ...updated,
-      };
-
-      // Update AuthContext and localStorage
-      updateUser(updatedUser);
+      // Update AuthContext with the complete user object
+      if (updatedUser) {
+        updateUser(updatedUser);
+      }
 
       setTimeout(() => {
         setSuccess("");
@@ -157,17 +145,14 @@ export default function EditProfile() {
     setError("");
     // Reset form to current user data
     setFormData({
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      dateOfBirth: user.dateOfBirth || "",
-      specialization: user.specialization || "",
-      licenseNumber: user.licenseNumber || "",
-      qualifications: user.qualifications || "",
-      experience: user.experience || "",
-      consultationFee: user.consultationFee || "",
-      availableDays: user.availableDays || "",
+      name: user.doctorProfile?.name || "",
+      phone: user.doctorProfile?.phone || "",
+      dateOfBirth: user.doctorProfile?.dateOfBirth || "",
+      locationDiv: user.doctorProfile?.locationDiv || "",
+      licenseNumber: user.doctorProfile?.licenseNumber || "",
+      consultationFee: user.doctorProfile?.consultationFee || "",
+      experienceYears: user.doctorProfile?.experienceYears || "",
+      specialties: user.doctorProfile?.specialties?.map(s => s.id) || [],
     });
   };
 
@@ -222,37 +207,12 @@ export default function EditProfile() {
             <div className="form-section">
               <h2>Personal Information</h2>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>First Name</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Last Name</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    required
-                  />
-                </div>
-              </div>
-
               <div className="form-group">
-                <label>Email</label>
+                <label>Full Name</label>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
                   disabled={!isEditing}
                   required
@@ -295,58 +255,23 @@ export default function EditProfile() {
 
               <div className="form-row">
                 <div className="form-group ">
-                  <label>Specialization</label>
+                  <label>Location Division</label>
                   <select
-                    name="specialization"
-                    value={formData.specialization}
+                    name="locationDiv"
+                    value={formData.locationDiv}
                     onChange={handleChange}
                     disabled={!isEditing}
                     required
-                    className="border border-purple-700 rounded-lg p-3 w-full hover:bg-purple-100 hover:border-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
                   >
-                    <option value="">Select Specialization</option>
-                    <option value="Burn & Plastic Surgery">
-                      Burn & Plastic Surgery
-                    </option>
-                    <option value="Cardiology">Cardiology</option>
-                    <option value="Colorectal Surgery">
-                      Colorectal Surgery
-                    </option>
-                    <option value="Dentistry">Dentistry</option>
-                    <option value="Endocrinology">Endocrinology</option>
-                    <option value="ENT">ENT</option>
-                    <option value="General Surgery">General Surgery</option>
-                    <option value="Gynaecology & Obstetrics">
-                      Gynaecology & Obstetrics
-                    </option>
-                    <option value="Hepatobiliary Surgery">
-                      Hepatobiliary Surgery
-                    </option>
-                    <option value="Hepatology">Hepatology</option>
-                    <option value="Internal Medicine">Internal Medicine</option>
-                    <option value="Laparoscopic Surgery">
-                      Laparoscopic Surgery
-                    </option>
-                    <option value="Nephrology">Nephrology</option>
-                    <option value="Neurosurgery">Neurosurgery</option>
-                    <option value="Oncology">Oncology</option>
-                    <option value="Orthopaedics">Orthopaedics</option>
-                    <option value="Pediatrics">Pediatrics</option>
-                    <option value="Physical Medicine">Physical Medicine</option>
-                    <option value="Psychiatry">Psychiatry</option>
-                    <option value="Respiratory Medicine">
-                      Respiratory Medicine
-                    </option>
-                    <option value="Rheumatology">Rheumatology</option>
-                    <option value="Skin & Venereal Diseases">
-                      Skin & Venereal Diseases
-                    </option>
-                    <option value="Skin-V.D-Allergy-Dermato-Laser-Dermato-Surgery and Cosmetic Dermatology">
-                      Skin-V.D, Allergy, Dermato, Laser, Dermato, Surgery and
-                      Cosmetic Dermatology
-                    </option>
-                    <option value="Surgical Oncology">Surgical Oncology</option>
-                    <option value="Urology">Urology</option>
+                    <option value="">Select Division</option>
+                    <option value="DHAKA">Dhaka</option>
+                    <option value="CHITTAGONG">Chittagong</option>
+                    <option value="RAJSHAHI">Rajshahi</option>
+                    <option value="KHULNA">Khulna</option>
+                    <option value="BARISHAL">Barishal</option>
+                    <option value="SYLHET">Sylhet</option>
+                    <option value="RANGPUR">Rangpur</option>
+                    <option value="MYMENSINGH">Mymensingh</option>
                   </select>
                 </div>
                 <div className="form-group">
@@ -365,23 +290,11 @@ export default function EditProfile() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Qualifications (JSON)</label>
-                  <input
-                    type="text"
-                    name="qualifications"
-                    value={formData.qualifications}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    placeholder='e.g., ["MBBS", "MD in Cardiology", "Advanced Certification"]'
-                    required
-                  />
-                </div>
-                <div className="form-group">
                   <label>Experience (Years)</label>
                   <input
                     type="number"
-                    name="experience"
-                    value={formData.experience}
+                    name="experienceYears"
+                    value={formData.experienceYears}
                     onChange={handleChange}
                     disabled={!isEditing}
                     placeholder="e.g., 10"
@@ -390,9 +303,6 @@ export default function EditProfile() {
                     required
                   />
                 </div>
-              </div>
-
-              <div className="form-row">
                 <div className="form-group">
                   <label>Consultation Fee (৳)</label>
                   <input
@@ -404,18 +314,6 @@ export default function EditProfile() {
                     placeholder="e.g., 500"
                     step="0.01"
                     min="0"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Available Days</label>
-                  <input
-                    type="text"
-                    name="availableDays"
-                    value={formData.availableDays}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    placeholder='e.g., ["Monday", "Tuesday", "Wednesday"]'
                     required
                   />
                 </div>

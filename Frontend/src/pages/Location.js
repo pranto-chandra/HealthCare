@@ -6,22 +6,27 @@ import "./side.css";
 export default function Location() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { user } = useContext(AuthContext);
-  const role = user?.role; // Patient | Doctor | Admin
+  
+  // Only show sidebar for logged-in users
+  const shouldShowSidebar = user && user.role;
   const normalizedRole = user?.role
-  ? user.role.toLowerCase().charAt(0).toUpperCase() +
-    user.role.toLowerCase().slice(1)
-  : null;
+    ? user.role.toLowerCase().charAt(0).toUpperCase() +
+      user.role.toLowerCase().slice(1)
+    : null;
+    
   return (
     <div className="bg-gray-50 min-h-screen">
-       {/* Toggle Button */}
-      <button
-        className="sidebar-toggle"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        ☰
-      </button>
+       {/* Toggle Button - Only show if logged in */}
+      {shouldShowSidebar && (
+        <button
+          className="sidebar-toggle"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          ☰
+        </button>
+      )}
     <div className={`side-layout ${isSidebarOpen ? "" : "collapsed"}`}>
-      {isSidebarOpen && <Sidebar role={normalizedRole} />}
+      {shouldShowSidebar && isSidebarOpen && <Sidebar role={normalizedRole} />}
       
       <main className="side-content">
         {/* Header */}

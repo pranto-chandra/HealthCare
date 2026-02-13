@@ -13,11 +13,8 @@ export default function EditProfile() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
+    name: "",
     phone: "",
-    dateOfBirth: "",
   });
 
   const [error, setError] = useState("");
@@ -39,22 +36,16 @@ export default function EditProfile() {
         const profile = res?.data?.data;
         if (mounted && profile) {
           setFormData({
-            firstName: profile.firstName || "",
-            lastName: profile.lastName || "",
-            email: profile.email || "",
-            phone: profile.phone || "",
-            dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.split("T")[0] : "",
+            name: profile.adminProfile?.name || "",
+            phone: profile.adminProfile?.phone || "",
           });
         }
       } catch (err) {
         // fallback to context user if API fails
         if (mounted) {
           setFormData({
-            firstName: user.firstName || "",
-            lastName: user.lastName || "",
-            email: user.email || "",
-            phone: user.phone || "",
-            dateOfBirth: user.dateOfBirth || "",
+            name: user.adminProfile?.name || "",
+            phone: user.adminProfile?.phone || "",
           });
         }
       }
@@ -109,17 +100,14 @@ export default function EditProfile() {
 
     try {
       const res = await userApi.updateProfile(user.id, formData);
-      const updated = res?.data?.data;
+      const updatedUser = res?.data?.data;
       setSuccess("Profile updated successfully!");
       setIsEditing(false);
 
-      const updatedUser = {
-        ...user,
-        ...updated,
-      };
-
-      // Update AuthContext and localStorage
-      updateUser(updatedUser);
+      // Update AuthContext with the complete user object
+      if (updatedUser) {
+        updateUser(updatedUser);
+      }
 
       setTimeout(() => {
         setSuccess("");
@@ -137,11 +125,8 @@ export default function EditProfile() {
     setError("");
     // Reset form to current user data
     setFormData({
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      dateOfBirth: user.dateOfBirth || "",
+      name: user.adminProfile?.name || "",
+      phone: user.adminProfile?.phone || "",
     });
   };
 
@@ -196,66 +181,28 @@ export default function EditProfile() {
           <div className="form-section">
             <h2>Personal Information</h2>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>First Name</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Last Name</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  required
-                />
-              </div>
-            </div>
-
             <div className="form-group">
-              <label>Email</label>
+              <label>Full Name</label>
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                type="text"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 disabled={!isEditing}
                 required
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Date of Birth</label>
-                <input
-                  type="date"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  required
-                />
-              </div>
+            <div className="form-group">
+              <label>Phone Number</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                disabled={!isEditing}
+                required
+              />
             </div>
 
             <div className="user-role">

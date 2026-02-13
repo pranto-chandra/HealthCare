@@ -9,8 +9,8 @@ export default function DoctorDashboard() {
   const { user } = useContext(AuthContext);
 
   const getDoctorName = () => {
-    if (user && user.firstName) {
-      return `Dr. ${user.firstName}${user.lastName ? " " + user.lastName : ""}`;
+    if (user?.doctorProfile?.name) {
+      return `Dr. ${user.doctorProfile.name}`;
     }
     return "Doctor";
   };

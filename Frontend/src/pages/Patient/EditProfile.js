@@ -13,11 +13,11 @@ export default function EditProfile() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
+    name: "",
     phone: "",
     dateOfBirth: "",
+    gender: "",
+    bloodGroup: "",
   });
 
   const [error, setError] = useState("");
@@ -39,22 +39,22 @@ export default function EditProfile() {
         const profile = res?.data?.data;
         if (mounted && profile) {
           setFormData({
-            firstName: profile.firstName || "",
-            lastName: profile.lastName || "",
-            email: profile.email || "",
-            phone: profile.phone || "",
-            dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.split("T")[0] : "",
+            name: profile.patientProfile?.name || "",
+            phone: profile.patientProfile?.phone || "",
+            dateOfBirth: profile.patientProfile?.dateOfBirth ? profile.patientProfile.dateOfBirth.split("T")[0] : "",
+            gender: profile.patientProfile?.gender || "",
+            bloodGroup: profile.patientProfile?.bloodGroup || "",
           });
         }
       } catch (err) {
         // fallback to context user if API fails
-        if (mounted) {
+        if (mounted && user.patientProfile) {
           setFormData({
-            firstName: user.firstName || "",
-            lastName: user.lastName || "",
-            email: user.email || "",
-            phone: user.phone || "",
-            dateOfBirth: user.dateOfBirth || "",
+            name: user.patientProfile?.name || "",
+            phone: user.patientProfile?.phone || "",
+            dateOfBirth: user.patientProfile?.dateOfBirth || "",
+            gender: user.patientProfile?.gender || "",
+            bloodGroup: user.patientProfile?.bloodGroup || "",
           });
         }
       }
@@ -109,17 +109,14 @@ export default function EditProfile() {
 
     try {
       const res = await userApi.updateProfile(user.id, formData);
-      const updated = res?.data?.data;
+      const updatedUser = res?.data?.data;
       setSuccess("Profile updated successfully!");
       setIsEditing(false);
 
-      const updatedUser = {
-        ...user,
-        ...updated,
-      };
-
-      // Update AuthContext and localStorage
-      updateUser(updatedUser);
+      // Update AuthContext with the complete user object
+      if (updatedUser) {
+        updateUser(updatedUser);
+      }
 
       setTimeout(() => {
         setSuccess("");
@@ -137,11 +134,11 @@ export default function EditProfile() {
     setError("");
     // Reset form to current user data
     setFormData({
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      dateOfBirth: user.dateOfBirth || "",
+      name: user.patientProfile?.name || "",
+      phone: user.patientProfile?.phone || "",
+      dateOfBirth: user.patientProfile?.dateOfBirth || "",
+      gender: user.patientProfile?.gender || "",
+      bloodGroup: user.patientProfile?.bloodGroup || "",
     });
   };
 
@@ -196,37 +193,12 @@ export default function EditProfile() {
           <div className="form-section">
             <h2>Personal Information</h2>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>First Name</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Last Name</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  required
-                />
-              </div>
-            </div>
-
             <div className="form-group">
-              <label>Email</label>
+              <label>Full Name</label>
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                type="text"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 disabled={!isEditing}
                 required
@@ -255,6 +227,44 @@ export default function EditProfile() {
                   disabled={!isEditing}
                   required
                 />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Gender</label>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  required
+                >
+                  <option value="">Select Gender</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Blood Group</label>
+                <select
+                  name="bloodGroup"
+                  value={formData.bloodGroup}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  required
+                >
+                  <option value="">Select Blood Group</option>
+                  <option value="A_POSITIVE">A+</option>
+                  <option value="A_NEGATIVE">A-</option>
+                  <option value="B_POSITIVE">B+</option>
+                  <option value="B_NEGATIVE">B-</option>
+                  <option value="AB_POSITIVE">AB+</option>
+                  <option value="AB_NEGATIVE">AB-</option>
+                  <option value="O_POSITIVE">O+</option>
+                  <option value="O_NEGATIVE">O-</option>
+                </select>
               </div>
             </div>
 

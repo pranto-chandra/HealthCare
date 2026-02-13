@@ -15,43 +15,46 @@ export const register = async (req, res) => {
   // Hash password
   const hashedPassword = await hashPassword(password);
 
-  // Create user with default values for required fields
+  // Create user
   const user = await prisma.user.create({
     data: {
-      firstName: 'User',
-      lastName: 'Account',
       email,
       password: hashedPassword,
-      phone: 'N/A',
-      dateOfBirth: new Date('2000-01-01'),
       role
     }
   });
 
-  // Create role-specific entry
+  // Create role-specific profile
   if (role === 'PATIENT') {
-    await prisma.patient.create({
+    await prisma.patientProfile.create({
       data: {
         userId: user.id,
-        bloodGroup: 'N/A',
+        name: 'Patient',
+        phone: '',
+        dateOfBirth: new Date('2000-01-01'),
         gender: 'OTHER',
-        emergencyContact: 'N/A'
+        bloodGroup: 'O_POSITIVE'
       }
     });
   } else if (role === 'DOCTOR') {
-    await prisma.doctor.create({
+    await prisma.doctorProfile.create({
       data: {
         userId: user.id,
-        specialization: 'General',
+        name: 'Doctor',
+        phone: '',
+        dateOfBirth: new Date('2000-01-01'),
+        locationDiv: 'DHAKA',
         licenseNumber: 'N/A',
         consultationFee: 0,
-        availableDays: '[]'
+        experienceYears: 0
       }
     });
   } else if (role === 'ADMIN') {
-    await prisma.admin.create({
+    await prisma.adminProfile.create({
       data: {
-        userId: user.id
+        userId: user.id,
+        name: 'Admin',
+        phone: ''
       }
     });
   }
@@ -65,10 +68,9 @@ export const register = async (req, res) => {
     data: {
       user: {
         id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
         email: user.email,
-        role: user.role
+        role: user.role,
+        isProfileComplete: user.isProfileComplete
       },
       tokens: {
         accessToken,
@@ -93,6 +95,20 @@ export const login = async (req, res) => {
     throw new UnauthorizedError('Invalid credentials');
   }
 
+  // Fetch the complete user profile
+  const completeUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      isProfileComplete: true,
+      patientProfile: true,
+      doctorProfile: true,
+      adminProfile: true,
+    }
+  });
+
   // Generate tokens
   const accessToken = generateToken(user.id);
   const refreshToken = generateRefreshToken(user.id);
@@ -100,13 +116,7 @@ export const login = async (req, res) => {
   res.json({
     success: true,
     data: {
-      user: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role
-      },
+      user: completeUser,
       tokens: {
         accessToken,
         refreshToken

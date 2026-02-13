@@ -14,13 +14,15 @@ import peditricImage from "./images/pediatrics.jpg";
 export default function Landing() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { user } = useContext(AuthContext);
-  const role = user?.role; // Patient | Doctor | Admin
-  const normalizedRole = user?.role
-  ? user.role.toLowerCase().charAt(0).toUpperCase() +
-    user.role.toLowerCase().slice(1)
-  : null;
   const navigate = useNavigate();
   const [showDermatologyOptions, setShowDermatologyOptions] = React.useState(false);
+
+  // Only show sidebar for logged-in users
+  const shouldShowSidebar = user && user.role;
+  const normalizedRole = user?.role
+    ? user.role.toLowerCase().charAt(0).toUpperCase() +
+      user.role.toLowerCase().slice(1)
+    : null;
 
   const handleDermatologyClick = () => {
     setShowDermatologyOptions(!showDermatologyOptions);
@@ -33,14 +35,16 @@ export default function Landing() {
 
   return (
     <div className="dashboard">
-       {/* Toggle Button */}
-      <button
-        className="sidebar-toggle"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        ☰
-      </button>
-       {isSidebarOpen && <Sidebar role={normalizedRole} />}
+       {/* Toggle Button - Only show if logged in */}
+      {shouldShowSidebar && (
+        <button
+          className="sidebar-toggle"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          ☰
+        </button>
+      )}
+       {shouldShowSidebar && isSidebarOpen && <Sidebar role={normalizedRole} />}
       {/* --- Hero Section --- */}
       <section className="hero">
         <div className="hero-content">

@@ -179,8 +179,7 @@ export default function BookAppointment() {
     if (searchTerm.trim()) {
       const lowerSearch = searchTerm.toLowerCase();
       filtered = filtered.filter((doc) => {
-        const fullName =
-          `${doc.firstName || ""} ${doc.lastName || ""}`.toLowerCase();
+        const fullName = `${doc.name || ""}`.toLowerCase();
         return fullName.includes(lowerSearch);
       });
     }
@@ -216,9 +215,8 @@ export default function BookAppointment() {
 
       const appointmentData = {
         doctorId: doctor.id,
-        appointmentDate: new Date(appointmentDate).toISOString(),
-        appointmentType: appointmentType,
-        status: "PENDING",
+        scheduledAt: new Date(appointmentDate).toISOString(),
+        type: appointmentType,
       };
 
       await appointmentApi.createAppointment(patientId, appointmentData);
@@ -245,7 +243,7 @@ export default function BookAppointment() {
     return (
       <div className="book-appointment-page">
         <div className="error-container">
-          <p>Please log in as a patient to book an appointment.</p>
+          <p>Only logged in patient can book appointments.</p>
           <button onClick={() => navigate("/login")}>Go to Login</button>
         </div>
       </div>
@@ -362,7 +360,7 @@ export default function BookAppointment() {
             {filteredDoctors.map((doctor) => (
               <div key={doctor.id} className="doctor-card">
                 <div className="doctor-info">
-                  <h3>{`Dr. ${doctor.firstName} ${doctor.lastName}`}</h3>
+                  <h3>{`Dr. ${doctor.name}`}</h3>
                   <p className="specialization">{doctor.specialization}</p>
 
                   {doctor.qualifications && (

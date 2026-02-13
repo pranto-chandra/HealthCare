@@ -2,26 +2,30 @@ import { prisma } from '../config/db.js';
 import { NotFoundError, BadRequestError } from '../utils/errors.js';
 
 export const createPatient = async (req, res) => {
-  const { bloodGroup, gender, emergencyContact } = req.body;
+  const { name, phone, dateOfBirth, gender, bloodGroup } = req.body;
 
-  const patient = await prisma.patient.create({
+  const patient = await prisma.patientProfile.create({
     data: {
       userId: req.user.id,
-      bloodGroup,
+      name,
+      phone,
+      dateOfBirth: new Date(dateOfBirth),
       gender,
-      emergencyContact,
+      bloodGroup,
     },
     include: {
       user: {
         select: {
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
         },
       },
     },
+  });
+
+  // Mark user profile as complete
+  await prisma.user.update({
+    where: { id: req.user.id },
+    data: { isProfileComplete: true }
   });
 
   res.status(201).json({
@@ -31,16 +35,12 @@ export const createPatient = async (req, res) => {
 };
 
 export const getPatient = async (req, res) => {
-  const patient = await prisma.patient.findUnique({
+  const patient = await prisma.patientProfile.findUnique({
     where: { id: req.params.id },
     include: {
       user: {
         select: {
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
         },
       },
     },
@@ -57,16 +57,12 @@ export const getPatient = async (req, res) => {
 };
 
 export const getPatientByUserId = async (req, res) => {
-  const patient = await prisma.patient.findUnique({
+  const patient = await prisma.patientProfile.findUnique({
     where: { userId: req.params.userId },
     include: {
       user: {
         select: {
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
         },
       },
     },
@@ -83,23 +79,22 @@ export const getPatientByUserId = async (req, res) => {
 };
 
 export const updatePatient = async (req, res) => {
-  const { bloodGroup, gender, emergencyContact } = req.body;
+  const { name, phone, dateOfBirth, gender, bloodGroup } = req.body;
 
-  const patient = await prisma.patient.update({
+  const updateData = {};
+  if (name) updateData.name = name;
+  if (phone) updateData.phone = phone;
+  if (dateOfBirth) updateData.dateOfBirth = new Date(dateOfBirth);
+  if (gender) updateData.gender = gender;
+  if (bloodGroup) updateData.bloodGroup = bloodGroup;
+
+  const patient = await prisma.patientProfile.update({
     where: { id: req.params.id },
-    data: {
-      bloodGroup,
-      gender,
-      emergencyContact,
-    },
+    data: updateData,
     include: {
       user: {
         select: {
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
         },
       },
     },
@@ -119,8 +114,7 @@ export const getPatientHistory = async (req, res) => {
         include: {
           user: {
             select: {
-              firstName: true,
-              lastName: true,
+              email: true,
             },
           },
         },
@@ -136,10 +130,10 @@ export const getPatientHistory = async (req, res) => {
 };
 
 export const createAppointment = async (req, res) => {
-  const { doctorId, appointmentDate, appointmentType, status } = req.body;
+  const { doctorId, scheduledAt, type, symptoms } = req.body;
 
   // Check if doctor exists
-  const doctor = await prisma.doctor.findUnique({
+  const doctor = await prisma.doctorProfile.findUnique({
     where: { id: doctorId },
   });
 
@@ -151,17 +145,16 @@ export const createAppointment = async (req, res) => {
     data: {
       patientId: req.params.id,
       doctorId,
-      appointmentDate: new Date(appointmentDate),
-      appointmentType,
-      status,
+      scheduledAt: new Date(scheduledAt),
+      type,
+      symptoms,
     },
     include: {
       doctor: {
         include: {
           user: {
             select: {
-              firstName: true,
-              lastName: true,
+              email: true,
             },
           },
         },
@@ -183,14 +176,13 @@ export const getAppointments = async (req, res) => {
         include: {
           user: {
             select: {
-              firstName: true,
-              lastName: true,
+              email: true,
             },
           },
         },
       },
     },
-    orderBy: { appointmentDate: 'desc' },
+    orderBy: { scheduledAt: 'desc' },
   });
 
   res.json({
