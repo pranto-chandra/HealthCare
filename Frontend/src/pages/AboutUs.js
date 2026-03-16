@@ -20,8 +20,11 @@ export default function AboutUs() {
       >
         ☰
       </button>
-      {isSidebarOpen && <Sidebar role={normalizedRole} />}
-      {/* Hero Section */}
+      <div className="flex transition-[margin-left] duration-300 ease-in-out">
+        {isSidebarOpen && <Sidebar role={normalizedRole} />}
+        <main className={`flex-1 p-0 transition-[margin-left] duration-300 ease-in-out 
+    ${isSidebarOpen ? "ml-[160px]" : "ml-0"}`}>
+           {/* Hero Section */}
       <section className="bg-teal-700 text-white py-20 text-center">
         <h1 className="text-4xl font-bold mb-4">About Us</h1>
         <p className="max-w-2xl mx-auto text-lg text-teal-100">
@@ -79,6 +82,8 @@ export default function AboutUs() {
           </div>
         </div>
       </section>
+        </main>
+      </div>
     </div>
   );
 }

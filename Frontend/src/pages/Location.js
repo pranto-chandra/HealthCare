@@ -20,10 +20,11 @@ export default function Location() {
       >
         ☰
       </button>
-    <div className={`side-layout ${isSidebarOpen ? "" : "collapsed"}`}>
+    <div className="flex transition-[margin-left] duration-300 ease-in-out">
       {isSidebarOpen && <Sidebar role={normalizedRole} />}
       
-      <main className="side-content">
+      <main className={`flex-1 p-0 transition-[margin-left] duration-300 ease-in-out 
+    ${isSidebarOpen ? "ml-[160px]" : "ml-0"}`}>
         {/* Header */}
       <section className="bg-teal-700 text-white py-20 text-center">
         <h1 className="text-4xl font-bold mb-4">Our Location</h1>
