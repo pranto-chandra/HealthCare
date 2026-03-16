@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext} from "react";
 import Sidebar from "../components/Sidebar";
 import { AuthContext } from "../context/AuthContext";
 
@@ -10,7 +10,9 @@ import blog3 from "./images/blog-lifestyle.jpg";
 export default function Blogs() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { user } = useContext(AuthContext);
-  const role = user?.role; // Patient | Doctor | Admin
+  
+  // Only show sidebar for logged-in users
+  const shouldShowSidebar = user && user.role;
   const normalizedRole = user?.role
     ? user.role.toLowerCase().charAt(0).toUpperCase() +
       user.role.toLowerCase().slice(1)
@@ -28,7 +30,7 @@ export default function Blogs() {
       title: "Understanding Brain Health",
       description:
         "Explore how sleep, mental exercises, and stress management impact brain function.",
-      image: blog2,
+       image: blog2,
       date: "March 16, 2023",
       link: "https://cmha.ca/news/understanding-brain-health-and-its-connection-to-mental-well-being/",
     },
@@ -43,81 +45,59 @@ export default function Blogs() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-gray-50">
-
-  {/* Toggle Button */}
-  <button
-    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-    className="fixed top-4 left-4 z-50 bg-teal-700 text-white px-3 py-2 rounded-md shadow-md"
-  >
-    ☰
-  </button>
-
-  {/* Sidebar */}
-  <div
-    className={`fixed top-0 left-0 h-full w-[160px] bg-white shadow-lg z-40
-    transform transition-transform duration-300 ease-in-out
-    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
-  >
-    <Sidebar role={normalizedRole} />
-  </div>
-
-  {/* Main Content */}
-  <main
-    className={`min-h-screen bg-gray-50 py-16 px-6
-    transition-transform duration-300 ease-in-out
-    ${isSidebarOpen ? "translate-x-[160px]" : "translate-x-0"}`}
-  >
-    {/* Page Header */}
-    <h1 className="text-4xl font-bold text-center text-teal-800 mb-4">
-      Health Blogs
-    </h1>
-
-    <p className="text-center text-gray-600 mb-12">
-      Latest insights, tips, and updates from our healthcare experts
-    </p>
-
-    {/* Blog Grid */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      {blogs.map((blog, index) => (
-        <a
-          key={index}
-          href={blog.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+    <div className="min-h-screen bg-gray-50 py-16 px-6">
+       {/* Toggle Button - Only show if logged in */}
+      {shouldShowSidebar && (
+        <button
+          className="sidebar-toggle"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
-          {/* Image */}
-          <div className="h-48 bg-gray-200">
-            <img
-              src={blog.image}
-              alt={blog.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          ☰
+        </button>
+      )}
+      {shouldShowSidebar && isSidebarOpen && <Sidebar role={normalizedRole} />}
+      <div className={`max-w-6xl mx-auto ${isSidebarOpen ? "" : "collapsed"}`}>
+        {/* Page Header */}
+        <h1 className="text-4xl font-bold text-center text-teal-800 mb-4">
+          Health Blogs
+        </h1>
+        <p className="text-center text-gray-600 mb-12">
+          Latest insights, tips, and updates from our healthcare experts
+        </p>
 
-          {/* Content */}
-          <div className="p-6">
-            <p className="text-sm text-gray-500 mb-2">{blog.date}</p>
+        {/* Blog Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {blogs.map((blog, index) => (
+            <a
+              key={index}
+              href={blog.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block no-underline hover:no-underline bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+            >
+              {/* Image */}
+              <div className="h-48 bg-gray-200">
+                <img
+                  src={blog.image}
+                  alt={blog.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
-            <h3 className="text-xl font-semibold text-teal-800 mb-3">
-              {blog.title}
-            </h3>
+              {/* Content */}
+              <div className="p-6">
+                <p className="text-sm text-gray-500 mb-2">{blog.date}</p>
+                <h3 className="text-xl font-semibold text-teal-800 mb-3">
+                  {blog.title}
+                </h3>
+                <p className="text-gray-600 text-sm mb-4">{blog.description}</p>
 
-            <p className="text-gray-600 text-sm mb-4">
-              {blog.description}
-            </p>
-
-            <span className="text-teal-700 font-semibold">
-              Read More →
-            </span>
-          </div>
-        </a>
-      ))}
+                <span className="text-teal-700 font-semibold">Read More →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
-  </main>
-
-</div>
-
   );
 }

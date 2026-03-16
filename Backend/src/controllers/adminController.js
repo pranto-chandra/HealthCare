@@ -5,24 +5,29 @@ export const getAllUsers = async (req, res) => {
   const users = await prisma.user.findMany({
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
       email: true,
-      phone: true,
       role: true,
+      isProfileComplete: true,
       createdAt: true,
-      patient: {
+      patientProfile: {
         select: {
           id: true,
+          name: true,
           bloodGroup: true,
           gender: true
         }
       },
-      doctor: {
+      doctorProfile: {
         select: {
           id: true,
-          specialization: true,
+          name: true,
           licenseNumber: true
+        }
+      },
+      adminProfile: {
+        select: {
+          id: true,
+          name: true,
         }
       }
     }
@@ -72,31 +77,21 @@ export const getAnalytics = async (req, res) => {
     recentAppointments
   ] = await Promise.all([
     prisma.user.count(),
-    prisma.patient.count(),
-    prisma.doctor.count(),
+    prisma.patientProfile.count(),
+    prisma.doctorProfile.count(),
     prisma.appointment.count(),
     prisma.appointment.findMany({
       take: 10,
       orderBy: { createdAt: 'desc' },
       include: {
         patient: {
-          include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true
-              }
-            }
+          select: {
+            name: true
           }
         },
         doctor: {
-          include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true
-              }
-            }
+          select: {
+            name: true
           }
         }
       }

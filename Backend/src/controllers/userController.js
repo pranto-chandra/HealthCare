@@ -13,13 +13,13 @@ export const getUserProfile = async (req, res) => {
     where: { id },
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
       email: true,
-      phone: true,
-      dateOfBirth: true,
       role: true,
+      isProfileComplete: true,
       createdAt: true,
+      patientProfile: true,
+      doctorProfile: true,
+      adminProfile: true,
     }
   });
 
@@ -35,40 +35,71 @@ export const getUserProfile = async (req, res) => {
 
 export const updateUserProfile = async (req, res) => {
   const { id } = req.params;
-  const { firstName, lastName, phone, dateOfBirth } = req.body;
+  const { name, phone, dateOfBirth, gender, bloodGroup } = req.body;
 
   // Check if user is authorized
   if (req.user.id !== id && req.user.role !== 'ADMIN') {
     throw new UnauthorizedError('Not authorized to update this profile');
   }
 
-  // Email cannot be updated through this endpoint (prevent duplication issues)
-  // Password is updated through separate endpoint
+  const user = await prisma.user.findUnique({ where: { id } });
 
-  const updateData = {};
-  if (firstName) updateData.firstName = firstName;
-  if (lastName) updateData.lastName = lastName;
-  if (phone) updateData.phone = phone;
-  if (dateOfBirth) updateData.dateOfBirth = new Date(dateOfBirth);
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
 
-  const user = await prisma.user.update({
+  // Update the appropriate profile based on role
+  if (user.role === 'PATIENT') {
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (phone) updateData.phone = phone;
+    if (dateOfBirth) updateData.dateOfBirth = new Date(dateOfBirth);
+    if (gender) updateData.gender = gender;
+    if (bloodGroup) updateData.bloodGroup = bloodGroup;
+
+    await prisma.patientProfile.update({
+      where: { userId: id },
+      data: updateData,
+    });
+  } else if (user.role === 'DOCTOR') {
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (phone) updateData.phone = phone;
+    if (dateOfBirth) updateData.dateOfBirth = new Date(dateOfBirth);
+
+    await prisma.doctorProfile.update({
+      where: { userId: id },
+      data: updateData,
+    });
+  } else if (user.role === 'ADMIN') {
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (phone) updateData.phone = phone;
+
+    await prisma.adminProfile.update({
+      where: { userId: id },
+      data: updateData,
+    });
+  }
+
+  const updatedUser = await prisma.user.findUnique({
     where: { id },
-    data: updateData,
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
       email: true,
-      phone: true,
-      dateOfBirth: true,
       role: true,
+      isProfileComplete: true,
+      createdAt: true,
+      patientProfile: true,
+      doctorProfile: true,
+      adminProfile: true,
     }
   });
 
   res.json({
     success: true,
     message: 'Profile updated successfully',
-    data: user
+    data: updatedUser
   });
 };
 
@@ -77,12 +108,13 @@ export const getCurrentUser = async (req, res) => {
     where: { id: req.user.id },
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
       email: true,
-      phone: true,
-      dateOfBirth: true,
       role: true,
+      isProfileComplete: true,
+      createdAt: true,
+      patientProfile: true,
+      doctorProfile: true,
+      adminProfile: true,
     }
   });
 

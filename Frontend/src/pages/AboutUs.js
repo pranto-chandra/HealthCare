@@ -6,25 +6,27 @@ import { AuthContext } from "../context/AuthContext";
 export default function AboutUs() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { user } = useContext(AuthContext);
-  const role = user?.role; // Patient | Doctor | Admin
+  
+  // Only show sidebar for logged-in users
+  const shouldShowSidebar = user && user.role;
   const normalizedRole = user?.role
-  ? user.role.toLowerCase().charAt(0).toUpperCase() +
-    user.role.toLowerCase().slice(1)
-  : null;
+    ? user.role.toLowerCase().charAt(0).toUpperCase() +
+      user.role.toLowerCase().slice(1)
+    : null;
+    
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Toggle Button */}
-      <button
-        className="sidebar-toggle"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        ☰
-      </button>
-      <div className="flex transition-[margin-left] duration-300 ease-in-out">
-        {isSidebarOpen && <Sidebar role={normalizedRole} />}
-        <main className={`flex-1 p-0 transition-[margin-left] duration-300 ease-in-out 
-    ${isSidebarOpen ? "ml-[160px]" : "ml-0"}`}>
-           {/* Hero Section */}
+      {/* Toggle Button - Only show if logged in */}
+      {shouldShowSidebar && (
+        <button
+          className="sidebar-toggle"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          ☰
+        </button>
+      )}
+      {shouldShowSidebar && isSidebarOpen && <Sidebar role={normalizedRole} />}
+      {/* Hero Section */}
       <section className="bg-teal-700 text-white py-20 text-center">
         <h1 className="text-4xl font-bold mb-4">About Us</h1>
         <p className="max-w-2xl mx-auto text-lg text-teal-100">
@@ -82,8 +84,6 @@ export default function AboutUs() {
           </div>
         </div>
       </section>
-        </main>
-      </div>
     </div>
   );
 }
