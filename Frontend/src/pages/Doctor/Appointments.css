@@ -112,38 +112,125 @@
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
 }
 
-.appointment-card h3 {
-  color: #004d40;
-  margin-bottom: 8px;
-  font-size: 1.2rem;
+.appointment-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
 }
 
-.appointment-card p {
+.patient-info {
+  flex: 1;
+}
+
+.patient-info h3 {
+  color: #004d40;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.patient-info p {
   color: #555;
   font-size: 0.95rem;
-  margin: 4px 0;
+  margin: 6px 0;
 }
 
-.status-buttons {
-  margin-top: 10px;
+.status-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
 }
 
-.status-buttons button {
-  margin-right: 10px;
-  padding: 6px 12px;
+.status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.pending {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.status-badge.confirmed {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.completed {
+  background-color: #e0e7ff;
+  color: #3949ab;
+}
+
+.status-badge.cancelled {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-btn,
+.reject-btn {
+  padding: 8px 16px;
   border: none;
   border-radius: 6px;
-  background-color: #00796b;
-  color: white;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
 
-.status-buttons button:hover {
-  background-color: #004d40;
+.confirm-btn {
+  background-color: #2e7d32;
+  color: white;
 }
 
+.confirm-btn:hover:not(:disabled) {
+  background-color: #1b5e20;
+  transform: translateY(-2px);
+}
+
+.reject-btn {
+  background-color: #c62828;
+  color: white;
+}
+
+.reject-btn:hover:not(:disabled) {
+  background-color: #ad1457;
+  transform: translateY(-2px);
+}
+
+.confirm-btn:disabled,
+.reject-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 4px solid #c62828;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #00695c;
+  font-size: 1rem;
+}
+
+.no-appointments,
 .no-results {
   font-size: 1rem;
   color: #777;

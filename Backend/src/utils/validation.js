@@ -42,10 +42,24 @@ export const patientValidation = {
 export const appointmentValidation = {
   create: [
     body('doctorId').isUUID().withMessage('Invalid doctor ID'),
-    body('appointmentDate').isISO8601().withMessage('Invalid appointment date'),
-    body('appointmentType').trim().notEmpty().withMessage('Appointment type is required'),
-    body('status').isIn(['SCHEDULED', 'COMPLETED', 'CANCELLED', 'PENDING'])
-      .withMessage('Invalid appointment status')
+    body('scheduledAt')
+      .custom((value) => {
+        if (!value) {
+          throw new Error('Appointment date is required');
+        }
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+          throw new Error('Invalid appointment date format');
+        }
+        // Check if date is in the future
+        if (date <= new Date()) {
+          throw new Error('Appointment date must be in the future');
+        }
+        return true;
+      })
+      .withMessage('Invalid appointment date'),
+    body('type').isIn(['ONLINE', 'OFFLINE']).withMessage('Appointment type must be ONLINE or OFFLINE'),
+    body('symptoms').optional().trim()
   ]
 };
 

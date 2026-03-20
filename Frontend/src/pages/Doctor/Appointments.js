@@ -1,61 +1,103 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
-import Navbar from "../../components/Navbar";
+import { AuthContext } from "../../context/AuthContext";
+import doctorApi from "../../api/doctorApi";
+import { getErrorMessage } from "../../utils/helpers";
 import "./Appointments.css";
 
 export default function Appointments() {
-  const [appointments, setAppointments] = useState([
-    {
-      id: 1,
-      patient: "John Doe",
-      date: "2025-11-15",
-      time: "10:00 AM",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      patient: "Jane Smith",
-      date: "2025-11-14",
-      time: "2:30 PM",
-      status: "Completed",
-    },
-    {
-      id: 3,
-      patient: "Michael Lee",
-      date: "2025-11-13",
-      time: "11:15 AM",
-      status: "Cancelled",
-    },
-    {
-      id: 4,
-      patient: "Sara Khan",
-      date: "2025-11-15",
-      time: "3:00 PM",
-      status: "Pending",
-    },
-  ]);
-
+  const { user } = useContext(AuthContext);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [selectedDate, setSelectedDate] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [confirmingId, setConfirmingId] = useState(null);
 
-  const updateStatus = (id, newStatus) => {
-    setAppointments(prev =>
-      prev.map(app =>
-        app.id === id ? { ...app, status: newStatus } : app
-      )
-    );
+  // Fetch doctor appointments
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchAppointments = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await doctorApi.getMyAppointments();
+        const appointmentData = res?.data?.data || [];
+        setAppointments(appointmentData);
+      } catch (err) {
+        setError(getErrorMessage(err));
+        console.error("Error fetching appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [user]);
+
+  // Handle appointment confirmation
+  const handleConfirmAppointment = async (appointmentId, status) => {
+    try {
+      setConfirmingId(appointmentId);
+      await doctorApi.confirmAppointment(appointmentId, status);
+
+      // Update local state
+      setAppointments((prev) =>
+        prev.map((app) =>
+          app.id === appointmentId ? { ...app, status } : app
+        )
+      );
+    } catch (err) {
+      alert(getErrorMessage(err));
+      console.error("Error confirming appointment:", err);
+    } finally {
+      setConfirmingId(null);
+    }
   };
 
-  const filteredAppointments = appointments.filter(app => {
-    const matchStatus = filterStatus === "All" || app.status === filterStatus;
-    const matchDate = !selectedDate || app.date === selectedDate;
+  // Filter appointments
+  const filteredAppointments = appointments.filter((app) => {
+    const matchStatus =
+      filterStatus === "All" || app.status === filterStatus;
+    const matchDate =
+      !selectedDate ||
+      new Date(app.scheduledAt).toISOString().split("T")[0] === selectedDate;
     return matchStatus && matchDate;
   });
 
+  // Format date and time
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString(),
+      time: date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+  };
+
+  // Get status badge color
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "PENDING":
+        return "pending";
+      case "CONFIRMED":
+        return "confirmed";
+      case "COMPLETED":
+        return "completed";
+      case "CANCELLED":
+        return "cancelled";
+      default:
+        return "pending";
+    }
+  };
+
   return (
     <div className="doctor-appointments-page">
-         {/* Toggle Button */}
+      {/* Toggle Button */}
       <button
         className="sidebar-toggle"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -63,8 +105,12 @@ export default function Appointments() {
         ☰
       </button>
 
-       <div className={`doctor-appointments-layout ${isSidebarOpen ? "" : "collapsed"}`}>
-              {isSidebarOpen && <Sidebar role="Doctor" />}
+      <div
+        className={`doctor-appointments-layout ${
+          isSidebarOpen ? "" : "collapsed"
+        }`}
+      >
+        {isSidebarOpen && <Sidebar role="Doctor" />}
 
         <main className="doctor-appointments-content">
           <section className="appointments-header">
@@ -77,12 +123,13 @@ export default function Appointments() {
               <label>Status:</label>
               <select
                 value={filterStatus}
-                onChange={e => setFilterStatus(e.target.value)}
+                onChange={(e) => setFilterStatus(e.target.value)}
               >
                 <option>All</option>
-                <option>Pending</option>
-                <option>Completed</option>
-                <option>Cancelled</option>
+                <option value="PENDING">Pending Confirmation</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
               </select>
             </div>
 
@@ -91,30 +138,80 @@ export default function Appointments() {
               <input
                 type="date"
                 value={selectedDate}
-                onChange={e => setSelectedDate(e.target.value)}
+                onChange={(e) => setSelectedDate(e.target.value)}
               />
             </div>
           </section>
 
-          <section className="appointments-list">
-            {filteredAppointments.length === 0 ? (
-              <p className="no-results">No appointments found.</p>
-            ) : (
-              filteredAppointments.map(app => (
-                <div key={app.id} className="appointment-card">
-                  <h3>{app.patient}</h3>
-                  <p>Date: {app.date}</p>
-                  <p>Time: {app.time}</p>
-                  <p>Status: <strong>{app.status}</strong></p>
+          {error && <div className="error-message">{error}</div>}
 
-                  <div className="status-buttons">
-                    <button onClick={() => updateStatus(app.id, "Completed")}>Complete</button>
-                    <button onClick={() => updateStatus(app.id, "Cancelled")}>Cancel</button>
-                    <button onClick={() => updateStatus(app.id, "Pending")}>Reset</button>
+          {loading && <div className="loading">Loading appointments...</div>}
+
+          {!loading && filteredAppointments.length === 0 && (
+            <div className="no-appointments">
+              <p>No appointments found.</p>
+            </div>
+          )}
+
+          <section className="appointments-list">
+            {filteredAppointments.map((app) => {
+              const { date, time } = formatDateTime(app.scheduledAt);
+              return (
+                <div key={app.id} className="appointment-card">
+                  <div className="appointment-info">
+                    <div className="patient-info">
+                      <h3>Patient: {app.patient?.user?.email}</h3>
+                      <p>
+                        <strong>Date:</strong> {date}
+                      </p>
+                      <p>
+                        <strong>Time:</strong> {time}
+                      </p>
+                      <p>
+                        <strong>Type:</strong> {app.type}
+                      </p>
+                      {app.symptoms && (
+                        <p>
+                          <strong>Symptoms:</strong> {app.symptoms}
+                        </p>
+                      )}
+                    </div>
+                    <div className="status-section">
+                      <span
+                        className={`status-badge ${getStatusColor(
+                          app.status
+                        )}`}
+                      >
+                        {app.status}
+                      </span>
+
+                      {app.status === "PENDING" && (
+                        <div className="action-buttons">
+                          <button
+                            className="confirm-btn"
+                            onClick={() =>
+                              handleConfirmAppointment(app.id, "CONFIRMED")
+                            }
+                            disabled={confirmingId === app.id}
+                          >
+                            {confirmingId === app.id ? "Confirming..." : "Confirm"}
+                          </button>
+                          <button
+                            className="reject-btn"
+                            onClick={() =>
+                              handleConfirmAppointment(app.id, "CANCELLED")
+                            }
+                            disabled={confirmingId === app.id}
+                          >
+                            {confirmingId === app.id ? "Rejecting..." : "Reject"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              ))
-            )}
+              );
+            })}
           </section>
         </main>
       </div>

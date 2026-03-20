@@ -1,34 +1,97 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
+import { AuthContext } from "../../context/AuthContext";
+import appointmentApi from "../../api/appointmentApi";
+import patientApi from "../../api/patientApi";
+import { getErrorMessage } from "../../utils/helpers";
 import "./Appointments.css";
 
 export default function Appointments() {
+  const { user } = useContext(AuthContext);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [patientId, setPatientId] = useState(null);
 
-  // Temporary Dummy Data (replace with API later)
-  const appointments = [
-    {
-      id: 1,
-      doctor: "Dr. Rahman",
-      date: "2025-02-12",
-      time: "10:00 AM",
-      status: "Confirmed",
-    },
-    {
-      id: 2,
-      doctor: "Dr. Sara Ahmed",
-      date: "2025-02-18",
-      time: "3:15 PM",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      doctor: "Dr. Kamal Hossain",
-      date: "2025-03-01",
-      time: "8:45 AM",
-      status: "Completed",
-    },
-  ];
+  // Fetch patient ID and appointments
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        // Get patient ID
+        const patientRes = await patientApi.getPatientByUserId(user.id);
+        const pId = patientRes?.data?.data?.id || user.id;
+        setPatientId(pId);
+
+        // Get appointments
+        const appointmentRes = await appointmentApi.getAppointments(pId);
+        const appointmentData = appointmentRes?.data?.data || [];
+        
+        // Sort by scheduled date descending
+        appointmentData.sort(
+          (a, b) =>
+            new Date(b.scheduledAt) - new Date(a.scheduledAt)
+        );
+        
+        setAppointments(appointmentData);
+      } catch (err) {
+        setError(getErrorMessage(err));
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+  // Format date and time
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString(),
+      time: date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+  };
+
+  // Get upcoming appointment (first confirmed appointment in future)
+  const upcomingAppointment = appointments.find(
+    (app) =>
+      app.status === "CONFIRMED" &&
+      new Date(app.scheduledAt) > new Date()
+  );
+
+  // Get status color class
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "PENDING":
+        return "pending";
+      case "CONFIRMED":
+        return "confirmed";
+      case "COMPLETED":
+        return "completed";
+      case "CANCELLED":
+        return "cancelled";
+      default:
+        return "pending";
+    }
+  };
+
+  // Get doctor name
+  const getDoctorName = (doctor) => {
+    if (doctor?.user?.firstName && doctor?.user?.lastName) {
+      return `Dr. ${doctor.user.firstName} ${doctor.user.lastName}`;
+    }
+    return doctor?.user?.email || "Unknown Doctor";
+  };
 
   return (
     <div className="appointments-page">
@@ -50,63 +113,94 @@ export default function Appointments() {
         {/* MAIN CONTENT */}
         <main className="appointments-content">
           <section className="appointment-header">
-          <h1>Your Appointments</h1>
+            <h1>Your Appointments</h1>
           </section>
 
-          {/* --- Upcoming Card Section --- */}
-          <section className="upcoming-section">
-            <h2>Upcoming Appointment</h2>
+          {error && <div className="error-message">{error}</div>}
 
-            {appointments.length > 0 ? (
-              <div className="upcoming-card">
-                <p>
-                  <strong>Doctor:</strong> {appointments[0].doctor}
-                </p>
-                <p>
-                  <strong>Date:</strong> {appointments[0].date}
-                </p>
-                <p>
-                  <strong>Time:</strong> {appointments[0].time}
-                </p>
-                <span className="status confirmed">
-                  {appointments[0].status}
-                </span>
-              </div>
-            ) : (
-              <p>No upcoming appointments.</p>
-            )}
-          </section>
+          {loading && <div className="loading">Loading appointments...</div>}
 
-          {/* --- Table of All Appointments --- */}
-          <section className="table-section">
-            <h2>Appointment History</h2>
+          {!loading && (
+            <>
+              {/* --- Upcoming Card Section --- */}
+              <section className="upcoming-section">
+                <h2>Upcoming Appointment</h2>
 
-            <table className="appointments-table">
-              <thead>
-                <tr>
-                  <th>Doctor</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
+                {upcomingAppointment ? (
+                  <div className="upcoming-card">
+                    <p>
+                      <strong>Doctor:</strong>{" "}
+                      {getDoctorName(upcomingAppointment.doctor)}
+                    </p>
+                    <p>
+                      <strong>Date:</strong>{" "}
+                      {formatDateTime(upcomingAppointment.scheduledAt).date}
+                    </p>
+                    <p>
+                      <strong>Time:</strong>{" "}
+                      {formatDateTime(upcomingAppointment.scheduledAt).time}
+                    </p>
+                    <p>
+                      <strong>Type:</strong> {upcomingAppointment.type}
+                    </p>
+                    <span
+                      className={`status ${getStatusClass(
+                        upcomingAppointment.status
+                      )}`}
+                    >
+                      {upcomingAppointment.status}
+                    </span>
+                  </div>
+                ) : (
+                  <p>No upcoming confirmed appointments.</p>
+                )}
+              </section>
 
-              <tbody>
-                {appointments.map((a) => (
-                  <tr key={a.id}>
-                    <td>{a.doctor}</td>
-                    <td>{a.date}</td>
-                    <td>{a.time}</td>
-                    <td>
-                      <span className={`status ${a.status.toLowerCase()}`}>
-                        {a.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
+              {/* --- Table of All Appointments --- */}
+              <section className="table-section">
+                <h2>Appointment History</h2>
+
+                {appointments.length === 0 ? (
+                  <p>No appointments found.</p>
+                ) : (
+                  <table className="appointments-table">
+                    <thead>
+                      <tr>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {appointments.map((app) => {
+                        const { date, time } = formatDateTime(app.scheduledAt);
+                        return (
+                          <tr key={app.id}>
+                            <td>{getDoctorName(app.doctor)}</td>
+                            <td>{date}</td>
+                            <td>{time}</td>
+                            <td>{app.type}</td>
+                            <td>
+                              <span
+                                className={`status ${getStatusClass(
+                                  app.status
+                                )}`}
+                              >
+                                {app.status}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </section>
+            </>
+          )}
         </main>
       </div>
     </div>

@@ -1,27 +1,111 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
 import { useParams, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import appointmentApi from "../api/appointmentApi";
 import doctorApi from "../api/doctorApi";
+import patientApi from "../api/patientApi";
 import { getErrorMessage } from "../utils/helpers";
 import "./DoctorsBySpecialization.css";
 
 export default function DoctorsBySpecialization() {
   const { specialization } = useParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const role = user?.role; // Patient | Doctor | Admin
+  const normalizedRole = user?.role
+    ? user.role.toLowerCase().charAt(0).toUpperCase() +
+      user.role.toLowerCase().slice(1)
+    : null;
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // State for filters and search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [qualificationFilter, setQualificationFilter] = useState("");
+
+  // State for data
   const [doctors, setDoctors] = useState([]);
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const [qualifications, setQualifications] = useState([]);
+  const [patientId, setPatientId] = useState(null);
+
+  // State for loading and errors
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [bookingError, setBookingError] = useState("");
 
+  // State for booking
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [appointmentDate, setAppointmentDate] = useState("");
+  const [appointmentType, setAppointmentType] = useState("ONLINE");
+  const [isBooking, setIsBooking] = useState(false);
+
+  // Check if user is logged in
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    // Only allow patients to book appointments
+    if (user.role !== "PATIENT") {
+      setError("Only patients can book appointments");
+      return;
+    }
+
+    // Fetch patient ID using user ID
+    const fetchPatientId = async () => {
+      try {
+        const res = await patientApi.getPatientByUserId(user.id);
+        if (res?.data?.data?.id) {
+          setPatientId(res.data.data.id);
+        } else {
+          setPatientId(user.id); // Fallback
+        }
+      } catch (err) {
+        console.log("Using user ID as fallback:", user.id);
+        setPatientId(user.id); // Fallback to user ID
+      }
+    };
+
+    fetchPatientId();
+  }, [user, navigate]);
+
+  // Fetch doctors for the selected specialization
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
         setError("");
-        const res = await doctorApi.getDoctorsBySpecialization(specialization);
-        if (res?.data?.data) {
-          setDoctors(res.data.data);
-        } else {
-          setError("No doctors found for this specialization");
+
+        if (!specialization) {
+          setError("No specialization selected");
+          setLoading(false);
+          return;
         }
+
+        // Fetch all doctors
+        const res = await doctorApi.getAllDoctors();
+        const allDoctors = res?.data?.data || [];
+
+        // Filter doctors by specialization
+        const doctorsBySpec = allDoctors.filter((doc) => {
+          if (!doc.specialties || !Array.isArray(doc.specialties)) return false;
+          return doc.specialties.some((spec) => spec.name === specialization);
+        });
+
+        // Build set for degrees for filters
+        const degreeSet = new Set();
+        doctorsBySpec.forEach((doc) => {
+          if (doc.degrees && Array.isArray(doc.degrees)) {
+            doc.degrees.forEach((d) => d?.name && degreeSet.add(d.name));
+          }
+        });
+
+        setDoctors(doctorsBySpec);
+        setFilteredDoctors(doctorsBySpec);
+        setQualifications(Array.from(degreeSet).sort());
       } catch (err) {
         setError(getErrorMessage(err));
         console.error("Error fetching doctors:", err);
@@ -35,186 +119,288 @@ export default function DoctorsBySpecialization() {
     }
   }, [specialization]);
 
-  const parseQualifications = (qualificationsStr) => {
-    if (!qualificationsStr) return [];
+  // Apply filters
+  useEffect(() => {
+    let filtered = doctors;
 
-    try {
-      if (typeof qualificationsStr === "string") {
-        // Try parsing as JSON first
-        const parsed = JSON.parse(qualificationsStr);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      // Not valid JSON, treat as comma-separated string
-      if (typeof qualificationsStr === "string") {
-        return qualificationsStr
-          .split(",")
-          .map((q) => q.trim())
-          .filter((q) => q.length > 0);
-      }
+    // Filter by search term (doctor name)
+    if (searchTerm.trim()) {
+      const lowerSearch = searchTerm.toLowerCase();
+      filtered = filtered.filter((doc) => {
+        const fullName = `${doc.name || ""}`.toLowerCase();
+        return fullName.includes(lowerSearch);
+      });
     }
 
-    return qualificationsStr && Array.isArray(qualificationsStr)
-      ? qualificationsStr
-      : [];
-  };
-
-  const parseAvailableDays = (daysStr) => {
-    if (!daysStr) return [];
-
-    try {
-      if (typeof daysStr === "string") {
-        // Try parsing as JSON first
-        const parsed = JSON.parse(daysStr);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      // Not valid JSON, treat as comma-separated string
-      if (typeof daysStr === "string") {
-        return daysStr
-          .split(",")
-          .map((d) => d.trim())
-          .filter((d) => d.length > 0);
-      }
+    // Filter by qualification/degree
+    if (qualificationFilter) {
+      filtered = filtered.filter((doc) => {
+        if (!doc.degrees || !Array.isArray(doc.degrees)) return false;
+        return doc.degrees.some((deg) => deg.name === qualificationFilter);
+      });
     }
 
-    return daysStr && Array.isArray(daysStr) ? daysStr : [];
+    setFilteredDoctors(filtered);
+  }, [searchTerm, qualificationFilter, doctors]);
+
+  // Handle booking appointment
+  const handleBookAppointment = async (doctor) => {
+    if (!appointmentDate) {
+      setBookingError("Please select an appointment date");
+      return;
+    }
+
+    try {
+      setIsBooking(true);
+      setBookingError("");
+
+      const appointmentData = {
+        doctorId: doctor.id,
+        scheduledAt: new Date(appointmentDate).toISOString(),
+        type: appointmentType,
+      };
+
+      await appointmentApi.createAppointment(patientId, appointmentData);
+
+      // Success - navigate to appointments page
+      navigate("/patient/appointments");
+    } catch (err) {
+      setBookingError(getErrorMessage(err));
+      console.error("Error booking appointment:", err);
+    } finally {
+      setIsBooking(false);
+    }
   };
+
+  // Close modal
+  const closeModal = () => {
+    setSelectedDoctor(null);
+    setAppointmentDate("");
+    setAppointmentType("ONLINE");
+    setBookingError("");
+  };
+
+  if (!user || user.role !== "PATIENT") {
+    return (
+      <div className="doctors-by-specialization-page">
+        <div className="error-container">
+          <p>Only logged in patient can view and book appointments.</p>
+          <button onClick={() => navigate("/login")}>Go to Login</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="doctors-by-specialization-page">
-      {/* Header */}
-      <div className="dbs-header">
-        <button className="back-btn" onClick={() => navigate("/")}>
-          ← Back
-        </button>
-        <h1>{specialization}</h1>
-        <p className="doctors-count">
-          {doctors.length} {doctors.length === 1 ? "Doctor" : "Doctors"}{" "}
-          Available
-        </p>
-      </div>
+      {/* Toggle Button */}
+      <button
+        className="sidebar-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
 
-      {/* Content */}
-      <div className="dbs-container">
-        {loading && (
-          <div className="loading">
-            <p>Loading doctors...</p>
+      <div className={`dbs-layout ${isSidebarOpen ? "" : "collapsed"}`}>
+        {isSidebarOpen && <Sidebar role={normalizedRole} />}
+
+        <main className="dbs-content">
+          {/* Header */}
+          <div className="dbs-header">
+            <h1>Doctors - {specialization}</h1>
+            <p>
+              Find and book an appointment with our {specialization} specialists
+            </p>
           </div>
-        )}
 
-        {error && !loading && (
-          <div className="error-message">
-            <p>{error}</p>
+          {/* Filters Section */}
+          <div className="dbs-filters flex justify-between items-center flex-wrap gap-4">
+            <div className="filter-group">
+              <label htmlFor="search"></label>
+              <input
+                id="search"
+                type="text"
+                placeholder="Enter doctor's name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="filter-input"
+              />
+            </div>
+
+            <div className="filter-group">
+              <label htmlFor="qualification"></label>
+              <select
+                id="qualification"
+                value={qualificationFilter}
+                onChange={(e) => setQualificationFilter(e.target.value)}
+                className="filter-select h-12 border-6"
+              >
+                <option value="">All Qualifications</option>
+                {qualifications.map((qual) => (
+                  <option key={qual} value={qual}>
+                    {qual}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              className="reset-btn h-12 flex items-center justify-center"
+              onClick={() => {
+                setSearchTerm("");
+                setQualificationFilter("");
+              }}
+            >
+              Reset Filters
+            </button>
           </div>
-        )}
 
-        {!loading && doctors.length === 0 && !error && (
-          <div className="no-doctors">
-            <p>No doctors found for this specialization.</p>
-          </div>
-        )}
+          {/* Error Message */}
+          {error && <div className="error-message">{error}</div>}
 
-        {!loading && doctors.length > 0 && (
-          <div className="doctors-grid">
-            {doctors.map((doctor, index) => (
-              <div key={index} className="doctor-card">
-                {/* Image Placeholder */}
-                <div className="doctor-image-placeholder">
-                  <div className="image-placeholder">
-                    <p>Image</p>
+          {/* Loading State */}
+          {loading && (
+            <div className="loading">
+              <p>Loading doctors...</p>
+            </div>
+          )}
+
+          {/* No Results */}
+          {!loading && !error && filteredDoctors.length === 0 && (
+            <div className="no-results">
+              <p>
+                No doctors found matching your criteria. Try adjusting your
+                filters.
+              </p>
+            </div>
+          )}
+
+          {/* Doctors Grid */}
+          {!loading && !error && filteredDoctors.length > 0 && (
+            <div className="doctors-container">
+              <p className="results-count">
+                Found {filteredDoctors.length} doctor
+                {filteredDoctors.length !== 1 ? "s" : ""}
+              </p>
+              <div className="doctors-grid">
+                {filteredDoctors.map((doctor) => (
+                  <div key={doctor.id} className="doctor-card">
+                    <div className="doctor-info">
+                      <h3>{`Dr. ${doctor.name}`}</h3>
+
+                      {doctor.specialties && doctor.specialties.length > 0 && (
+                        <p className="specialization">
+                          {doctor.specialties.map((s) => s.name).join(", ")}
+                        </p>
+                      )}
+
+                      {doctor.degrees && doctor.degrees.length > 0 && (
+                        <div className="qualifications">
+                          <strong>Degrees:</strong>
+                          <ul>
+                            {doctor.degrees.map((deg, idx) => (
+                              <li key={idx}>
+                                {deg.name}
+                                {deg.passingYear && ` (${deg.passingYear})`}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {doctor.experienceYears !== undefined && (
+                        <p className="experience">
+                          <strong>Experience:</strong> {doctor.experienceYears}{" "}
+                          years
+                        </p>
+                      )}
+
+                      {doctor.consultationFee !== undefined && (
+                        <p className="fee">
+                          <strong>Consultation Fee:</strong> Rs.{" "}
+                          {doctor.consultationFee}
+                        </p>
+                      )}
+
+                      {doctor.locationDiv && (
+                        <p className="location">
+                          <strong>Location:</strong> {doctor.locationDiv}
+                        </p>
+                      )}
+                    </div>
+
+                    <button
+                      className="book-btn"
+                      onClick={() => setSelectedDoctor(doctor)}
+                    >
+                      Book Appointment
+                    </button>
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Booking Modal */}
+          {selectedDoctor && (
+            <div className="modal-overlay" onClick={closeModal}>
+              <div className="modal" onClick={(e) => e.stopPropagation()}>
+                <button className="close-btn" onClick={closeModal}>
+                  ×
+                </button>
+
+                <h2>Book Appointment</h2>
+                <p>with Dr. {selectedDoctor.name}</p>
+
+                {bookingError && (
+                  <div className="error-message">{bookingError}</div>
+                )}
+
+                <div className="form-group">
+                  <label htmlFor="date">Appointment Date</label>
+                  <input
+                    id="date"
+                    type="datetime-local"
+                    value={appointmentDate}
+                    onChange={(e) => setAppointmentDate(e.target.value)}
+                    min={new Date().toISOString().slice(0, 16)}
+                    className="form-input"
+                  />
                 </div>
 
-                {/* Doctor Info */}
-                <div className="doctor-info">
-                  <div className="name-section">
-                    <h2 className="doctor-name">
-                      Dr. {doctor.firstName} {doctor.lastName}
-                    </h2>
-                  </div>
+                <div className="form-group">
+                  <label htmlFor="type">Appointment Type</label>
+                  <select
+                    id="type"
+                    value={appointmentType}
+                    onChange={(e) => setAppointmentType(e.target.value)}
+                    className="form-select"
+                  >
+                    <option value="ONLINE">Online</option>
+                    <option value="OFFLINE">Offline</option>
+                  </select>
+                </div>
 
-                  <div className="specialization-badge">
-                    {doctor.specialization}
-                  </div>
-
-                  <div className="info-group">
-                    <label>License Number:</label>
-                    <p>{doctor.licenseNumber}</p>
-                  </div>
-
-                  <div className="info-group">
-                    <label>Qualifications:</label>
-                    <div className="qualifications-list">
-                      {parseQualifications(doctor.qualifications).length > 0 ? (
-                        parseQualifications(doctor.qualifications).map(
-                          (qual, idx) => (
-                            <span key={idx} className="qualification-badge">
-                              {qual}
-                            </span>
-                          ),
-                        )
-                      ) : (
-                        <p className="no-data">Not specified</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="info-group">
-                    <label>Experience:</label>
-                    <p className="experience">
-                      {doctor.experience
-                        ? `${doctor.experience} Years`
-                        : "Not specified"}
-                    </p>
-                  </div>
-
-                  <div className="info-group">
-                    <label>Contact Number:</label>
-                    <p className="contact">{doctor.phone}</p>
-                  </div>
-
-                  <div className="info-group">
-                    <label>Email:</label>
-                    <p className="email">{doctor.email}</p>
-                  </div>
-
-                  <div className="info-group">
-                    <label>Consultation Fee:</label>
-                    <p className="consultation-fee">
-                      ৳{doctor.consultationFee}
-                    </p>
-                  </div>
-
-                  <div className="info-group">
-                    <label>Available Days:</label>
-                    <div className="available-days">
-                      {parseAvailableDays(doctor.availableDays).length > 0 ? (
-                        parseAvailableDays(doctor.availableDays).map(
-                          (day, idx) => (
-                            <span key={idx} className="day-badge">
-                              {day}
-                            </span>
-                          ),
-                        )
-                      ) : (
-                        <p className="no-data">Not specified</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <button className="book-appointment-btn">
-                    Book Appointment
+                <div className="modal-actions">
+                  <button
+                    className="book-submit-btn"
+                    onClick={() => handleBookAppointment(selectedDoctor)}
+                    disabled={isBooking}
+                  >
+                    {isBooking ? "Booking..." : "Request Appointment"}
+                  </button>
+                  <button
+                    className="cancel-btn"
+                    onClick={closeModal}
+                    disabled={isBooking}
+                  >
+                    Cancel
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );

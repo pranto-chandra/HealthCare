@@ -407,7 +407,7 @@ export default function BookAppointment() {
                 onClick={() => handleBookAppointment(selectedDoctor)}
                 disabled={isBooking}
               >
-                {isBooking ? "Booking..." : "Confirm Booking"}
+                {isBooking ? "Booking..." : "Request Appointment"}
               </button>
               <button
                 className="cancel-btn"

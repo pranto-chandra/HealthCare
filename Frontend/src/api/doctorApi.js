@@ -11,12 +11,22 @@ export const doctorApi = {
     return apiClient.put(`/doctors/${userId}/profile`, profileData);
   },
 
-  // Get doctor appointments
+  // Get current doctor's appointments (using JWT)
+  getMyAppointments: () => {
+    return apiClient.get(`/doctors/me/appointments`);
+  },
+
+  // Get doctor appointments by ID
   getDoctorAppointments: (doctorId) => {
     return apiClient.get(`/doctors/${doctorId}/appointments`);
   },
 
-  // Get doctor patients
+  // Get current doctor's patients (using JWT)
+  getMyPatients: () => {
+    return apiClient.get(`/doctors/me/patients`);
+  },
+
+  // Get doctor patients by ID
   getDoctorPatients: (doctorId) => {
     return apiClient.get(`/doctors/${doctorId}/patients`);
   },
@@ -34,9 +44,12 @@ export const doctorApi = {
     );
   },
 
-  // Get patient record
-  getPatientRecord: (doctorId, patientId) => {
-    return apiClient.get(`/doctors/${doctorId}/records/${patientId}`);
+  // Confirm or reject an appointment (using JWT)
+  confirmAppointment: (appointmentId, status) => {
+    return apiClient.post(
+      `/doctors/me/appointments/${appointmentId}/confirm`,
+      { status }
+    );
   },
 
   // Get doctors by specialization (public route)

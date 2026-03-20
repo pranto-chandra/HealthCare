@@ -73,7 +73,7 @@ export default function Login() {
           </div>
 
           <div className="forgot">
-            <Link to="/reset-password">Forgot password?</Link>
+            <Link to="/forgot-password">Forgot password?</Link>
           </div>
 
           <button type="submit" className="login-btn">Log in</button>

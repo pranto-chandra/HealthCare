@@ -162,6 +162,8 @@ export const createAppointment = async (req, res) => {
     },
   });
 
+  console.log('Appointment created:', { appointmentId: appointment.id, patientId: appointment.patientId, doctorId: appointment.doctorId });
+
   res.status(201).json({
     success: true,
     data: appointment,

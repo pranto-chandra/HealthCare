@@ -6,6 +6,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";
 import LandingPage from "./pages/Landing";
 import DoctorsBySpecialization from "./pages/DoctorsBySpecialization";
 import PatientDashboard from "./pages/Patient/Dashboard";
@@ -39,6 +41,8 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/doctors/:specialization"
             element={<DoctorsBySpecialization />}

@@ -125,6 +125,84 @@ export const getDoctorPrescriptions = async (req, res) => {
   });
 };
 
+export const confirmAppointment = async (req, res) => {
+  const { appointmentId } = req.params;
+  const { status } = req.body; // status: CONFIRMED or CANCELLED
+
+  if (!['CONFIRMED', 'CANCELLED'].includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid status. Must be CONFIRMED or CANCELLED',
+    });
+  }
+
+  // Get the doctor's profile using their user ID from JWT
+  const doctorProfile = await prisma.doctorProfile.findUnique({
+    where: { userId: req.user.id },
+  });
+
+  if (!doctorProfile) {
+    return res.status(403).json({
+      success: false,
+      message: 'Doctor profile not found',
+    });
+  }
+
+  const appointment = await prisma.appointment.findUnique({
+    where: { id: appointmentId },
+  });
+
+  if (!appointment) {
+    return res.status(404).json({
+      success: false,
+      message: 'Appointment not found',
+    });
+  }
+
+  // Verify the doctor owns this appointment
+  if (appointment.doctorId !== doctorProfile.id) {
+    console.error('Authorization mismatch:', {
+      appointmentDoctorId: appointment.doctorId,
+      loggedInDoctorId: doctorProfile.id,
+      appointmentDetails: { id: appointment.id, patientId: appointment.patientId, status: appointment.status }
+    });
+    return res.status(403).json({
+      success: false,
+      message: 'You are not authorized to confirm this appointment',
+      debug: {
+        expectedDoctorId: doctorProfile.id,
+        appointmentDoctorId: appointment.doctorId,
+        match: appointment.doctorId === doctorProfile.id
+      }
+    });
+  }
+
+  const updatedAppointment = await prisma.appointment.update({
+    where: { id: appointmentId },
+    data: {
+      status: status,
+      ...(status === 'CANCELLED' && { cancelledAt: new Date() }),
+    },
+    include: {
+      patient: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  res.json({
+    success: true,
+    message: `Appointment ${status.toLowerCase()}`,
+    data: updatedAppointment,
+  });
+};
+
 export const getPatientRecord = async (req, res) => {
   const { patient_id } = req.params;
 
@@ -650,5 +728,73 @@ export const filterDoctors = async (req, res) => {
       specialties: doctor.specialties.map(s => s.speciality),
       degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
     })),
+  });
+};
+
+export const getMyAppointments = async (req, res) => {
+  // Get the doctor's profile using their user ID from JWT
+  const doctorProfile = await prisma.doctorProfile.findUnique({
+    where: { userId: req.user.id },
+  });
+
+  if (!doctorProfile) {
+    throw new NotFoundError('Doctor profile not found');
+  }
+
+  console.log('Getting appointments for doctorId:', doctorProfile.id);
+
+  const appointments = await prisma.appointment.findMany({
+    where: { doctorId: doctorProfile.id },
+    include: {
+      patient: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: { scheduledAt: 'desc' },
+  });
+
+  console.log(`Found ${appointments.length} appointments for doctor ${doctorProfile.id}`);
+
+  res.json({
+    success: true,
+    data: appointments,
+  });
+};
+
+export const getMyPatients = async (req, res) => {
+  // Get the doctor's profile using their user ID from JWT
+  const doctorProfile = await prisma.doctorProfile.findUnique({
+    where: { userId: req.user.id },
+  });
+
+  if (!doctorProfile) {
+    throw new NotFoundError('Doctor profile not found');
+  }
+
+  const patients = await prisma.appointment.findMany({
+    where: { doctorId: doctorProfile.id },
+    select: {
+      patient: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+    },
+    distinct: ['patientId'],
+  });
+
+  res.json({
+    success: true,
+    data: patients.map((p) => p.patient),
   });
 };

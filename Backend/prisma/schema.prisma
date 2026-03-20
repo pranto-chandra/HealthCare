@@ -56,13 +56,15 @@ enum AppointmentType {
 
 // Core User Table
 model User {
-  id                String    @id @default(uuid())
-  email             String    @unique
-  password          String
-  role              Role
-  isProfileComplete Boolean   @default(false)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                        String    @id @default(uuid())
+  email                     String    @unique
+  password                  String
+  role                      Role
+  isProfileComplete         Boolean   @default(false)
+  passwordResetToken        String?
+  passwordResetTokenExpiry  DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
 
   // Relations
   adminProfile   AdminProfile?
