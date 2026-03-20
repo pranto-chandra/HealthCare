@@ -144,7 +144,7 @@ export const createAppointment = async (req, res) => {
   // Parse the date and set a default time (10:00 AM)
   const dateObj = new Date(requestedDate);
   dateObj.setHours(10, 0, 0, 0); // Default time: 10:00 AM
-  
+
   const appointment = await prisma.appointment.create({
     data: {
       patientId: req.params.id,

@@ -41,21 +41,25 @@ export default function Appointments() {
   // Handle appointment confirmation
   const handleConfirmAppointment = async (appointmentId, status) => {
     // For CONFIRMED status, time is required
-    if (status === 'CONFIRMED' && !appointmentTimes[appointmentId]) {
-      alert('Please select a time for this appointment');
+    if (status === "CONFIRMED" && !appointmentTimes[appointmentId]) {
+      alert("Please select a time for this appointment");
       return;
     }
 
     try {
       setConfirmingId(appointmentId);
       const confirmData = { status };
-      
+
       // Add time if confirming
-      if (status === 'CONFIRMED') {
+      if (status === "CONFIRMED") {
         confirmData.time = appointmentTimes[appointmentId];
       }
 
-      await doctorApi.confirmAppointment(appointmentId, confirmData.status, confirmData.time);
+      await doctorApi.confirmAppointment(
+        appointmentId,
+        confirmData.status,
+        confirmData.time,
+      );
 
       // Update local state
       setAppointments((prev) =>
@@ -206,7 +210,9 @@ export default function Appointments() {
                       {app.status === "PENDING" && (
                         <div>
                           <div className="time-input-group">
-                            <label htmlFor={`time-${app.id}`}>Select Time:</label>
+                            <label htmlFor={`time-${app.id}`}>
+                              Select Time:
+                            </label>
                             <input
                               id={`time-${app.id}`}
                               type="time"

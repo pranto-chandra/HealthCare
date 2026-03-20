@@ -63,14 +63,15 @@ export const appointmentValidation = {
       .withMessage('Appointment type must be ONLINE or OFFLINE'),
     body('symptoms').optional().trim(),
   ],
-  
+
   confirm: [
     body('status')
       .isIn(['CONFIRMED', 'CANCELLED'])
       .withMessage('Status must be CONFIRMED or CANCELLED'),
     body('time')
       .if(body('status').equals('CONFIRMED'))
-      .notEmpty().withMessage('Time is required when confirming appointment')
+      .notEmpty()
+      .withMessage('Time is required when confirming appointment')
       .custom((value) => {
         if (value && !/^([01]\d|2[0-3]):([0-5]\d)$/.test(value)) {
           throw new Error('Invalid time format. Use HH:mm');

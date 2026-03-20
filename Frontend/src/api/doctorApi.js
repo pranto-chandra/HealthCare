@@ -50,7 +50,10 @@ export const doctorApi = {
     if (time) {
       payload.time = time;
     }
-    return apiClient.post(`/doctors/me/appointments/${appointmentId}/confirm`, payload);
+    return apiClient.post(
+      `/doctors/me/appointments/${appointmentId}/confirm`,
+      payload,
+    );
   },
 
   // Get doctors by specialization (public route)
