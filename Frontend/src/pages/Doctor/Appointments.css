@@ -214,6 +214,65 @@
   cursor: not-allowed;
 }
 
+.confirmed-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.complete-btn {
+  padding: 8px 16px;
+  background-color: #00796b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.complete-btn:hover:not(:disabled) {
+  background-color: #004d40;
+  transform: translateY(-2px);
+}
+
+.complete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.completed-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.prescribe-test-btn {
+  padding: 8px 16px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prescribe-test-btn:hover {
+  background-color: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.prescribe-test-btn:active {
+  transform: translateY(0);
+}
+
 .error-message {
   background-color: #ffebee;
   color: #c62828;

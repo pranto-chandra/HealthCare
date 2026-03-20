@@ -13,6 +13,7 @@ import {
   getDoctorsByQualification,
   filterDoctors,
   confirmAppointment,
+  completeAppointment,
   getMyAppointments,
   getMyPatients,
 } from '../controllers/doctorController.js';
@@ -39,6 +40,10 @@ router.post(
   appointmentValidation.confirm,
   validate,
   confirmAppointment
+);
+router.post(
+  '/me/appointments/:appointmentId/complete',
+  completeAppointment
 );
 router.get('/:id/profile', getDoctorProfile);
 router.put('/:id/profile', updateDoctorProfile);

@@ -149,6 +149,33 @@ async function main() {
       console.log(`✅ Doctor created: ${email} (speciality: ${specName})`);
     }
 
+    // Create Pathologist user + profile
+    const pathologistPassword = await hashPassword('pathologist123');
+    const pathologistUser = await prisma.user.upsert({
+      where: { email: 'pathologist@healthcare.com' },
+      update: {},
+      create: {
+        email: 'pathologist@healthcare.com',
+        password: pathologistPassword,
+        role: 'PATHOLOGIST',
+        isProfileComplete: true,
+      },
+    });
+
+    await prisma.pathologistProfile.upsert({
+      where: { userId: pathologistUser.id },
+      update: {},
+      create: {
+        userId: pathologistUser.id,
+        name: 'Dr. Sarah Khan',
+        phone: '01800000000',
+        licenseNumber: 'PATH-2020-001',
+        labName: 'Central Diagnostic Lab',
+        qualification: 'MD Pathology',
+      },
+    });
+    console.log('✅ Pathologist user + profile created');
+
     // Create Patient user + profile
     const patientPassword = await hashPassword('patient123');
     const patientUser = await prisma.user.upsert({
@@ -191,10 +218,97 @@ async function main() {
       console.log('✅ Sample appointment created');
     }
 
+    // Create sample Lab Tests to demonstrate workflow
+    const patientProfile = await prisma.patientProfile.findUnique({ where: { userId: patientUser.id } });
+    const pathologistProfile = await prisma.pathologistProfile.findUnique({ where: { userId: pathologistUser.id } });
+
+    if (firstDoctorProfile && patientProfile && pathologistProfile) {
+      // Find a completed appointment or create one for testing
+      let testAppointment = await prisma.appointment.findFirst({
+        where: {
+          patientId: patientProfile.id,
+          doctorId: firstDoctorProfile.id,
+        },
+      });
+
+      if (!testAppointment) {
+        testAppointment = await prisma.appointment.create({
+          data: {
+            patientId: patientProfile.id,
+            doctorId: firstDoctorProfile.id,
+            scheduledAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+            type: 'OFFLINE',
+            status: 'COMPLETED',
+            symptoms: 'General health checkup',
+            diagnosis: 'Routine checkup required',
+          },
+        });
+      }
+
+      // Test 1: RECOMMENDED status (awaiting pathologist acceptance)
+      await prisma.labTest.upsert({
+        where: { id: 'test-recommended-001' },
+        update: {},
+        create: {
+          id: 'test-recommended-001',
+          patientId: patientProfile.id,
+          doctorId: firstDoctorProfile.id,
+          appointmentId: testAppointment.id,
+          testName: 'Complete Blood Count (CBC)',
+          description: 'Full blood count to check for infections and abnormalities',
+          status: 'RECOMMENDED',
+          recommendedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+          pathologistId: null,
+        },
+      });
+
+      // Test 2: PENDING status (accepted by pathologist, awaiting results)
+      await prisma.labTest.upsert({
+        where: { id: 'test-pending-001' },
+        update: {},
+        create: {
+          id: 'test-pending-001',
+          patientId: patientProfile.id,
+          doctorId: firstDoctorProfile.id,
+          appointmentId: testAppointment.id,
+          testName: 'Blood Sugar Level (Fasting)',
+          description: 'Fasting glucose test to check for diabetes',
+          status: 'PENDING',
+          recommendedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+          pathologistId: pathologistProfile.id,
+          testDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      // Test 3: REPORT_ADDED status (completed with results)
+      await prisma.labTest.upsert({
+        where: { id: 'test-completed-001' },
+        update: {},
+        create: {
+          id: 'test-completed-001',
+          patientId: patientProfile.id,
+          doctorId: firstDoctorProfile.id,
+          appointmentId: testAppointment.id,
+          testName: 'Liver Function Test (LFT)',
+          description: 'Tests liver enzyme levels and function',
+          status: 'REPORT_ADDED',
+          reportNotes: 'All parameters within normal range. Liver function is normal.',
+          resultFile: 'uploads/reports/lft-report-001.pdf',
+          recommendedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          pathologistId: pathologistProfile.id,
+          testDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+          completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      console.log('✅ Sample Lab Tests created (RECOMMENDED, PENDING, REPORT_ADDED)');
+    }
+
     console.log('\n📋 Test Credentials:');
-    console.log('Admin:   admin@healthcare.com / admin123');
-    console.log('Doctors: doctor1@healthcare.com to doctor' + specializations.length + '@healthcare.com / doctor123');
-    console.log('Patient: patient@healthcare.com / patient123');
+    console.log('Admin:       admin@healthcare.com / admin123');
+    console.log('Doctors:     doctor1@healthcare.com to doctor' + specializations.length + '@healthcare.com / doctor123');
+    console.log('Pathologist: pathologist@healthcare.com / pathologist123');
+    console.log('Patient:     patient@healthcare.com / patient123');
 
     console.log('\n✨ Database seeded successfully!');
   } catch (error) {

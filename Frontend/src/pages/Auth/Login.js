@@ -27,6 +27,8 @@ export default function Login() {
           navigate("/doctor/dashboard");
         } else if (role === "ADMIN") {
           navigate("/admin/dashboard");
+        } else if (role === "PATHOLOGIST") {
+          navigate("/pathologist/dashboard");
         } else {
           navigate("/patient/dashboard"); // default fallback
         }

@@ -41,10 +41,9 @@ export default function DoctorsBySpecialization() {
   const [appointmentType, setAppointmentType] = useState("ONLINE");
   const [isBooking, setIsBooking] = useState(false);
 
-  // Check if user is logged in
+  // Fetch patient ID if user is logged in
   useEffect(() => {
     if (!user) {
-      navigate("/login");
       return;
     }
 
@@ -70,7 +69,7 @@ export default function DoctorsBySpecialization() {
     };
 
     fetchPatientId();
-  }, [user, navigate]);
+  }, [user]);
 
   // Fetch doctors for the selected specialization
   useEffect(() => {
@@ -145,6 +144,17 @@ export default function DoctorsBySpecialization() {
 
   // Handle booking appointment
   const handleBookAppointment = async (doctor) => {
+    // Check if user is logged in and is a patient
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    if (user.role !== "PATIENT") {
+      alert("Only patients can book appointments");
+      return;
+    }
+
     if (!appointmentDate) {
       setBookingError("Please select an appointment date");
       return;
@@ -180,29 +190,21 @@ export default function DoctorsBySpecialization() {
     setBookingError("");
   };
 
-  if (!user || user.role !== "PATIENT") {
-    return (
-      <div className="doctors-by-specialization-page">
-        <div className="error-container">
-          <p>Only logged in patient can view and book appointments.</p>
-          <button onClick={() => navigate("/login")}>Go to Login</button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="doctors-by-specialization-page">
-      {/* Toggle Button */}
-      <button
-        className="sidebar-toggle"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        ☰
-      </button>
+      {/* Toggle Button - Only show if logged in */}
+      {user && (
+        <button
+          className="sidebar-toggle"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          ☰
+        </button>
+      )}
 
-      <div className={`dbs-layout ${isSidebarOpen ? "" : "collapsed"}`}>
-        {isSidebarOpen && <Sidebar role={normalizedRole} />}
+      <div className={`dbs-layout ${isSidebarOpen && user ? "" : "collapsed"}`}>
+        {/* Sidebar - Only show if logged in */}
+        {user && isSidebarOpen && <Sidebar role={normalizedRole} />}
 
         <main className="dbs-content">
           {/* Header */}
@@ -332,8 +334,9 @@ export default function DoctorsBySpecialization() {
                     <button
                       className="book-btn"
                       onClick={() => setSelectedDoctor(doctor)}
+                      title={!user ? "Login to book appointment" : ""}
                     >
-                      Book Appointment
+                      {!user ? "🔐 Login to Book" : "Book Appointment"}
                     </button>
                   </div>
                 ))}

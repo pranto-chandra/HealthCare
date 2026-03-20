@@ -226,6 +226,74 @@ export const confirmAppointment = async (req, res) => {
   });
 };
 
+export const completeAppointment = async (req, res) => {
+  const { appointmentId } = req.params;
+
+  // Get the doctor's profile using their user ID from JWT
+  const doctorProfile = await prisma.doctorProfile.findUnique({
+    where: { userId: req.user.id },
+  });
+
+  if (!doctorProfile) {
+    return res.status(403).json({
+      success: false,
+      message: 'Doctor profile not found',
+    });
+  }
+
+  const appointment = await prisma.appointment.findUnique({
+    where: { id: appointmentId },
+  });
+
+  if (!appointment) {
+    return res.status(404).json({
+      success: false,
+      message: 'Appointment not found',
+    });
+  }
+
+  // Verify the doctor owns this appointment
+  if (appointment.doctorId !== doctorProfile.id) {
+    return res.status(403).json({
+      success: false,
+      message: 'You are not authorized to complete this appointment',
+    });
+  }
+
+  // Only CONFIRMED appointments can be completed
+  if (appointment.status !== 'CONFIRMED') {
+    return res.status(400).json({
+      success: false,
+      message: `Only CONFIRMED appointments can be completed. Current status: ${appointment.status}`,
+    });
+  }
+
+  const updatedAppointment = await prisma.appointment.update({
+    where: { id: appointmentId },
+    data: {
+      status: 'COMPLETED',
+      completedAt: new Date(),
+    },
+    include: {
+      patient: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  res.json({
+    success: true,
+    message: 'Appointment marked as completed',
+    data: updatedAppointment,
+  });
+};
+
 export const getPatientRecord = async (req, res) => {
   const { patient_id } = req.params;
 

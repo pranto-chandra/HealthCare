@@ -12,6 +12,7 @@ enum Role {
   ADMIN
   PATIENT
   DOCTOR
+  PATHOLOGIST
 }
 
 enum Gender {
@@ -54,6 +55,13 @@ enum AppointmentType {
   OFFLINE
 }
 
+enum TestStatus {
+  RECOMMENDED
+  PENDING
+  COMPLETED
+  REPORT_ADDED
+}
+
 // Core User Table
 model User {
   id                        String    @id @default(uuid())
@@ -67,9 +75,10 @@ model User {
   updatedAt                 DateTime  @updatedAt
 
   // Relations
-  adminProfile   AdminProfile?
-  patientProfile PatientProfile?
-  doctorProfile  DoctorProfile?
+  adminProfile            AdminProfile?
+  patientProfile          PatientProfile?
+  doctorProfile           DoctorProfile?
+  pathologistProfile      PathologistProfile?
 }
 
 // Admin Profile
@@ -80,6 +89,21 @@ model AdminProfile {
   phone  String
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Pathologist Profile
+model PathologistProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  name            String
+  phone           String
+  licenseNumber   String   @unique
+  labName         String?
+  qualification   String?
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  labTests        LabTest[] @relation("PathologistLabTests")
 }
 
 // Patient Profile
@@ -231,16 +255,22 @@ model LabTest {
   patientId       String
   doctorId        String
   appointmentId   String?
+  pathologistId   String?
   testName        String
-  testDate        DateTime
+  testDate        DateTime?
   description     String         @db.Text
   resultFile      String?
+  reportNotes     String?        @db.Text
+  status          TestStatus     @default(RECOMMENDED)
+  recommendedAt   DateTime       @default(now())
+  completedAt     DateTime?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
   patient         PatientProfile @relation(fields: [patientId], references: [id])
   doctor          DoctorProfile  @relation(fields: [doctorId], references: [id])
   appointment     Appointment?   @relation(fields: [appointmentId], references: [id])
+  pathologist     PathologistProfile? @relation("PathologistLabTests", fields: [pathologistId], references: [id])
 }
 
 // Medical History

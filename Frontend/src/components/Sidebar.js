@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./Sidebar.css";
 
-export default function Sidebar({ role, isOpen }) {
+export default function Sidebar({ role }) {
   const links = {
     Patient: [
       { path: "/patient/dashboard", label: "Dashboard" },
@@ -14,9 +14,10 @@ export default function Sidebar({ role, isOpen }) {
     Doctor: [
       { path: "/doctor/dashboard", label: "Dashboard" },
       { path: "/doctor/appointments", label: "Appointments" },
+      { path: "/doctor/test-results", label: "Test Results" },
       { path: "/doctor/patients", label: "Patient Records" },
       { path: "/doctor/prescriptions", label: "Prescriptions" },
-      { path: "/doctor/editprofile", label: "Edit Profile" }, 
+      { path: "/doctor/editprofile", label: "Edit Profile" },
     ],
     Admin: [
       { path: "/admin/dashboard", label: "Dashboard" },
@@ -25,15 +26,19 @@ export default function Sidebar({ role, isOpen }) {
       { path: "/admin/clinics", label: "Clinics" },
       { path: "/admin/editprofile", label: "Edit Profile" },
     ],
+    Pathologist: [
+      { path: "/pathologist/dashboard", label: "Dashboard" },
+      { path: "/pathologist/editprofile", label: "Edit Profile" },
+    ],
   };
 
   const roleLinks = links[role] || [];
 
   return (
-    <aside className={`sidebar ${isOpen ? "open" : "closed"}`}>
+    <aside className="sidebar">
       <h3 className="sidebar-title">{role} Menu</h3>
 
-      <nav >
+      <nav>
         <ul className="sidebar-list">
           {roleLinks.map((item) => (
             <li key={item.path}>
@@ -43,7 +48,6 @@ export default function Sidebar({ role, isOpen }) {
             </li>
           ))}
         </ul>
-        
       </nav>
     </aside>
   );

@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import { protect, authorize } from '../middlewares/authMiddleware.js';
-import * as labTestController from '../controllers/labTestController.js';
+import * as pathologistController from '../controllers/pathologistController.js';
 
 const router = express.Router();
 
@@ -34,35 +34,32 @@ const upload = multer({
   }
 });
 
-router.use(protect); // All routes require authentication
+// All routes require authentication and PATHOLOGIST role
+router.use(protect);
+router.use(authorize('PATHOLOGIST'));
 
-// Doctor recommends test
-router.post(
-  '/doctors/:id/recommend',
-  authorize('DOCTOR'),
-  labTestController.recommendTest
-);
+// Pathologist profile
+router.get('/profile', pathologistController.getPathologistProfile);
+router.put('/profile', pathologistController.updatePathologistProfile);
 
-// Get patient tests
-router.get('/patients/:patientId', labTestController.getPatientTests);
-
-// Get doctor's recommended tests
-router.get(
-  '/doctors/:doctorId/recommended',
-  authorize('DOCTOR'),
-  labTestController.getDoctorRecommendedTests
-);
+// Get recommended tests
+router.get('/tests/recommended', pathologistController.getRecommendedTests);
+router.get('/tests/my', pathologistController.getMyTests);
 
 // Get single test details
-router.get('/:testId', labTestController.getTestDetail);
+router.get('/tests/:testId', pathologistController.getTestDetails);
 
-// Get test results
-router.get('/patients/:patientId/results', labTestController.getTestResults);
+// Accept test (assign to pathologist)
+router.put('/tests/:testId/accept', pathologistController.acceptTest);
 
-// Update test status
-router.put('/:testId/status', labTestController.updateTestStatus);
+// Add test report with file upload
+router.post(
+  '/tests/:testId/report',
+  upload.single('reportFile'),
+  pathologistController.addTestReport
+);
 
-// Delete test recommendation
-router.delete('/:testId', labTestController.deleteTestRecommendation);
+// Get patient test results
+router.get('/patients/:patientId/results', pathologistController.getPatientTestResults);
 
 export default router;

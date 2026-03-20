@@ -13,11 +13,13 @@ import DoctorsBySpecialization from "./pages/DoctorsBySpecialization";
 import PatientDashboard from "./pages/Patient/Dashboard";
 import DoctorDashboard from "./pages/Doctor/Dashboard";
 import AdminDashboard from "./pages/Admin/Dashboard";
+import PathologistDashboard from "./pages/Pathologist/PathologistDashboard";
 import PatientAppointment from "./pages/Patient/Appointments";
 import PatientPrescriptions from "./pages/Patient/Prescriptions";
 import HealthMonitoring from "./pages/Patient/HealthMonitoring";
 import BookAppointment from "./pages/Patient/BookAppointment";
 import DoctorAppointment from "./pages/Doctor/Appointments";
+import DoctorTestResults from "./pages/Doctor/TestResults";
 import PatientRecords from "./pages/Doctor/PatientRecords";
 import PrescriptionPage from "./pages/Doctor/Prescriptions";
 import ManageUsers from "./pages/Admin/ManageUsers";
@@ -27,6 +29,7 @@ import NotFound from "./pages/NotFound";
 import PatientEdit from "./pages/Patient/EditProfile";
 import DoctorEdit from "./pages/Doctor/EditProfile";
 import AdminEdit from "./pages/Admin/EditProfile";
+import PathologistEdit from "./pages/Pathologist/EditProfile";
 import Contact from "./pages/contact";
 import Blogs from "./pages/Blogs";
 import AboutUs from "./pages/AboutUs";
@@ -58,6 +61,7 @@ export default function App() {
           />
           <Route path="/patient/health" element={<HealthMonitoring />} />
           <Route path="/doctor/appointments" element={<DoctorAppointment />} />
+          <Route path="/doctor/test-results" element={<DoctorTestResults />} />
           <Route path="/doctor/patients" element={<PatientRecords />} />
           <Route path="/doctor/prescriptions" element={<PrescriptionPage />} />
           <Route path="/admin/manage" element={<ManageUsers />} />
@@ -66,6 +70,7 @@ export default function App() {
           <Route path="/patient/editprofile" element={<PatientEdit />} />
           <Route path="/doctor/editprofile" element={<DoctorEdit />} />
           <Route path="/admin/editprofile" element={<AdminEdit />} />
+          <Route path="/pathologist/editprofile" element={<PathologistEdit />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/about" element={<AboutUs />} />
@@ -92,6 +97,14 @@ export default function App() {
             element={
               <ProtectedRoute role="Admin">
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pathologist/dashboard"
+            element={
+              <ProtectedRoute role="Pathologist">
+                <PathologistDashboard />
               </ProtectedRoute>
             }
           />

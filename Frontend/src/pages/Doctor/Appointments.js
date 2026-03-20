@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
 import { AuthContext } from "../../context/AuthContext";
 import doctorApi from "../../api/doctorApi";
+import RecommendTest from "./RecommendTest";
 import { getErrorMessage } from "../../utils/helpers";
 import "./Appointments.css";
 
@@ -15,6 +16,11 @@ export default function Appointments() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [confirmingId, setConfirmingId] = useState(null);
   const [appointmentTimes, setAppointmentTimes] = useState({}); // Track time for each appointment
+  const [completingId, setCompletingId] = useState(null); // Track which appointment is being completed
+  const [showTestForm, setShowTestForm] = useState(null); // Track which appointment to recommend test for
+
+  // Get doctorId from user's doctorProfile
+  const doctorId = user?.doctorProfile?.id;
 
   // Fetch doctor appointments
   useEffect(() => {
@@ -79,6 +85,30 @@ export default function Appointments() {
       console.error("Error confirming appointment:", err);
     } finally {
       setConfirmingId(null);
+    }
+  };
+
+  // Handle appointment completion
+  const handleCompleteAppointment = async (appointmentId) => {
+    if (!window.confirm("Mark this appointment as completed?")) {
+      return;
+    }
+
+    try {
+      setCompletingId(appointmentId);
+      await doctorApi.completeAppointment(appointmentId);
+
+      // Update local state
+      setAppointments((prev) =>
+        prev.map((app) =>
+          app.id === appointmentId ? { ...app, status: "COMPLETED" } : app,
+        ),
+      );
+    } catch (err) {
+      alert(getErrorMessage(err));
+      console.error("Error completing appointment:", err);
+    } finally {
+      setCompletingId(null);
     }
   };
 
@@ -252,8 +282,53 @@ export default function Appointments() {
                           </div>
                         </div>
                       )}
+
+                      {app.status === "CONFIRMED" && (
+                        <div className="confirmed-actions">
+                          <button
+                            className="complete-btn"
+                            onClick={() => handleCompleteAppointment(app.id)}
+                            disabled={completingId === app.id}
+                          >
+                            {completingId === app.id
+                              ? "Completing..."
+                              : "✓ Mark Complete"}
+                          </button>
+                        </div>
+                      )}
+
+                      {app.status === "COMPLETED" && (
+                        <div className="completed-actions">
+                          <button
+                            className="prescribe-test-btn"
+                            onClick={() => setShowTestForm(app.id)}
+                          >
+                            📋 Prescribe Test
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
+
+                  {/* Test Recommendation Form */}
+                  {showTestForm === app.id && doctorId && (
+                    <RecommendTest
+                      appointmentId={app.id}
+                      patientId={app.patientId}
+                      doctorId={doctorId}
+                      onTestRecommended={() => {
+                        setShowTestForm(null);
+                        setAppointments((prev) =>
+                          prev.map((a) =>
+                            a.id === app.id
+                              ? { ...a, testRecommended: true }
+                              : a
+                          )
+                        );
+                      }}
+                      onCancel={() => setShowTestForm(null)}
+                    />
+                  )}
                 </div>
               );
             })}

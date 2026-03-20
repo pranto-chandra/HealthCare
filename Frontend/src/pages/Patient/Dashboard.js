@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
+import TestReports from "../../components/TestReports";
 import "./Dashboard.css";
 
 export default function PatientDashboard() {
@@ -14,6 +15,11 @@ export default function PatientDashboard() {
     }
     return "Patient";
   };
+
+  const getPatientId = () => {
+    return user?.patientProfile?.id;
+  };
+
   return (
     <div className="patient-dashboard">
 
@@ -60,6 +66,13 @@ export default function PatientDashboard() {
               <li>📊 Health data updated.</li>
             </ul>
           </section>
+
+          {/* Lab Test Reports Section */}
+          {getPatientId() && (
+            <section className="lab-tests-section">
+              <TestReports patientId={getPatientId()} />
+            </section>
+          )}
         </main>
       </div>
     </div>

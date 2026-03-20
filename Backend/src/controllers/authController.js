@@ -58,6 +58,15 @@ export const register = async (req, res) => {
         phone: '',
       },
     });
+  } else if (role === 'PATHOLOGIST') {
+    await prisma.pathologistProfile.create({
+      data: {
+        userId: user.id,
+        name: 'Pathologist',
+        phone: '',
+        licenseNumber: 'N/A',
+      },
+    });
   }
 
   // Generate tokens
@@ -107,6 +116,7 @@ export const login = async (req, res) => {
       patientProfile: true,
       doctorProfile: true,
       adminProfile: true,
+      pathologistProfile: true,
     },
   });
 

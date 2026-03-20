@@ -56,6 +56,14 @@ export const doctorApi = {
     );
   },
 
+  // Complete an appointment (mark as COMPLETED)
+  completeAppointment: (appointmentId) => {
+    return apiClient.post(
+      `/doctors/me/appointments/${appointmentId}/complete`,
+      {},
+    );
+  },
+
   // Get doctors by specialization (public route)
   getDoctorsBySpecialization: (specialization) => {
     return apiClient.get(

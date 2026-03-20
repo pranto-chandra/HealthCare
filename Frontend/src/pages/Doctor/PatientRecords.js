@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
+import TestReports from "../../components/TestReports";
 import "./PatientRecords.css";
 
 export default function PatientRecords() {
@@ -8,6 +9,7 @@ export default function PatientRecords() {
   const [isEditing, setIsEditing] = useState(false);
 
   const [patient, setPatient] = useState({
+    id: "patient-123", // Add patient ID for test reports
     name: "John Doe",
     age: 42,
     gender: "Male",
@@ -78,6 +80,9 @@ export default function PatientRecords() {
               {patient.prescriptions.map((med, index) => <li key={index}>{med}</li>)}
             </ul>
           </section>
+
+          {/* Test Reports Section */}
+          {patient.id && <TestReports patientId={patient.id} />}
 
           <section className="activity-section">
             <h2>Recent Activity</h2>

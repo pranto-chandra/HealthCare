@@ -4,6 +4,7 @@ import userRoutes from './userRoutes.js';
 import patientRoutes from './patientRoutes.js';
 import doctorRoutes from './doctorRoutes.js';
 import adminRoutes from './adminRoutes.js';
+import pathologistRoutes from './pathologistRoutes.js';
 import healthMonitoringRoutes from './healthMonitoringRoutes.js';
 import labTestRoutes from './labTestRoutes.js';
 
@@ -14,6 +15,7 @@ router.use('/users', userRoutes);
 router.use('/patients', patientRoutes);
 router.use('/doctors', doctorRoutes);
 router.use('/admin', adminRoutes);
+router.use('/pathologists', pathologistRoutes);
 router.use('/health-monitoring', healthMonitoringRoutes);
 router.use('/lab-tests', labTestRoutes);
 
