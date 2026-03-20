@@ -25,7 +25,7 @@ export const createPatient = async (req, res) => {
   // Mark user profile as complete
   await prisma.user.update({
     where: { id: req.user.id },
-    data: { isProfileComplete: true }
+    data: { isProfileComplete: true },
   });
 
   res.status(201).json({
@@ -162,7 +162,11 @@ export const createAppointment = async (req, res) => {
     },
   });
 
-  console.log('Appointment created:', { appointmentId: appointment.id, patientId: appointment.patientId, doctorId: appointment.doctorId });
+  console.log('Appointment created:', {
+    appointmentId: appointment.id,
+    patientId: appointment.patientId,
+    doctorId: appointment.doctorId,
+  });
 
   res.status(201).json({
     success: true,

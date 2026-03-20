@@ -21,8 +21,8 @@ export const register = async (req, res) => {
     data: {
       email,
       password: hashedPassword,
-      role
-    }
+      role,
+    },
   });
 
   // Create role-specific profile
@@ -34,8 +34,8 @@ export const register = async (req, res) => {
         phone: '',
         dateOfBirth: new Date('2000-01-01'),
         gender: 'OTHER',
-        bloodGroup: 'O_POSITIVE'
-      }
+        bloodGroup: 'O_POSITIVE',
+      },
     });
   } else if (role === 'DOCTOR') {
     await prisma.doctorProfile.create({
@@ -47,16 +47,16 @@ export const register = async (req, res) => {
         locationDiv: 'DHAKA',
         licenseNumber: 'N/A',
         consultationFee: 0,
-        experienceYears: 0
-      }
+        experienceYears: 0,
+      },
     });
   } else if (role === 'ADMIN') {
     await prisma.adminProfile.create({
       data: {
         userId: user.id,
         name: 'Admin',
-        phone: ''
-      }
+        phone: '',
+      },
     });
   }
 
@@ -71,13 +71,13 @@ export const register = async (req, res) => {
         id: user.id,
         email: user.email,
         role: user.role,
-        isProfileComplete: user.isProfileComplete
+        isProfileComplete: user.isProfileComplete,
       },
       tokens: {
         accessToken,
-        refreshToken
-      }
-    }
+        refreshToken,
+      },
+    },
   });
 };
 
@@ -107,7 +107,7 @@ export const login = async (req, res) => {
       patientProfile: true,
       doctorProfile: true,
       adminProfile: true,
-    }
+    },
   });
 
   // Generate tokens
@@ -120,9 +120,9 @@ export const login = async (req, res) => {
       user: completeUser,
       tokens: {
         accessToken,
-        refreshToken
-      }
-    }
+        refreshToken,
+      },
+    },
   });
 };
 
@@ -131,7 +131,7 @@ export const logout = async (req, res) => {
   // or implement a token revocation mechanism
   res.json({
     success: true,
-    message: 'Successfully logged out'
+    message: 'Successfully logged out',
   });
 };
 
@@ -145,14 +145,14 @@ export const forgotPassword = async (req, res) => {
     // Don't reveal if user exists or not for security
     return res.json({
       success: true,
-      message: 'If an account exists with that email, password reset instructions have been sent'
+      message: 'If an account exists with that email, password reset instructions have been sent',
     });
   }
 
   // Generate a random reset token
   const resetToken = crypto.randomBytes(32).toString('hex');
   const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  
+
   // Set token expiry to 1 hour from now
   const tokenExpiry = new Date(Date.now() + 3600000);
 
@@ -161,8 +161,8 @@ export const forgotPassword = async (req, res) => {
     where: { id: user.id },
     data: {
       passwordResetToken: hashedToken,
-      passwordResetTokenExpiry: tokenExpiry
-    }
+      passwordResetTokenExpiry: tokenExpiry,
+    },
   });
 
   // In a real application, send email with reset link
@@ -172,7 +172,7 @@ export const forgotPassword = async (req, res) => {
     message: 'Password reset token generated',
     // NOTE: In production, send this token via email instead of returning it
     resetToken: resetToken,
-    resetLink: `http://localhost:3000/reset-password?token=${resetToken}`
+    resetLink: `http://localhost:3000/reset-password?token=${resetToken}`,
   });
 };
 
@@ -196,9 +196,9 @@ export const confirmPasswordReset = async (req, res) => {
     where: {
       passwordResetToken: hashedToken,
       passwordResetTokenExpiry: {
-        gt: new Date() // Token must not be expired
-      }
-    }
+        gt: new Date(), // Token must not be expired
+      },
+    },
   });
 
   if (!user) {
@@ -214,13 +214,13 @@ export const confirmPasswordReset = async (req, res) => {
     data: {
       password: hashedPassword,
       passwordResetToken: null,
-      passwordResetTokenExpiry: null
-    }
+      passwordResetTokenExpiry: null,
+    },
   });
 
   res.json({
     success: true,
-    message: 'Password has been reset successfully. Please login with your new password.'
+    message: 'Password has been reset successfully. Please login with your new password.',
   });
 };
 
@@ -243,14 +243,14 @@ export const resetPassword = async (req, res) => {
     where: { id: user.id },
     data: {
       passwordResetToken: hashedToken,
-      passwordResetTokenExpiry: tokenExpiry
-    }
+      passwordResetTokenExpiry: tokenExpiry,
+    },
   });
 
   res.json({
     success: true,
     message: 'Password reset instructions sent to email',
     resetToken: resetToken,
-    resetLink: `http://localhost:3000/reset-password?token=${resetToken}`
+    resetLink: `http://localhost:3000/reset-password?token=${resetToken}`,
   });
 };

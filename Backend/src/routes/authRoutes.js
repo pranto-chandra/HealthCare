@@ -1,5 +1,12 @@
 import express from 'express';
-import { register, login, logout, resetPassword, forgotPassword, confirmPasswordReset } from '../controllers/authController.js';
+import {
+  register,
+  login,
+  logout,
+  resetPassword,
+  forgotPassword,
+  confirmPasswordReset,
+} from '../controllers/authController.js';
 import { userValidation, validate } from '../utils/validation.js';
 
 const router = express.Router();

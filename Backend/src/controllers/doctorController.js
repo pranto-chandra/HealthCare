@@ -164,7 +164,11 @@ export const confirmAppointment = async (req, res) => {
     console.error('Authorization mismatch:', {
       appointmentDoctorId: appointment.doctorId,
       loggedInDoctorId: doctorProfile.id,
-      appointmentDetails: { id: appointment.id, patientId: appointment.patientId, status: appointment.status }
+      appointmentDetails: {
+        id: appointment.id,
+        patientId: appointment.patientId,
+        status: appointment.status,
+      },
     });
     return res.status(403).json({
       success: false,
@@ -172,8 +176,8 @@ export const confirmAppointment = async (req, res) => {
       debug: {
         expectedDoctorId: doctorProfile.id,
         appointmentDoctorId: appointment.doctorId,
-        match: appointment.doctorId === doctorProfile.id
-      }
+        match: appointment.doctorId === doctorProfile.id,
+      },
     });
   }
 
@@ -295,8 +299,8 @@ export const getDoctorProfile = async (req, res) => {
       licenseNumber: doctor.licenseNumber,
       consultationFee: doctor.consultationFee,
       experienceYears: doctor.experienceYears,
-      specialties: doctor.specialties.map(s => s.speciality),
-      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
+      specialties: doctor.specialties.map((s) => s.speciality),
+      degrees: doctor.degrees.map((d) => ({ ...d.degree, passingYear: d.passingYear })),
     },
   });
 };
@@ -354,7 +358,7 @@ export const updateDoctorProfile = async (req, res) => {
   // Mark user profile as complete
   await prisma.user.update({
     where: { id },
-    data: { isProfileComplete: true }
+    data: { isProfileComplete: true },
   });
 
   // Fetch the updated doctor profile with all relationships
@@ -393,7 +397,7 @@ export const updateDoctorProfile = async (req, res) => {
       patientProfile: true,
       doctorProfile: true,
       adminProfile: true,
-    }
+    },
   });
 
   res.json({
@@ -463,8 +467,8 @@ export const getDoctorsBySpecialization = async (req, res) => {
       licenseNumber: ds.doctor.licenseNumber,
       consultationFee: ds.doctor.consultationFee,
       experienceYears: ds.doctor.experienceYears,
-      specialties: ds.doctor.specialties.map(s => s.speciality),
-      degrees: ds.doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
+      specialties: ds.doctor.specialties.map((s) => s.speciality),
+      degrees: ds.doctor.degrees.map((d) => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };
@@ -508,8 +512,8 @@ export const getAllDoctors = async (req, res) => {
       licenseNumber: doctor.licenseNumber,
       consultationFee: doctor.consultationFee,
       experienceYears: doctor.experienceYears,
-      specialties: doctor.specialties.map(s => s.speciality),
-      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
+      specialties: doctor.specialties.map((s) => s.speciality),
+      degrees: doctor.degrees.map((d) => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };
@@ -587,8 +591,8 @@ export const searchDoctors = async (req, res) => {
       licenseNumber: doctor.licenseNumber,
       consultationFee: doctor.consultationFee,
       experienceYears: doctor.experienceYears,
-      specialties: doctor.specialties.map(s => s.speciality),
-      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
+      specialties: doctor.specialties.map((s) => s.speciality),
+      degrees: doctor.degrees.map((d) => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };
@@ -628,7 +632,7 @@ export const getDoctorsByQualification = async (req, res) => {
   });
 
   // Filter to only include doctors with the specific degree
-  const filtered = doctors.filter(doc => doc.degrees.length > 0);
+  const filtered = doctors.filter((doc) => doc.degrees.length > 0);
 
   res.json({
     success: true,
@@ -643,8 +647,8 @@ export const getDoctorsByQualification = async (req, res) => {
       licenseNumber: doctor.licenseNumber,
       consultationFee: doctor.consultationFee,
       experienceYears: doctor.experienceYears,
-      specialties: doctor.specialties.map(s => s.speciality),
-      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
+      specialties: doctor.specialties.map((s) => s.speciality),
+      degrees: doctor.degrees.map((d) => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };
@@ -708,7 +712,7 @@ export const filterDoctors = async (req, res) => {
   if (qualification) {
     const decodedQual = decodeURIComponent(qualification);
     filteredDoctors = filteredDoctors.filter((doctor) => {
-      return doctor.degrees.some(d => d.degree.name === decodedQual);
+      return doctor.degrees.some((d) => d.degree.name === decodedQual);
     });
   }
 
@@ -725,8 +729,8 @@ export const filterDoctors = async (req, res) => {
       licenseNumber: doctor.licenseNumber,
       consultationFee: doctor.consultationFee,
       experienceYears: doctor.experienceYears,
-      specialties: doctor.specialties.map(s => s.speciality),
-      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
+      specialties: doctor.specialties.map((s) => s.speciality),
+      degrees: doctor.degrees.map((d) => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };

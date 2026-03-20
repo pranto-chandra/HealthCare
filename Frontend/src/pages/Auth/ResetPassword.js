@@ -26,7 +26,8 @@ export default function ResetPassword() {
           <div className="error-box">
             <h2>Invalid Reset Link</h2>
             <p>
-              The password reset link is invalid or has expired. Please request a new one.
+              The password reset link is invalid or has expired. Please request
+              a new one.
             </p>
             <Link to="/forgot-password" className="btn-primary">
               Request New Reset Link
@@ -98,7 +99,8 @@ export default function ResetPassword() {
           <div className="error-box">
             <h2>Reset Link Expired</h2>
             <p>
-              This password reset link has expired or is invalid. Please request a new one.
+              This password reset link has expired or is invalid. Please request
+              a new one.
             </p>
             <Link to="/forgot-password" className="btn-primary">
               Request New Reset Link
@@ -117,7 +119,8 @@ export default function ResetPassword() {
       <div className="reset-password-card">
         <h2>Reset Your Password</h2>
         <p className="subtitle">
-          Enter a new password for your account. Make sure it's strong and secure.
+          Enter a new password for your account. Make sure it's strong and
+          secure.
         </p>
 
         {success && (
@@ -193,7 +196,9 @@ export default function ResetPassword() {
                 <p className="match-indicator valid">✓ Passwords match</p>
               )}
               {confirmPassword && password !== confirmPassword && (
-                <p className="match-indicator invalid">✗ Passwords do not match</p>
+                <p className="match-indicator invalid">
+                  ✗ Passwords do not match
+                </p>
               )}
             </div>
 

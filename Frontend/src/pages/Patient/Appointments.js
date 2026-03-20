@@ -31,13 +31,12 @@ export default function Appointments() {
         // Get appointments
         const appointmentRes = await appointmentApi.getAppointments(pId);
         const appointmentData = appointmentRes?.data?.data || [];
-        
+
         // Sort by scheduled date descending
         appointmentData.sort(
-          (a, b) =>
-            new Date(b.scheduledAt) - new Date(a.scheduledAt)
+          (a, b) => new Date(b.scheduledAt) - new Date(a.scheduledAt),
         );
-        
+
         setAppointments(appointmentData);
       } catch (err) {
         setError(getErrorMessage(err));
@@ -65,8 +64,7 @@ export default function Appointments() {
   // Get upcoming appointment (first confirmed appointment in future)
   const upcomingAppointment = appointments.find(
     (app) =>
-      app.status === "CONFIRMED" &&
-      new Date(app.scheduledAt) > new Date()
+      app.status === "CONFIRMED" && new Date(app.scheduledAt) > new Date(),
   );
 
   // Get status color class
@@ -104,9 +102,7 @@ export default function Appointments() {
       </button>
 
       <div
-        className={`appointments-layout ${
-          isSidebarOpen ? "" : "collapsed"
-        }`}
+        className={`appointments-layout ${isSidebarOpen ? "" : "collapsed"}`}
       >
         {isSidebarOpen && <Sidebar role="Patient" />}
 
@@ -145,7 +141,7 @@ export default function Appointments() {
                     </p>
                     <span
                       className={`status ${getStatusClass(
-                        upcomingAppointment.status
+                        upcomingAppointment.status,
                       )}`}
                     >
                       {upcomingAppointment.status}
@@ -186,7 +182,7 @@ export default function Appointments() {
                             <td>
                               <span
                                 className={`status ${getStatusClass(
-                                  app.status
+                                  app.status,
                                 )}`}
                               >
                                 {app.status}

@@ -15,28 +15,28 @@ export const userValidation = {
     body('password')
       .isLength({ min: 6 })
       .withMessage('Password must be at least 6 characters long'),
-    body('role').isIn(['ADMIN', 'DOCTOR', 'PATIENT']).withMessage('Invalid role')
+    body('role').isIn(['ADMIN', 'DOCTOR', 'PATIENT']).withMessage('Invalid role'),
   ],
-  
+
   login: [
     body('email').isEmail().withMessage('Please provide a valid email'),
-    body('password').notEmpty().withMessage('Password is required')
-  ]
+    body('password').notEmpty().withMessage('Password is required'),
+  ],
 };
 
 export const patientValidation = {
   create: [
     body('bloodGroup').trim().notEmpty().withMessage('Blood group is required'),
     body('gender').isIn(['MALE', 'FEMALE', 'OTHER']).withMessage('Invalid gender'),
-    body('emergencyContact').trim().notEmpty().withMessage('Emergency contact is required')
+    body('emergencyContact').trim().notEmpty().withMessage('Emergency contact is required'),
   ],
-  
+
   update: [
     param('id').isUUID().withMessage('Invalid patient ID'),
     body('bloodGroup').optional().trim(),
     body('gender').optional().isIn(['MALE', 'FEMALE', 'OTHER']),
-    body('emergencyContact').optional().trim()
-  ]
+    body('emergencyContact').optional().trim(),
+  ],
 };
 
 export const appointmentValidation = {
@@ -58,9 +58,11 @@ export const appointmentValidation = {
         return true;
       })
       .withMessage('Invalid appointment date'),
-    body('type').isIn(['ONLINE', 'OFFLINE']).withMessage('Appointment type must be ONLINE or OFFLINE'),
-    body('symptoms').optional().trim()
-  ]
+    body('type')
+      .isIn(['ONLINE', 'OFFLINE'])
+      .withMessage('Appointment type must be ONLINE or OFFLINE'),
+    body('symptoms').optional().trim(),
+  ],
 };
 
 export const prescriptionValidation = {
@@ -69,12 +71,14 @@ export const prescriptionValidation = {
     body('diagnosis').trim().notEmpty().withMessage('Diagnosis is required'),
     body('description').trim().notEmpty().withMessage('Description is required'),
     body('medications').isArray().withMessage('Medications must be an array'),
-    body('medications.*.medicationName').trim().notEmpty()
+    body('medications.*.medicationName')
+      .trim()
+      .notEmpty()
       .withMessage('Medication name is required'),
     body('medications.*.dosage').trim().notEmpty().withMessage('Dosage is required'),
     body('medications.*.frequency').trim().notEmpty().withMessage('Frequency is required'),
-    body('medications.*.duration').trim().notEmpty().withMessage('Duration is required')
-  ]
+    body('medications.*.duration').trim().notEmpty().withMessage('Duration is required'),
+  ],
 };
 
 export const healthMonitoringValidation = {
@@ -84,8 +88,8 @@ export const healthMonitoringValidation = {
     body('temperature').optional().isFloat(),
     body('weight').optional().isFloat(),
     body('bloodPressure').optional().trim(),
-    body('recordDate').isISO8601().withMessage('Invalid record date')
-  ]
+    body('recordDate').isISO8601().withMessage('Invalid record date'),
+  ],
 };
 
 export const labTestValidation = {
@@ -93,6 +97,6 @@ export const labTestValidation = {
     param('id').isUUID().withMessage('Invalid patient ID'),
     body('testName').trim().notEmpty().withMessage('Test name is required'),
     body('testDate').isISO8601().withMessage('Invalid test date'),
-    body('description').trim().notEmpty().withMessage('Description is required')
-  ]
+    body('description').trim().notEmpty().withMessage('Description is required'),
+  ],
 };

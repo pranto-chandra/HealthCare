@@ -46,8 +46,8 @@ export default function Appointments() {
       // Update local state
       setAppointments((prev) =>
         prev.map((app) =>
-          app.id === appointmentId ? { ...app, status } : app
-        )
+          app.id === appointmentId ? { ...app, status } : app,
+        ),
       );
     } catch (err) {
       alert(getErrorMessage(err));
@@ -59,8 +59,7 @@ export default function Appointments() {
 
   // Filter appointments
   const filteredAppointments = appointments.filter((app) => {
-    const matchStatus =
-      filterStatus === "All" || app.status === filterStatus;
+    const matchStatus = filterStatus === "All" || app.status === filterStatus;
     const matchDate =
       !selectedDate ||
       new Date(app.scheduledAt).toISOString().split("T")[0] === selectedDate;
@@ -178,9 +177,7 @@ export default function Appointments() {
                     </div>
                     <div className="status-section">
                       <span
-                        className={`status-badge ${getStatusColor(
-                          app.status
-                        )}`}
+                        className={`status-badge ${getStatusColor(app.status)}`}
                       >
                         {app.status}
                       </span>
@@ -194,7 +191,9 @@ export default function Appointments() {
                             }
                             disabled={confirmingId === app.id}
                           >
-                            {confirmingId === app.id ? "Confirming..." : "Confirm"}
+                            {confirmingId === app.id
+                              ? "Confirming..."
+                              : "Confirm"}
                           </button>
                           <button
                             className="reject-btn"
@@ -203,7 +202,9 @@ export default function Appointments() {
                             }
                             disabled={confirmingId === app.id}
                           >
-                            {confirmingId === app.id ? "Rejecting..." : "Reject"}
+                            {confirmingId === app.id
+                              ? "Rejecting..."
+                              : "Reject"}
                           </button>
                         </div>
                       )}

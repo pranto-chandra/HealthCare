@@ -49,23 +49,19 @@ export default function ForgotPassword() {
       <div className="forgot-password-card">
         <h2>Forgot Password?</h2>
         <p className="subtitle">
-          Enter your email address and we'll send you instructions to reset your password.
+          Enter your email address and we'll send you instructions to reset your
+          password.
         </p>
 
         {resetSent && (
           <div className="success-message">
             <h3>✓ Email Sent Successfully!</h3>
             <p>
-              Check your email for password reset instructions. If you don't see it,
-              check your spam folder.
+              Check your email for password reset instructions. If you don't see
+              it, check your spam folder.
             </p>
-            <p className="small-text">
-              The link will expire in 1 hour.
-            </p>
-            <button 
-              className="btn-primary" 
-              onClick={() => navigate("/login")}
-            >
+            <p className="small-text">The link will expire in 1 hour.</p>
+            <button className="btn-primary" onClick={() => navigate("/login")}>
               Back to Login
             </button>
           </div>
@@ -88,11 +84,7 @@ export default function ForgotPassword() {
               />
             </div>
 
-            <button 
-              type="submit" 
-              className="btn-primary" 
-              disabled={loading}
-            >
+            <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? "Sending..." : "Send Reset Link"}
             </button>
 

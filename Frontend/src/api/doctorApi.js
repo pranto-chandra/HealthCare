@@ -46,10 +46,9 @@ export const doctorApi = {
 
   // Confirm or reject an appointment (using JWT)
   confirmAppointment: (appointmentId, status) => {
-    return apiClient.post(
-      `/doctors/me/appointments/${appointmentId}/confirm`,
-      { status }
-    );
+    return apiClient.post(`/doctors/me/appointments/${appointmentId}/confirm`, {
+      status,
+    });
   },
 
   // Get doctors by specialization (public route)
