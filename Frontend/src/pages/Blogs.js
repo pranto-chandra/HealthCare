@@ -9,9 +9,11 @@ import blog3 from "./images/blog-lifestyle.jpg";
 
 export default function Blogs() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const { user } = useContext(AuthContext);
-    const role = user?.role; // Patient | Doctor | Admin
-    const normalizedRole = user?.role
+  const { user } = useContext(AuthContext);
+  
+  // Only show sidebar for logged-in users
+  const shouldShowSidebar = user && user.role;
+  const normalizedRole = user?.role
     ? user.role.toLowerCase().charAt(0).toUpperCase() +
       user.role.toLowerCase().slice(1)
     : null;
@@ -44,15 +46,17 @@ export default function Blogs() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-6">
-       {/* Toggle Button */}
-      <button
-        className="sidebar-toggle"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        ☰
-      </button>
+       {/* Toggle Button - Only show if logged in */}
+      {shouldShowSidebar && (
+        <button
+          className="sidebar-toggle"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          ☰
+        </button>
+      )}
+      {shouldShowSidebar && isSidebarOpen && <Sidebar role={normalizedRole} />}
       <div className={`max-w-6xl mx-auto ${isSidebarOpen ? "" : "collapsed"}`}>
-        {isSidebarOpen && <Sidebar role={normalizedRole} />}
         {/* Page Header */}
         <h1 className="text-4xl font-bold text-center text-teal-800 mb-4">
           Health Blogs

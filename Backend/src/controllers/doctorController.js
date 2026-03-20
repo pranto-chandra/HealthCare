@@ -9,16 +9,13 @@ export const getDoctorAppointments = async (req, res) => {
         include: {
           user: {
             select: {
-              firstName: true,
-              lastName: true,
               email: true,
-              phone: true,
             },
           },
         },
       },
     },
-    orderBy: { appointmentDate: 'desc' },
+    orderBy: { scheduledAt: 'desc' },
   });
 
   res.json({
@@ -35,10 +32,7 @@ export const getDoctorPatients = async (req, res) => {
         include: {
           user: {
             select: {
-              firstName: true,
-              lastName: true,
               email: true,
-              phone: true,
             },
           },
         },
@@ -135,16 +129,12 @@ export const getPatientRecord = async (req, res) => {
   const { patient_id } = req.params;
 
   // Get comprehensive patient record
-  const patientRecord = await prisma.patient.findUnique({
+  const patientRecord = await prisma.patientProfile.findUnique({
     where: { id: patient_id },
     include: {
       user: {
         select: {
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
         },
       },
       appointments: {
@@ -189,18 +179,24 @@ export const getDoctorProfile = async (req, res) => {
     throw new UnauthorizedError('Not authorized to access this profile');
   }
 
-  const doctor = await prisma.doctor.findUnique({
+  const doctor = await prisma.doctorProfile.findUnique({
     where: { userId: id },
     include: {
       user: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
           role: true,
+        },
+      },
+      specialties: {
+        include: {
+          speciality: true,
+        },
+      },
+      degrees: {
+        include: {
+          degree: true,
         },
       },
     },
@@ -214,12 +210,15 @@ export const getDoctorProfile = async (req, res) => {
     success: true,
     data: {
       ...doctor.user,
-      specialization: doctor.specialization,
+      name: doctor.name,
+      phone: doctor.phone,
+      dateOfBirth: doctor.dateOfBirth,
+      locationDiv: doctor.locationDiv,
       licenseNumber: doctor.licenseNumber,
-      qualifications: doctor.qualifications,
-      experience: doctor.experience,
       consultationFee: doctor.consultationFee,
-      availableDays: doctor.availableDays,
+      experienceYears: doctor.experienceYears,
+      specialties: doctor.specialties.map(s => s.speciality),
+      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
     },
   });
 };
@@ -227,16 +226,14 @@ export const getDoctorProfile = async (req, res) => {
 export const updateDoctorProfile = async (req, res) => {
   const { id } = req.params;
   const {
-    firstName,
-    lastName,
+    name,
     phone,
     dateOfBirth,
-    specialization,
+    locationDiv,
     licenseNumber,
-    qualifications,
-    experience,
     consultationFee,
-    availableDays,
+    experienceYears,
+    specialties,
   } = req.body;
 
   // Check if user is authorized
@@ -244,51 +241,87 @@ export const updateDoctorProfile = async (req, res) => {
     throw new UnauthorizedError('Not authorized to update this profile');
   }
 
-  // Update user profile
-  const updateUserData = {};
-  if (firstName) updateUserData.firstName = firstName;
-  if (lastName) updateUserData.lastName = lastName;
-  if (phone) updateUserData.phone = phone;
-  if (dateOfBirth) updateUserData.dateOfBirth = new Date(dateOfBirth);
+  // Update doctor profile
+  const updateData = {};
+  if (name) updateData.name = name;
+  if (phone) updateData.phone = phone;
+  if (dateOfBirth) updateData.dateOfBirth = new Date(dateOfBirth);
+  if (locationDiv) updateData.locationDiv = locationDiv;
+  if (licenseNumber) updateData.licenseNumber = licenseNumber;
+  if (consultationFee) updateData.consultationFee = parseFloat(consultationFee);
+  if (experienceYears !== undefined && experienceYears !== null)
+    updateData.experienceYears = parseInt(experienceYears);
 
-  const user = await prisma.user.update({
-    where: { id },
-    data: updateUserData,
+  const doctor = await prisma.doctorProfile.update({
+    where: { userId: id },
+    data: updateData,
   });
 
-  // Update doctor profile
-  const updateDoctorData = {};
-  if (specialization) updateDoctorData.specialization = specialization;
-  if (licenseNumber) updateDoctorData.licenseNumber = licenseNumber;
-  if (qualifications) updateDoctorData.qualifications = qualifications;
-  if (experience !== undefined && experience !== null)
-    updateDoctorData.experience = parseInt(experience);
-  if (consultationFee) updateDoctorData.consultationFee = parseFloat(consultationFee);
-  if (availableDays) updateDoctorData.availableDays = availableDays;
+  // Update specialties if provided
+  if (specialties && specialties.length > 0) {
+    // Delete existing specialties
+    await prisma.doctorSpeciality.deleteMany({
+      where: { doctorId: doctor.id },
+    });
 
-  const doctor = await prisma.doctor.update({
+    // Create new specialties
+    await prisma.doctorSpeciality.createMany({
+      data: specialties.map((specialtyId) => ({
+        doctorId: doctor.id,
+        specialityId: specialtyId,
+      })),
+    });
+  }
+
+  // Mark user profile as complete
+  await prisma.user.update({
+    where: { id },
+    data: { isProfileComplete: true }
+  });
+
+  // Fetch the updated doctor profile with all relationships
+  const updatedDoctor = await prisma.doctorProfile.findUnique({
     where: { userId: id },
-    data: updateDoctorData,
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          isProfileComplete: true,
+        },
+      },
+      specialties: {
+        include: {
+          speciality: true,
+        },
+      },
+      degrees: {
+        include: {
+          degree: true,
+        },
+      },
+    },
+  });
+
+  // Return the full user object with updated doctor profile
+  const completeUser = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      isProfileComplete: true,
+      patientProfile: true,
+      doctorProfile: true,
+      adminProfile: true,
+    }
   });
 
   res.json({
     success: true,
     message: 'Doctor profile updated successfully',
-    data: {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      dateOfBirth: user.dateOfBirth,
-      role: user.role,
-      specialization: doctor.specialization,
-      licenseNumber: doctor.licenseNumber,
-      qualifications: doctor.qualifications,
-      experience: doctor.experience,
-      consultationFee: doctor.consultationFee,
-      availableDays: doctor.availableDays,
-    },
+    data: completeUser,
   });
 };
 export const getDoctorsBySpecialization = async (req, res) => {
@@ -297,31 +330,12 @@ export const getDoctorsBySpecialization = async (req, res) => {
   // Decode the specialization parameter
   const decodedSpecialization = decodeURIComponent(specialization);
 
-  const doctors = await prisma.doctor.findMany({
-    where: {
-      specialization: decodedSpecialization,
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-          phone: true,
-          dateOfBirth: true,
-          role: true,
-        },
-      },
-    },
-    orderBy: {
-      user: {
-        firstName: 'asc',
-      },
-    },
+  // Find speciality by name
+  const speciality = await prisma.speciality.findUnique({
+    where: { name: decodedSpecialization },
   });
 
-  if (doctors.length === 0) {
+  if (!speciality) {
     res.json({
       success: true,
       message: `No doctors found for specialization: ${decodedSpecialization}`,
@@ -330,45 +344,76 @@ export const getDoctorsBySpecialization = async (req, res) => {
     return;
   }
 
+  // Get doctors with this specialization
+  const doctorSpecialties = await prisma.doctorSpeciality.findMany({
+    where: { specialityId: speciality.id },
+    include: {
+      doctor: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              role: true,
+            },
+          },
+          specialties: {
+            include: {
+              speciality: true,
+            },
+          },
+          degrees: {
+            include: {
+              degree: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
   res.json({
     success: true,
-    data: doctors.map((doctor) => ({
-      id: doctor.id,
-      userId: doctor.userId,
-      firstName: doctor.user.firstName,
-      lastName: doctor.user.lastName,
-      email: doctor.user.email,
-      phone: doctor.user.phone,
-      dateOfBirth: doctor.user.dateOfBirth,
-      specialization: doctor.specialization,
-      licenseNumber: doctor.licenseNumber,
-      qualifications: doctor.qualifications,
-      experience: doctor.experience,
-      consultationFee: doctor.consultationFee,
-      availableDays: doctor.availableDays,
+    data: doctorSpecialties.map((ds) => ({
+      id: ds.doctor.id,
+      userId: ds.doctor.userId,
+      name: ds.doctor.name,
+      email: ds.doctor.user.email,
+      phone: ds.doctor.phone,
+      dateOfBirth: ds.doctor.dateOfBirth,
+      locationDiv: ds.doctor.locationDiv,
+      licenseNumber: ds.doctor.licenseNumber,
+      consultationFee: ds.doctor.consultationFee,
+      experienceYears: ds.doctor.experienceYears,
+      specialties: ds.doctor.specialties.map(s => s.speciality),
+      degrees: ds.doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };
 
 export const getAllDoctors = async (req, res) => {
-  const doctors = await prisma.doctor.findMany({
+  const doctors = await prisma.doctorProfile.findMany({
     include: {
       user: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
           role: true,
+        },
+      },
+      specialties: {
+        include: {
+          speciality: true,
+        },
+      },
+      degrees: {
+        include: {
+          degree: true,
         },
       },
     },
     orderBy: {
-      user: {
-        firstName: 'asc',
-      },
+      name: 'asc',
     },
   });
 
@@ -377,17 +422,16 @@ export const getAllDoctors = async (req, res) => {
     data: doctors.map((doctor) => ({
       id: doctor.id,
       userId: doctor.userId,
-      firstName: doctor.user.firstName,
-      lastName: doctor.user.lastName,
+      name: doctor.name,
       email: doctor.user.email,
-      phone: doctor.user.phone,
-      dateOfBirth: doctor.user.dateOfBirth,
-      specialization: doctor.specialization,
+      phone: doctor.phone,
+      dateOfBirth: doctor.dateOfBirth,
+      locationDiv: doctor.locationDiv,
       licenseNumber: doctor.licenseNumber,
-      qualifications: doctor.qualifications,
-      experience: doctor.experience,
       consultationFee: doctor.consultationFee,
-      availableDays: doctor.availableDays,
+      experienceYears: doctor.experienceYears,
+      specialties: doctor.specialties.map(s => s.speciality),
+      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };
@@ -405,29 +449,25 @@ export const searchDoctors = async (req, res) => {
 
   const searchTerm = q.trim();
 
-  const doctors = await prisma.doctor.findMany({
+  const doctors = await prisma.doctorProfile.findMany({
     where: {
       OR: [
         {
-          user: {
-            firstName: {
-              contains: searchTerm,
-              mode: 'insensitive',
-            },
-          },
-        },
-        {
-          user: {
-            lastName: {
-              contains: searchTerm,
-              mode: 'insensitive',
-            },
-          },
-        },
-        {
-          specialization: {
+          name: {
             contains: searchTerm,
             mode: 'insensitive',
+          },
+        },
+        {
+          specialties: {
+            some: {
+              speciality: {
+                name: {
+                  contains: searchTerm,
+                  mode: 'insensitive',
+                },
+              },
+            },
           },
         },
       ],
@@ -436,19 +476,23 @@ export const searchDoctors = async (req, res) => {
       user: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
           role: true,
+        },
+      },
+      specialties: {
+        include: {
+          speciality: true,
+        },
+      },
+      degrees: {
+        include: {
+          degree: true,
         },
       },
     },
     orderBy: {
-      user: {
-        firstName: 'asc',
-      },
+      name: 'asc',
     },
   });
 
@@ -457,17 +501,16 @@ export const searchDoctors = async (req, res) => {
     data: doctors.map((doctor) => ({
       id: doctor.id,
       userId: doctor.userId,
-      firstName: doctor.user.firstName,
-      lastName: doctor.user.lastName,
+      name: doctor.name,
       email: doctor.user.email,
-      phone: doctor.user.phone,
-      dateOfBirth: doctor.user.dateOfBirth,
-      specialization: doctor.specialization,
+      phone: doctor.phone,
+      dateOfBirth: doctor.dateOfBirth,
+      locationDiv: doctor.locationDiv,
       licenseNumber: doctor.licenseNumber,
-      qualifications: doctor.qualifications,
-      experience: doctor.experience,
       consultationFee: doctor.consultationFee,
-      availableDays: doctor.availableDays,
+      experienceYears: doctor.experienceYears,
+      specialties: doctor.specialties.map(s => s.speciality),
+      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };
@@ -476,53 +519,54 @@ export const getDoctorsByQualification = async (req, res) => {
   const { qualification } = req.params;
   const decodedQualification = decodeURIComponent(qualification);
 
-  const doctors = await prisma.doctor.findMany({
+  const doctors = await prisma.doctorProfile.findMany({
     include: {
       user: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
           role: true,
+        },
+      },
+      specialties: {
+        include: {
+          speciality: true,
+        },
+      },
+      degrees: {
+        where: {
+          degree: {
+            name: decodedQualification,
+          },
+        },
+        include: {
+          degree: true,
         },
       },
     },
     orderBy: {
-      user: {
-        firstName: 'asc',
-      },
+      name: 'asc',
     },
   });
 
-  // Filter doctors by qualification (since it's stored as JSON)
-  const filteredDoctors = doctors.filter((doctor) => {
-    try {
-      const quals = JSON.parse(doctor.qualifications || '[]');
-      return quals.includes(decodedQualification);
-    } catch (e) {
-      return false;
-    }
-  });
+  // Filter to only include doctors with the specific degree
+  const filtered = doctors.filter(doc => doc.degrees.length > 0);
 
   res.json({
     success: true,
-    data: filteredDoctors.map((doctor) => ({
+    data: filtered.map((doctor) => ({
       id: doctor.id,
       userId: doctor.userId,
-      firstName: doctor.user.firstName,
-      lastName: doctor.user.lastName,
+      name: doctor.name,
       email: doctor.user.email,
-      phone: doctor.user.phone,
-      dateOfBirth: doctor.user.dateOfBirth,
-      specialization: doctor.specialization,
+      phone: doctor.phone,
+      dateOfBirth: doctor.dateOfBirth,
+      locationDiv: doctor.locationDiv,
       licenseNumber: doctor.licenseNumber,
-      qualifications: doctor.qualifications,
-      experience: doctor.experience,
       consultationFee: doctor.consultationFee,
-      availableDays: doctor.availableDays,
+      experienceYears: doctor.experienceYears,
+      specialties: doctor.specialties.map(s => s.speciality),
+      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };
@@ -534,32 +578,42 @@ export const filterDoctors = async (req, res) => {
 
   // Add specialization filter
   if (specialization) {
-    whereClause.specialization = {
-      contains: decodeURIComponent(specialization),
-      mode: 'insensitive',
+    whereClause.specialties = {
+      some: {
+        speciality: {
+          name: {
+            contains: decodeURIComponent(specialization),
+            mode: 'insensitive',
+          },
+        },
+      },
     };
   }
 
   // Get doctors with filters
-  const doctors = await prisma.doctor.findMany({
+  const doctors = await prisma.doctorProfile.findMany({
     where: whereClause,
     include: {
       user: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
           email: true,
-          phone: true,
-          dateOfBirth: true,
           role: true,
+        },
+      },
+      specialties: {
+        include: {
+          speciality: true,
+        },
+      },
+      degrees: {
+        include: {
+          degree: true,
         },
       },
     },
     orderBy: {
-      user: {
-        firstName: 'asc',
-      },
+      name: 'asc',
     },
   });
 
@@ -569,20 +623,14 @@ export const filterDoctors = async (req, res) => {
   if (name) {
     const searchTerm = name.toLowerCase();
     filteredDoctors = filteredDoctors.filter((doctor) => {
-      const fullName = `${doctor.user.firstName} ${doctor.user.lastName}`.toLowerCase();
-      return fullName.includes(searchTerm);
+      return doctor.name.toLowerCase().includes(searchTerm);
     });
   }
 
   if (qualification) {
     const decodedQual = decodeURIComponent(qualification);
     filteredDoctors = filteredDoctors.filter((doctor) => {
-      try {
-        const quals = JSON.parse(doctor.qualifications || '[]');
-        return quals.includes(decodedQual);
-      } catch (e) {
-        return false;
-      }
+      return doctor.degrees.some(d => d.degree.name === decodedQual);
     });
   }
 
@@ -591,17 +639,16 @@ export const filterDoctors = async (req, res) => {
     data: filteredDoctors.map((doctor) => ({
       id: doctor.id,
       userId: doctor.userId,
-      firstName: doctor.user.firstName,
-      lastName: doctor.user.lastName,
+      name: doctor.name,
       email: doctor.user.email,
-      phone: doctor.user.phone,
-      dateOfBirth: doctor.user.dateOfBirth,
-      specialization: doctor.specialization,
+      phone: doctor.phone,
+      dateOfBirth: doctor.dateOfBirth,
+      locationDiv: doctor.locationDiv,
       licenseNumber: doctor.licenseNumber,
-      qualifications: doctor.qualifications,
-      experience: doctor.experience,
       consultationFee: doctor.consultationFee,
-      availableDays: doctor.availableDays,
+      experienceYears: doctor.experienceYears,
+      specialties: doctor.specialties.map(s => s.speciality),
+      degrees: doctor.degrees.map(d => ({ ...d.degree, passingYear: d.passingYear })),
     })),
   });
 };

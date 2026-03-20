@@ -1,10 +1,20 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
+import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
 import "./Dashboard.css";
 
 export default function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { user } = useContext(AuthContext);
+
+  const getAdminName = () => {
+    if (user && user.adminProfile && user.adminProfile.name) {
+      return user.adminProfile.name;
+    }
+    return "Admin";
+  };
+
   return (
     <div className="admin-dashboard">
        {/* Toggle Button */}
@@ -19,7 +29,7 @@ export default function AdminDashboard() {
 
         <main className="dashboard-content">
           <section className="welcome-section">
-            <h1>Welcome, System Admin 🏥</h1>
+            <h1>Welcome, {getAdminName()} 🏥</h1>
             <p>Manage users, clinics, and monitor overall system performance.</p>
           </section>
 
