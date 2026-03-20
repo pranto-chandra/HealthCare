@@ -127,12 +127,20 @@ export const getDoctorPrescriptions = async (req, res) => {
 
 export const confirmAppointment = async (req, res) => {
   const { appointmentId } = req.params;
-  const { status } = req.body; // status: CONFIRMED or CANCELLED
+  const { status, time } = req.body; // status: CONFIRMED or CANCELLED, time: HH:mm (required for CONFIRMED)
 
   if (!['CONFIRMED', 'CANCELLED'].includes(status)) {
     return res.status(400).json({
       success: false,
       message: 'Invalid status. Must be CONFIRMED or CANCELLED',
+    });
+  }
+
+  // Validate time is provided when confirming
+  if (status === 'CONFIRMED' && !time) {
+    return res.status(400).json({
+      success: false,
+      message: 'Time is required when confirming appointment. Format: HH:mm',
     });
   }
 
@@ -181,12 +189,23 @@ export const confirmAppointment = async (req, res) => {
     });
   }
 
+  // Prepare update data
+  const updateData = {
+    status: status,
+    ...(status === 'CANCELLED' && { cancelledAt: new Date() }),
+  };
+
+  // If confirming, update the scheduled time
+  if (status === 'CONFIRMED' && time) {
+    const [hours, minutes] = time.split(':').map(Number);
+    const scheduledDate = new Date(appointment.scheduledAt);
+    scheduledDate.setHours(hours, minutes, 0, 0);
+    updateData.scheduledAt = scheduledDate;
+  }
+
   const updatedAppointment = await prisma.appointment.update({
     where: { id: appointmentId },
-    data: {
-      status: status,
-      ...(status === 'CANCELLED' && { cancelledAt: new Date() }),
-    },
+    data: updateData,
     include: {
       patient: {
         include: {

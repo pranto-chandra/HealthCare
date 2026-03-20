@@ -14,6 +14,7 @@ export default function Appointments() {
   const [selectedDate, setSelectedDate] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [confirmingId, setConfirmingId] = useState(null);
+  const [appointmentTimes, setAppointmentTimes] = useState({}); // Track time for each appointment
 
   // Fetch doctor appointments
   useEffect(() => {
@@ -39,9 +40,22 @@ export default function Appointments() {
 
   // Handle appointment confirmation
   const handleConfirmAppointment = async (appointmentId, status) => {
+    // For CONFIRMED status, time is required
+    if (status === 'CONFIRMED' && !appointmentTimes[appointmentId]) {
+      alert('Please select a time for this appointment');
+      return;
+    }
+
     try {
       setConfirmingId(appointmentId);
-      await doctorApi.confirmAppointment(appointmentId, status);
+      const confirmData = { status };
+      
+      // Add time if confirming
+      if (status === 'CONFIRMED') {
+        confirmData.time = appointmentTimes[appointmentId];
+      }
+
+      await doctorApi.confirmAppointment(appointmentId, confirmData.status, confirmData.time);
 
       // Update local state
       setAppointments((prev) =>
@@ -49,6 +63,13 @@ export default function Appointments() {
           app.id === appointmentId ? { ...app, status } : app,
         ),
       );
+
+      // Clear the time input for this appointment
+      setAppointmentTimes((prev) => {
+        const newTimes = { ...prev };
+        delete newTimes[appointmentId];
+        return newTimes;
+      });
     } catch (err) {
       alert(getErrorMessage(err));
       console.error("Error confirming appointment:", err);
@@ -183,29 +204,46 @@ export default function Appointments() {
                       </span>
 
                       {app.status === "PENDING" && (
-                        <div className="action-buttons">
-                          <button
-                            className="confirm-btn"
-                            onClick={() =>
-                              handleConfirmAppointment(app.id, "CONFIRMED")
-                            }
-                            disabled={confirmingId === app.id}
-                          >
-                            {confirmingId === app.id
-                              ? "Confirming..."
-                              : "Confirm"}
-                          </button>
-                          <button
-                            className="reject-btn"
-                            onClick={() =>
-                              handleConfirmAppointment(app.id, "CANCELLED")
-                            }
-                            disabled={confirmingId === app.id}
-                          >
-                            {confirmingId === app.id
-                              ? "Rejecting..."
-                              : "Reject"}
-                          </button>
+                        <div>
+                          <div className="time-input-group">
+                            <label htmlFor={`time-${app.id}`}>Select Time:</label>
+                            <input
+                              id={`time-${app.id}`}
+                              type="time"
+                              value={appointmentTimes[app.id] || "10:00"}
+                              onChange={(e) =>
+                                setAppointmentTimes((prev) => ({
+                                  ...prev,
+                                  [app.id]: e.target.value,
+                                }))
+                              }
+                              className="time-input"
+                            />
+                          </div>
+                          <div className="action-buttons">
+                            <button
+                              className="confirm-btn"
+                              onClick={() =>
+                                handleConfirmAppointment(app.id, "CONFIRMED")
+                              }
+                              disabled={confirmingId === app.id}
+                            >
+                              {confirmingId === app.id
+                                ? "Confirming..."
+                                : "Confirm"}
+                            </button>
+                            <button
+                              className="reject-btn"
+                              onClick={() =>
+                                handleConfirmAppointment(app.id, "CANCELLED")
+                              }
+                              disabled={confirmingId === app.id}
+                            >
+                              {confirmingId === app.id
+                                ? "Rejecting..."
+                                : "Reject"}
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>

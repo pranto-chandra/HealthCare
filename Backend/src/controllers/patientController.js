@@ -130,7 +130,7 @@ export const getPatientHistory = async (req, res) => {
 };
 
 export const createAppointment = async (req, res) => {
-  const { doctorId, scheduledAt, type, symptoms } = req.body;
+  const { doctorId, requestedDate, type, symptoms } = req.body;
 
   // Check if doctor exists
   const doctor = await prisma.doctorProfile.findUnique({
@@ -141,11 +141,15 @@ export const createAppointment = async (req, res) => {
     throw new BadRequestError('Doctor not found');
   }
 
+  // Parse the date and set a default time (10:00 AM)
+  const dateObj = new Date(requestedDate);
+  dateObj.setHours(10, 0, 0, 0); // Default time: 10:00 AM
+  
   const appointment = await prisma.appointment.create({
     data: {
       patientId: req.params.id,
       doctorId,
-      scheduledAt: new Date(scheduledAt),
+      scheduledAt: dateObj,
       type,
       symptoms,
     },
@@ -166,6 +170,7 @@ export const createAppointment = async (req, res) => {
     appointmentId: appointment.id,
     patientId: appointment.patientId,
     doctorId: appointment.doctorId,
+    requestedDate: requestedDate,
   });
 
   res.status(201).json({

@@ -42,7 +42,7 @@ export const patientValidation = {
 export const appointmentValidation = {
   create: [
     body('doctorId').isUUID().withMessage('Invalid doctor ID'),
-    body('scheduledAt')
+    body('requestedDate')
       .custom((value) => {
         if (!value) {
           throw new Error('Appointment date is required');
@@ -62,6 +62,21 @@ export const appointmentValidation = {
       .isIn(['ONLINE', 'OFFLINE'])
       .withMessage('Appointment type must be ONLINE or OFFLINE'),
     body('symptoms').optional().trim(),
+  ],
+  
+  confirm: [
+    body('status')
+      .isIn(['CONFIRMED', 'CANCELLED'])
+      .withMessage('Status must be CONFIRMED or CANCELLED'),
+    body('time')
+      .if(body('status').equals('CONFIRMED'))
+      .notEmpty().withMessage('Time is required when confirming appointment')
+      .custom((value) => {
+        if (value && !/^([01]\d|2[0-3]):([0-5]\d)$/.test(value)) {
+          throw new Error('Invalid time format. Use HH:mm');
+        }
+        return true;
+      }),
   ],
 };
 

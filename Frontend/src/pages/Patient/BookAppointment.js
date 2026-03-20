@@ -160,7 +160,7 @@ export default function BookAppointment() {
 
       const appointmentData = {
         doctorId: doctor.id,
-        scheduledAt: new Date(appointmentDate).toISOString(),
+        requestedDate: appointmentDate, // Send as date string (YYYY-MM-DD)
         type: appointmentType,
       };
 
@@ -380,10 +380,10 @@ export default function BookAppointment() {
               <label htmlFor="date">Appointment Date</label>
               <input
                 id="date"
-                type="datetime-local"
+                type="date"
                 value={appointmentDate}
                 onChange={(e) => setAppointmentDate(e.target.value)}
-                min={new Date().toISOString().slice(0, 16)}
+                min={new Date().toISOString().split('T')[0]}
                 className="form-input"
               />
             </div>
