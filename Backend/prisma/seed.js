@@ -123,7 +123,9 @@ async function main() {
       const speciality = await prisma.speciality.findUnique({ where: { name: specName } });
       if (speciality) {
         await prisma.doctorSpeciality.upsert({
-          where: { doctorId_specialityId: { doctorId: doctorProfile.id, specialityId: speciality.id } },
+          where: {
+            doctorId_specialityId: { doctorId: doctorProfile.id, specialityId: speciality.id },
+          },
           update: {},
           create: {
             doctorId: doctorProfile.id,
@@ -208,7 +210,8 @@ async function main() {
     if (firstDoctorProfile) {
       await prisma.appointment.create({
         data: {
-          patientId: (await prisma.patientProfile.findUnique({ where: { userId: patientUser.id } })).id,
+          patientId: (await prisma.patientProfile.findUnique({ where: { userId: patientUser.id } }))
+            .id,
           doctorId: firstDoctorProfile.id,
           scheduledAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
           type: 'OFFLINE',
@@ -219,8 +222,12 @@ async function main() {
     }
 
     // Create sample Lab Tests to demonstrate workflow
-    const patientProfile = await prisma.patientProfile.findUnique({ where: { userId: patientUser.id } });
-    const pathologistProfile = await prisma.pathologistProfile.findUnique({ where: { userId: pathologistUser.id } });
+    const patientProfile = await prisma.patientProfile.findUnique({
+      where: { userId: patientUser.id },
+    });
+    const pathologistProfile = await prisma.pathologistProfile.findUnique({
+      where: { userId: pathologistUser.id },
+    });
 
     if (firstDoctorProfile && patientProfile && pathologistProfile) {
       // Find a completed appointment or create one for testing
@@ -306,7 +313,11 @@ async function main() {
 
     console.log('\n📋 Test Credentials:');
     console.log('Admin:       admin@healthcare.com / admin123');
-    console.log('Doctors:     doctor1@healthcare.com to doctor' + specializations.length + '@healthcare.com / doctor123');
+    console.log(
+      'Doctors:     doctor1@healthcare.com to doctor' +
+        specializations.length +
+        '@healthcare.com / doctor123'
+    );
     console.log('Pathologist: pathologist@healthcare.com / pathologist123');
     console.log('Patient:     patient@healthcare.com / patient123');
 

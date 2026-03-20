@@ -322,8 +322,8 @@ export default function Appointments() {
                           prev.map((a) =>
                             a.id === app.id
                               ? { ...a, testRecommended: true }
-                              : a
-                          )
+                              : a,
+                          ),
                         );
                       }}
                       onCancel={() => setShowTestForm(null)}

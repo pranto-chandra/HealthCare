@@ -67,9 +67,7 @@ export default function Prescriptions() {
         ☰
       </button>
       <div
-        className={`prescription-layout  ${
-          isSidebarOpen ? "" : "collapsed"
-        }`}
+        className={`prescription-layout  ${isSidebarOpen ? "" : "collapsed"}`}
       >
         {isSidebarOpen && <Sidebar role="Patient" />}
 
@@ -127,9 +125,11 @@ export default function Prescriptions() {
           {/* Lab Tests Tab */}
           {activeTab === "lab-tests" && (
             <section className="prescription-list">
-              {loading && <div className="loading-text">Loading lab tests...</div>}
+              {loading && (
+                <div className="loading-text">Loading lab tests...</div>
+              )}
               {error && <div className="error-message">{error}</div>}
-              
+
               {!loading && labTests.length === 0 && (
                 <div className="no-data">
                   <p>No lab tests prescribed yet.</p>
@@ -138,21 +138,28 @@ export default function Prescriptions() {
 
               {!loading &&
                 labTests.map((test) => (
-                  <div key={test.id} className="prescription-card lab-test-card">
+                  <div
+                    key={test.id}
+                    className="prescription-card lab-test-card"
+                  >
                     <div className="test-header">
                       <h3>{test.testName}</h3>
-                      <span className={`status-badge ${getStatusColor(test.status)}`}>
+                      <span
+                        className={`status-badge ${getStatusColor(test.status)}`}
+                      >
                         {getStatusLabel(test.status)}
                       </span>
                     </div>
 
                     <p>
-                      <strong>Prescribed by:</strong> Dr. {test.doctor?.name || "Unknown"}
+                      <strong>Prescribed by:</strong> Dr.{" "}
+                      {test.doctor?.name || "Unknown"}
                     </p>
 
                     {test.pathologist && (
                       <p>
-                        <strong>Lab:</strong> {test.pathologist.labName || test.pathologist.name}
+                        <strong>Lab:</strong>{" "}
+                        {test.pathologist.labName || test.pathologist.name}
                       </p>
                     )}
 

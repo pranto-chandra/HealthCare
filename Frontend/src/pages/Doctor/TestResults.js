@@ -46,9 +46,17 @@ export default function TestResults() {
 
   const getStatusBadge = (status) => {
     const badges = {
-      RECOMMENDED: { className: "badge-warning", label: "Recommended", icon: "📋" },
+      RECOMMENDED: {
+        className: "badge-warning",
+        label: "Recommended",
+        icon: "📋",
+      },
       PENDING: { className: "badge-info", label: "Processing", icon: "⏳" },
-      REPORT_ADDED: { className: "badge-success", label: "Report Ready", icon: "✅" },
+      REPORT_ADDED: {
+        className: "badge-success",
+        label: "Report Ready",
+        icon: "✅",
+      },
     };
     const badge = badges[status] || {
       className: "badge-secondary",
@@ -127,7 +135,9 @@ export default function TestResults() {
                 className="filter-select"
               >
                 <option value="all">All Tests ({stats.all})</option>
-                <option value="recommended">Recommended ({stats.recommended})</option>
+                <option value="recommended">
+                  Recommended ({stats.recommended})
+                </option>
                 <option value="pending">Processing ({stats.pending})</option>
                 <option value="completed">Completed ({stats.completed})</option>
               </select>
@@ -150,7 +160,10 @@ export default function TestResults() {
           {/* Results List */}
           <section className="results-list">
             {filtered.map((test) => (
-              <div key={test.id} className={`result-card status-${test.status?.toLowerCase()}`}>
+              <div
+                key={test.id}
+                className={`result-card status-${test.status?.toLowerCase()}`}
+              >
                 <div className="result-card-header">
                   <div className="result-info">
                     <h3>{test.testName}</h3>
@@ -164,7 +177,8 @@ export default function TestResults() {
                 <div className="result-card-body">
                   {test.pathologist && (
                     <p>
-                      <strong>Lab/Pathologist:</strong> {test.pathologist.labName || test.pathologist.name}
+                      <strong>Lab/Pathologist:</strong>{" "}
+                      {test.pathologist.labName || test.pathologist.name}
                     </p>
                   )}
 

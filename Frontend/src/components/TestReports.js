@@ -44,12 +44,11 @@ export default function TestReports({ patientId }) {
       COMPLETED: { className: "badge-primary", label: "Processing" },
       REPORT_ADDED: { className: "badge-success", label: "Report Ready" },
     };
-    const badge = badges[status] || { className: "badge-secondary", label: status };
-    return (
-      <span className={`badge ${badge.className}`}>
-        {badge.label}
-      </span>
-    );
+    const badge = badges[status] || {
+      className: "badge-secondary",
+      label: status,
+    };
+    return <span className={`badge ${badge.className}`}>{badge.label}</span>;
   };
 
   const filteredTests = getFilteredTests();
@@ -81,13 +80,15 @@ export default function TestReports({ patientId }) {
               className={`filter-btn ${filter === "recommended" ? "active" : ""}`}
               onClick={() => setFilter("recommended")}
             >
-              Recommended ({tests.filter((t) => t.status === "RECOMMENDED").length})
+              Recommended (
+              {tests.filter((t) => t.status === "RECOMMENDED").length})
             </button>
             <button
               className={`filter-btn ${filter === "completed" ? "active" : ""}`}
               onClick={() => setFilter("completed")}
             >
-              Completed ({tests.filter((t) => t.status === "REPORT_ADDED").length})
+              Completed (
+              {tests.filter((t) => t.status === "REPORT_ADDED").length})
             </button>
           </div>
 
@@ -110,7 +111,8 @@ export default function TestReports({ patientId }) {
                     )}
                     {test.pathologist && (
                       <p>
-                        <strong>Lab:</strong> {test.pathologist.labName || test.pathologist.name}
+                        <strong>Lab:</strong>{" "}
+                        {test.pathologist.labName || test.pathologist.name}
                       </p>
                     )}
                     <p>

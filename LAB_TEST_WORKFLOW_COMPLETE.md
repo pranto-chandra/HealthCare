@@ -1,6 +1,7 @@
 # Lab Test Prescription Workflow - Complete Implementation Guide
 
 ## Overview
+
 The complete lab test prescription workflow has been successfully implemented with all 9 steps fully functional:
 
 1. ✅ Doctor completes appointment
@@ -20,6 +21,7 @@ The complete lab test prescription workflow has been successfully implemented wi
 ### 1. Backend (Already Fully Functional)
 
 **API Endpoints:**
+
 - `POST /lab-tests/doctors/:doctorId/recommend` - Doctor recommends a test
 - `GET /lab-tests/doctors/:doctorId/recommended` - Get doctor's recommended tests
 - `GET /lab-tests/patients/:patientId` - Get patient's test history
@@ -30,6 +32,7 @@ The complete lab test prescription workflow has been successfully implemented wi
 - `GET /pathologists/tests/my` - Get pathologist's assigned tests
 
 **Database Model:**
+
 - Status Flow: `RECOMMENDED` → `PENDING` (after acceptance) → `REPORT_ADDED` (after report upload)
 - All relationships: Doctor → Patient → Pathologist properly linked
 - File storage for test reports with timestamps
@@ -39,6 +42,7 @@ The complete lab test prescription workflow has been successfully implemented wi
 ### 2. Frontend - Doctor Side (Updated)
 
 #### A. Doctor Dashboard (`/doctor/dashboard`)
+
 - **New Feature:** Test statistics card showing:
   - 📋 Test Recommendations (count)
   - ⏳ Tests in Progress (PENDING status)
@@ -46,12 +50,14 @@ The complete lab test prescription workflow has been successfully implemented wi
 - Real-time count fetched from backend via `labApi.getDoctorRecommendedTests()`
 
 #### B. Doctor Appointments (`/doctor/appointments`)
+
 - **Existing Feature:** "📋 Prescribe Test" button for COMPLETED appointments
 - Opens `RecommendTest` form when clicked
 - Form allows selecting test type & adding description
 - Successfully sends test recommendation to backend
 
 #### C. **NEW** Doctor Test Results Page (`/doctor/test-results`)
+
 - **Full test tracking dashboard** with:
   - Real-time statistics card (Total, Recommended, Processing, Completed)
   - Filter by status dropdown
@@ -71,12 +77,14 @@ The complete lab test prescription workflow has been successfully implemented wi
 ### 3. Frontend - Patient Side (Updated)
 
 #### A. Patient Dashboard (`/patient/dashboard`)
+
 - **New Feature:** Integrated `TestReports` component showing live test data
 - Displays all test recommendations and results
 - Filter tabs: All, Recommended, Completed
 - Real-time data from backend via `labApi.getPatientTests()`
 
 #### B. Patient Prescriptions (`/patient/prescriptions`)
+
 - **Updated:** Now has two tabs:
   - 💊 **Medications** - Hardcoded/existing medicines
   - 🧪 **Lab Tests** - Real lab test data from backend
@@ -95,6 +103,7 @@ The complete lab test prescription workflow has been successfully implemented wi
 ### 4. Pathologist Side (Already Fully Functional)
 
 #### Pathologist Dashboard (`/pathologist/dashboard`)
+
 - **Recommended Tab:** Shows all tests with "Accept Test" button
 - **My Tests Tab:** Shows assigned tests with "Add Report" button
 - **Completed Tab:** Shows finished tests with "Download" button
@@ -107,6 +116,7 @@ The complete lab test prescription workflow has been successfully implemented wi
 ## Navigation Flow
 
 ### Doctor's Journey:
+
 ```
 Dashboard (see test stats)
     ↓
@@ -122,6 +132,7 @@ View & Download Reports
 ```
 
 ### Patient's Journey:
+
 ```
 Dashboard (see TestReports component with all tests)
     ↓
@@ -133,6 +144,7 @@ Download Reports (when Report Ready status)
 ```
 
 ### Pathologist's Journey:
+
 ```
 Dashboard > Recommended Tab
     ↓
@@ -150,10 +162,12 @@ Visible to Patient & Doctor
 ## New/Updated Components
 
 ### Created:
+
 1. **`Frontend/src/pages/Doctor/TestResults.js`** - Full test tracking page for doctors
 2. **`Frontend/src/pages/Doctor/TestResults.css`** - Styling for test results page
 
 ### Updated:
+
 1. **`Frontend/src/pages/Doctor/Dashboard.js`** - Added test statistics
 2. **`Frontend/src/pages/Patient/Dashboard.js`** - Integrated TestReports component
 3. **`Frontend/src/pages/Patient/Prescriptions.js`** - Added Lab Tests tab with real data
@@ -162,6 +176,7 @@ Visible to Patient & Doctor
 6. **`Frontend/src/App.js`** - Added route for Test Results page
 
 ### Already Functional:
+
 - `Frontend/src/pages/Doctor/RecommendTest.js` - Test recommendation form
 - `Frontend/src/pages/Doctor/Appointments.js` - Already had "Prescribe Test" button
 - `Frontend/src/components/TestReports.js` - Test display component
@@ -225,11 +240,13 @@ Visible to Patient & Doctor
    - Can download the report
 
 ### Test Case 2: Real-Time Updates
+
 1. Keep Doctor Test Results page open in one window
 2. Accept test in Pathologist dashboard (another window)
 3. Refresh Doctor page → Should reflect PENDING status (if auto-refresh implemented)
 
 ### Test Case 3: Multiple Tests
+
 1. Recommend multiple tests for same patient
 2. Verify all appear in:
    - Doctor's Test Results page
@@ -270,38 +287,41 @@ Pathologist views as: Available in "Completed" tab
 ### Frontend Calls Backend:
 
 **Doctor Operations:**
+
 ```javascript
 // Get test statistics
-labApi.getDoctorRecommendedTests(doctorId)
+labApi.getDoctorRecommendedTests(doctorId);
 
 // Recommend test
 labApi.recommendTest(doctorId, {
   patientId,
   appointmentId,
   testName,
-  description
-})
+  description,
+});
 ```
 
 **Patient Operations:**
+
 ```javascript
 // Get all tests
-labApi.getPatientTests(patientId)
+labApi.getPatientTests(patientId);
 
 // Get completed tests only
-labApi.getPatientTestResults(patientId)
+labApi.getPatientTestResults(patientId);
 ```
 
 **Pathologist Operations:**
+
 ```javascript
 // Get recommended tests
-labApi.getRecommendedTests()
+labApi.getRecommendedTests();
 
 // Accept test
-labApi.acceptTest(testId)
+labApi.acceptTest(testId);
 
 // Upload report
-labApi.addTestReport(testId, formData)
+labApi.addTestReport(testId, formData);
 ```
 
 ---
@@ -309,6 +329,7 @@ labApi.addTestReport(testId, formData)
 ## Known Features & Capabilities
 
 ✅ **Fully Implemented:**
+
 - Complete workflow from doctor recommendation to test completion
 - Real-time data fetching and display
 - Status tracking at all stages
@@ -319,6 +340,7 @@ labApi.addTestReport(testId, formData)
 - Test statistics and analytics
 
 ⚠️ **Possible Future Enhancements:**
+
 - Email/SMS notifications when test status changes
 - Expected completion date/SLA tracking
 - Bulk test operations
@@ -332,18 +354,22 @@ labApi.addTestReport(testId, formData)
 ## Troubleshooting
 
 ### Issue: Test not appearing in dashboard
+
 - **Solution:** Check that test status is correctly set (RECOMMENDED, PENDING, or REPORT_ADDED)
 - Verify patient ID matches between recommendation and retrieval
 
 ### Issue: Download button not working
+
 - **Solution:** Ensure test has `resultFile` field populated (set by pathologist during upload)
 - Check file path is correct in backend
 
 ### Issue: Filters not working
+
 - **Solution:** API returns all tests by default when status filter applied
 - Frontend filter logic works but backend may not support status query param
 
 ### Issue: Real-time updates not showing
+
 - **Solution:** Manual page refresh required (auto-refresh polling not yet implemented)
 - Consider adding WebSocket/polling for real-time updates
 

@@ -12,15 +12,15 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/lab-results');
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
+  },
 });
 
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 5 * 1024 * 1024, // 5MB limit
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|pdf/;
@@ -31,7 +31,7 @@ const upload = multer({
       return cb(null, true);
     }
     cb(new Error('Only .jpeg, .jpg, .png and .pdf format allowed!'));
-  }
+  },
 });
 
 // All routes require authentication and PATHOLOGIST role

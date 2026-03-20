@@ -8,7 +8,7 @@ import "./Dashboard.css";
 export default function PatientDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { user } = useContext(AuthContext);
-  
+
   const getPatientName = () => {
     if (user && user.patientProfile && user.patientProfile.name) {
       return user.patientProfile.name;
@@ -22,7 +22,6 @@ export default function PatientDashboard() {
 
   return (
     <div className="patient-dashboard">
-
       {/* Toggle Button */}
       <button
         className="sidebar-toggle"

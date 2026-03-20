@@ -3,7 +3,13 @@ import labApi from "../../api/labApi";
 import { getErrorMessage } from "../../utils/helpers";
 import "./RecommendTest.css";
 
-export default function RecommendTest({ appointmentId, patientId, doctorId, onTestRecommended, onCancel }) {
+export default function RecommendTest({
+  appointmentId,
+  patientId,
+  doctorId,
+  onTestRecommended,
+  onCancel,
+}) {
   const [testName, setTestName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,7 +36,7 @@ export default function RecommendTest({ appointmentId, patientId, doctorId, onTe
 
   const handleRecommendTest = async (e) => {
     e.preventDefault();
-    
+
     if (!testName.trim() || !description.trim()) {
       setError("Please fill in all fields");
       return;
@@ -51,7 +57,7 @@ export default function RecommendTest({ appointmentId, patientId, doctorId, onTe
       setSuccess(`Test "${testName}" recommended successfully!`);
       setTestName("");
       setDescription("");
-      
+
       // Call the callback to update parent component
       if (onTestRecommended) {
         onTestRecommended();

@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from "./apiClient";
 
 const labApi = {
   // Doctor endpoints
@@ -43,7 +43,7 @@ const labApi = {
     return apiClient.get(url);
   },
 
-  getMyTests: () => apiClient.get('/pathologists/tests/my'),
+  getMyTests: () => apiClient.get("/pathologists/tests/my"),
 
   getTestDetails: (testId) => apiClient.get(`/pathologists/tests/${testId}`),
 
@@ -52,14 +52,14 @@ const labApi = {
   addTestReport: (testId, formData) =>
     apiClient.post(`/pathologists/tests/${testId}/report`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     }),
 
-  getPathologistProfile: () => apiClient.get('/pathologists/profile'),
+  getPathologistProfile: () => apiClient.get("/pathologists/profile"),
 
   updatePathologistProfile: (data) =>
-    apiClient.put('/pathologists/profile', data),
+    apiClient.put("/pathologists/profile", data),
 };
 
 export default labApi;

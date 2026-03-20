@@ -41,10 +41,7 @@ router.post(
   validate,
   confirmAppointment
 );
-router.post(
-  '/me/appointments/:appointmentId/complete',
-  completeAppointment
-);
+router.post('/me/appointments/:appointmentId/complete', completeAppointment);
 router.get('/:id/profile', getDoctorProfile);
 router.put('/:id/profile', updateDoctorProfile);
 router.get('/:id/appointments', getDoctorAppointments);

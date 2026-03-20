@@ -70,7 +70,10 @@ export default function App() {
           <Route path="/patient/editprofile" element={<PatientEdit />} />
           <Route path="/doctor/editprofile" element={<DoctorEdit />} />
           <Route path="/admin/editprofile" element={<AdminEdit />} />
-          <Route path="/pathologist/editprofile" element={<PathologistEdit />} />
+          <Route
+            path="/pathologist/editprofile"
+            element={<PathologistEdit />}
+          />
           <Route path="/contact" element={<Contact />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/about" element={<AboutUs />} />

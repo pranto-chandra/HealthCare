@@ -30,9 +30,11 @@ export default function DoctorDashboard() {
     const fetchTestStats = async () => {
       try {
         setLoading(true);
-        const response = await labApi.getDoctorRecommendedTests(user.doctorProfile.id);
+        const response = await labApi.getDoctorRecommendedTests(
+          user.doctorProfile.id,
+        );
         const tests = response?.data?.data || [];
-        
+
         const stats = {
           recommended: tests.filter((t) => t.status === "RECOMMENDED").length,
           pending: tests.filter((t) => t.status === "PENDING").length,
