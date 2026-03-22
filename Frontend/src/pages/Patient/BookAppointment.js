@@ -40,6 +40,7 @@ export default function BookAppointment() {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentType, setAppointmentType] = useState("ONLINE");
   const [isBooking, setIsBooking] = useState(false);
+  const [appointmentDateConfirmed, setAppointmentDateConfirmed] = useState(false);
 
   // Check if user is logged in
   useEffect(() => {
@@ -151,6 +152,11 @@ export default function BookAppointment() {
   const handleBookAppointment = async (doctor) => {
     if (!appointmentDate) {
       setBookingError("Please select an appointment date");
+      return;
+    }
+
+    if (!appointmentDateConfirmed) {
+      setBookingError("Please confirm the selected date by pressing OK");
       return;
     }
 

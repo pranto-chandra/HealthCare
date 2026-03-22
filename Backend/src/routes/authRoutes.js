@@ -6,12 +6,16 @@ import {
   resetPassword,
   forgotPassword,
   confirmPasswordReset,
+  verifyOtp,
+  resendOtp,
 } from '../controllers/authController.js';
 import { userValidation, validate } from '../utils/validation.js';
 
 const router = express.Router();
 
 router.post('/register', userValidation.register, validate, register);
+router.post('/verify-otp', userValidation.verifyOtp, validate, verifyOtp);
+router.post('/resend-otp', userValidation.resendOtp, validate, resendOtp);
 router.post('/login', userValidation.login, validate, login);
 router.post('/logout', logout);
 router.post('/forgot-password', forgotPassword);

@@ -15,12 +15,21 @@ export const userValidation = {
     body('password')
       .isLength({ min: 6 })
       .withMessage('Password must be at least 6 characters long'),
-    body('role').isIn(['ADMIN', 'DOCTOR', 'PATIENT']).withMessage('Invalid role'),
+    body('role').isIn(['ADMIN', 'DOCTOR', 'PATIENT', 'PATHOLOGIST']).withMessage('Invalid role'),
   ],
 
   login: [
     body('email').isEmail().withMessage('Please provide a valid email'),
     body('password').notEmpty().withMessage('Password is required'),
+  ],
+
+  verifyOtp: [
+    body('email').isEmail().withMessage('Please provide a valid email'),
+    body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
+  ],
+
+  resendOtp: [
+    body('email').isEmail().withMessage('Please provide a valid email'),
   ],
 };
 
