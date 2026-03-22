@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
-import Navbar from "../../components/Navbar";
 import labApi from "../../api/labApi";
+import patientApi from "../../api/patientApi";
 import { AuthContext } from "../../context/AuthContext";
 import { getErrorMessage } from "../../utils/helpers";
 import "./Prescription.css";
@@ -9,31 +9,51 @@ import "./Prescription.css";
 export default function Prescriptions() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { user } = useContext(AuthContext);
+  const [medications, setMedications] = useState([]);
   const [labTests, setLabTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("medications"); // medications or lab-tests
 
-  // Fetch lab tests
+  // Fetch prescriptions and lab tests
   useEffect(() => {
-    if (!user?.patientProfile?.id) return;
+    if (!user?.id) return;
+    fetchData();
+  }, [user?.id]);
 
-    const fetchLabTests = async () => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      // Fetch prescriptions
       try {
-        setLoading(true);
-        setError("");
-        const response = await labApi.getPatientTests(user.patientProfile.id);
-        setLabTests(response?.data?.data || []);
+        const rxResponse = await patientApi.getMyPrescriptions();
+        setMedications(rxResponse?.data?.data || []);
       } catch (err) {
-        setError(getErrorMessage(err));
-        console.error("Error fetching lab tests:", err);
-      } finally {
-        setLoading(false);
+        console.warn("Could not fetch prescriptions:", err);
+        setMedications([]);
       }
-    };
 
-    fetchLabTests();
-  }, [user?.patientProfile?.id]);
+      // Fetch lab tests
+      try {
+        if (user?.patientProfile?.id) {
+          const testsResponse = await labApi.getPatientTests(
+            user.patientProfile.id,
+          );
+          setLabTests(testsResponse?.data?.data || []);
+        }
+      } catch (err) {
+        console.warn("Could not fetch lab tests:", err);
+        setLabTests([]);
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -73,9 +93,14 @@ export default function Prescriptions() {
 
         <main className="prescription-content">
           <section className="prescription-header">
-            <h1>My Prescriptions & Test Orders</h1>
-            <p>Review your medications and lab test prescriptions.</p>
+            <h1>💊 My Prescriptions & Lab Tests</h1>
+            <p>
+              Review your medications and lab test prescriptions from your
+              doctors.
+            </p>
           </section>
+
+          {error && <div className="alert alert-danger">{error}</div>}
 
           {/* Tab Navigation */}
           <div className="prescription-tabs">
@@ -83,42 +108,81 @@ export default function Prescriptions() {
               className={`tab-btn ${activeTab === "medications" ? "active" : ""}`}
               onClick={() => setActiveTab("medications")}
             >
-              💊 Medications
+              💊 Medications ({medications.length})
             </button>
             <button
               className={`tab-btn ${activeTab === "lab-tests" ? "active" : ""}`}
               onClick={() => setActiveTab("lab-tests")}
             >
-              🧪 Lab Tests
+              🧪 Lab Tests ({labTests.length})
             </button>
           </div>
 
           {/* Medications Tab */}
           {activeTab === "medications" && (
             <section className="prescription-list">
-              <div className="prescription-card">
-                <h3>Amoxicillin</h3>
-                <p>Dosage: 500mg, twice daily</p>
-                <p>Prescribed by: Dr. Rahman</p>
-                <p>Start Date: Nov 10, 2025</p>
-                <p>Status: Active</p>
-              </div>
+              {loading && (
+                <div className="loading-text">Loading medications...</div>
+              )}
 
-              <div className="prescription-card">
-                <h3>Metformin</h3>
-                <p>Dosage: 850mg, once daily</p>
-                <p>Prescribed by: Dr. Karim</p>
-                <p>Start Date: Oct 5, 2025</p>
-                <p>Status: Active</p>
-              </div>
+              {!loading && medications.length === 0 && (
+                <div className="no-data">
+                  <p>📋 No prescriptions from doctors yet.</p>
+                  <p>
+                    Your doctor's prescriptions will appear here once they are
+                    created.
+                  </p>
+                </div>
+              )}
 
-              <div className="prescription-card">
-                <h3>Ibuprofen</h3>
-                <p>Dosage: 400mg, as needed</p>
-                <p>Prescribed by: Dr. Nahar</p>
-                <p>Start Date: Sep 20, 2025</p>
-                <p>Status: Completed</p>
-              </div>
+              {!loading &&
+                medications.map((rx) => (
+                  <div key={rx.id} className="prescription-card">
+                    <div className="prescription-header-row">
+                      <div>
+                        <h3>📝 Prescription from Dr. {rx.doctor?.name}</h3>
+                        <p className="prescription-date">
+                          {new Date(rx.prescriptionDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="prescription-details">
+                      <p>
+                        <strong>Diagnosis:</strong> {rx.diagnosis}
+                      </p>
+                      <p>
+                        <strong>Clinical Notes:</strong> {rx.description}
+                      </p>
+
+                      {rx.medications && rx.medications.length > 0 && (
+                        <div className="medications-section">
+                          <strong>Prescribed Medications:</strong>
+                          <ul className="medications-list">
+                            {rx.medications.map((med, idx) => (
+                              <li key={idx} className="medication-item">
+                                <div className="med-name">
+                                  {med.medicationName}
+                                </div>
+                                <div className="med-details">
+                                  <span className="dosage">
+                                    💉 {med.dosage}
+                                  </span>
+                                  <span className="frequency">
+                                    ⏰ {med.frequency}
+                                  </span>
+                                  <span className="duration">
+                                    📅 {med.duration}
+                                  </span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
             </section>
           )}
 
@@ -128,11 +192,10 @@ export default function Prescriptions() {
               {loading && (
                 <div className="loading-text">Loading lab tests...</div>
               )}
-              {error && <div className="error-message">{error}</div>}
 
               {!loading && labTests.length === 0 && (
                 <div className="no-data">
-                  <p>No lab tests prescribed yet.</p>
+                  <p>🧪 No lab tests prescribed yet.</p>
                 </div>
               )}
 

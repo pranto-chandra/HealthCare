@@ -16,6 +16,10 @@ import {
   completeAppointment,
   getMyAppointments,
   getMyPatients,
+  searchPatientByEmail,
+  getMyPatientRecord,
+  getMyPrescriptions,
+  createPrescriptionWithJWT,
 } from '../controllers/doctorController.js';
 import { protect, authorize } from '../middlewares/authMiddleware.js';
 import { prescriptionValidation, appointmentValidation, validate } from '../utils/validation.js';
@@ -35,6 +39,9 @@ router.use(authorize('DOCTOR')); // Only doctors can access these routes
 
 router.get('/me/appointments', getMyAppointments);
 router.get('/me/patients', getMyPatients);
+router.get('/me/search-patient', searchPatientByEmail);
+router.get('/me/prescriptions', getMyPrescriptions);
+router.get('/me/patients/:patientId/record', getMyPatientRecord);
 router.post(
   '/me/appointments/:appointmentId/confirm',
   appointmentValidation.confirm,
@@ -42,6 +49,12 @@ router.post(
   confirmAppointment
 );
 router.post('/me/appointments/:appointmentId/complete', completeAppointment);
+router.post(
+  '/me/prescriptions',
+  prescriptionValidation.createWithJWT,
+  validate,
+  createPrescriptionWithJWT
+);
 router.get('/:id/profile', getDoctorProfile);
 router.put('/:id/profile', updateDoctorProfile);
 router.get('/:id/appointments', getDoctorAppointments);

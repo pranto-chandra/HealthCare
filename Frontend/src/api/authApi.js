@@ -9,6 +9,10 @@ export async function register(payload) {
   return API.post("/auth/register", payload);
 }
 
+export async function verifyOtp(payload) {
+  return API.post("/auth/verify-otp", payload);
+}
+
 export async function login(payload) {
   return API.post("/auth/login", payload);
 }

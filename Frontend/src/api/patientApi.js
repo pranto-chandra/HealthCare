@@ -38,6 +38,16 @@ const patientApi = {
       appointmentData,
     );
   },
+
+  // Get patient prescriptions
+  getPrescriptions: (patientId) => {
+    return apiClient.get(`/patients/${patientId}/prescriptions`);
+  },
+
+  // Get prescriptions for current logged-in patient (using JWT)
+  getMyPrescriptions: () => {
+    return apiClient.get(`/patients/me/prescriptions`);
+  },
 };
 
 export default patientApi;

@@ -22,6 +22,7 @@ export const register = async (req, res) => {
     upperCaseAlphabets: false,
     specialChars: false,
   });
+  console.log(`📧 Email Verification Code: ${otp}`);
 
   // Hash password
   const hashedPassword = await hashPassword(password);
@@ -74,8 +75,26 @@ export const register = async (req, res) => {
 export const verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
 
+  // Debug logs
+  console.log(`🔍 Verification attempt for ${email} with OTP: ${otp}`);
+
+  // Find user with matching email
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    console.log(`❌ User not found: ${email}`);
+    throw new BadRequestError('User not found');
+  }
+
+  // Debug: Show stored OTP and expiry
+  console.log(`   Stored OTP: ${user.emailVerificationOtp}`);
+  console.log(`   OTP Expiry: ${user.emailVerificationOtpExpiry}`);
+  console.log(`   Current Time: ${new Date()}`);
+  console.log(`   Is Expired: ${user.emailVerificationOtpExpiry < new Date()}`);
+  console.log(`   OTP Match: ${user.emailVerificationOtp === otp}`);
+
   // Find user with matching email and valid OTP
-  const user = await prisma.user.findFirst({
+  const verifiedUser = await prisma.user.findFirst({
     where: {
       email,
       emailVerificationOtp: otp,
@@ -86,13 +105,16 @@ export const verifyOtp = async (req, res) => {
     },
   });
 
-  if (!user) {
+  if (!verifiedUser) {
+    console.log(`❌ OTP verification failed for ${email}`);
     throw new BadRequestError('Invalid or expired OTP');
   }
 
+  console.log(`✅ OTP verified successfully for ${email}`);
+
   // Mark email as verified and clear OTP
   await prisma.user.update({
-    where: { id: user.id },
+    where: { id: verifiedUser.id },
     data: {
       isEmailVerified: true,
       emailVerificationOtp: null,
@@ -101,11 +123,11 @@ export const verifyOtp = async (req, res) => {
   });
 
   // Create role-specific profile
-  const { role } = user;
+  const { role } = verifiedUser;
   if (role === 'PATIENT') {
     await prisma.patientProfile.create({
       data: {
-        userId: user.id,
+        userId: verifiedUser.id,
         name: 'Patient',
         phone: '',
         dateOfBirth: new Date('2000-01-01'),
@@ -116,7 +138,7 @@ export const verifyOtp = async (req, res) => {
   } else if (role === 'DOCTOR') {
     await prisma.doctorProfile.create({
       data: {
-        userId: user.id,
+        userId: verifiedUser.id,
         name: 'Doctor',
         phone: '',
         dateOfBirth: new Date('2000-01-01'),
@@ -129,7 +151,7 @@ export const verifyOtp = async (req, res) => {
   } else if (role === 'ADMIN') {
     await prisma.adminProfile.create({
       data: {
-        userId: user.id,
+        userId: verifiedUser.id,
         name: 'Admin',
         phone: '',
       },
@@ -137,7 +159,7 @@ export const verifyOtp = async (req, res) => {
   } else if (role === 'PATHOLOGIST') {
     await prisma.pathologistProfile.create({
       data: {
-        userId: user.id,
+        userId: verifiedUser.id,
         name: 'Pathologist',
         phone: '',
         licenseNumber: 'N/A',
@@ -146,8 +168,8 @@ export const verifyOtp = async (req, res) => {
   }
 
   // Generate tokens
-  const accessToken = generateToken(user.id);
-  const refreshToken = generateRefreshToken(user.id);
+  const accessToken = generateToken(verifiedUser.id);
+  const refreshToken = generateRefreshToken(verifiedUser.id);
 
   res.status(200).json({
     success: true,

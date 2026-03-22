@@ -6,6 +6,7 @@
   background-color: #f9fafb;
   min-height: 100vh;
   font-family: "Segoe UI", sans-serif;
+  overflow-x: hidden;
 }
 
 .health-monitoring-layout {
@@ -15,8 +16,8 @@
 
 .health-monitoring-content {
   flex: 1;
-  padding: 0px;
-  margin-left: 160px;
+  padding: 30px;
+  margin-left: 280px;
   transition: margin-left 0.3s ease;
 }
 
@@ -123,7 +124,7 @@
 
 .monitoring-notes {
   background: white;
-  padding: 25px;
+  padding: 10px;
   border-radius: 12px;
   margin-left:30px ;
   box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);

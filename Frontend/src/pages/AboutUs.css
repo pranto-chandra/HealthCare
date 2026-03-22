@@ -1,24 +1,31 @@
-.side-layout{
-   display: flex;
+/* =========================================================
+   ABOUT US PAGE
+   ========================================================= */
+
+.about-us-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.about-us-layout {
+  display: flex;
   transition: margin-left 0.3s ease;
 }
 
-.side-content {
+.about-us-content {
   flex: 1;
   padding: 0px;
   margin-left: 280px;
   transition: margin-left 0.3s ease;
 }
 
-.sidebar-open .side-content {
-  margin-left: 280px; /* Adjust based on sidebar width */
-}
-
-.side-layout.collapsed .side-content {
+/* Collapsed mode */
+.about-us-layout.collapsed .about-us-content {
   margin-left: 0 !important;
 }
 
-
+/* Sidebar toggle */
 .sidebar-toggle {
   position: fixed;
   top: 80px;
@@ -27,8 +34,8 @@
   background-color: #004d40;
   color: white;
   border: none;
-  font-size: 22px;
   padding: 8px 12px;
+  font-size: 22px;
   border-radius: 6px;
   cursor: pointer;
   transition: 0.3s ease;
@@ -36,8 +43,4 @@
 
 .sidebar-toggle:hover {
   background-color: #00695c;
-}
-
-.sidebar-open .sidebar-toggle {
-  left: 170px; /* Stay visible when sidebar is open */
 }

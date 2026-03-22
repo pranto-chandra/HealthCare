@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+// import Button from '@mui/material/Button';
 import Navbar from "../../components/Navbar";
 import "./Login.css";
 
@@ -81,11 +82,12 @@ export default function Login() {
           </div>
 
           <div className="forgot">
-            <Link to="/forgot-password">Forgot password?</Link>
+            <Link to="/forgot-password">Forgot Password?</Link>
           </div>
 
-          <button type="submit" className="login-btn">
-            Log in
+
+         <button className="login-btn">
+            Log In
           </button>
 
           <p className="signup-text">

@@ -1,0 +1,47 @@
+/* =========================================================
+   BLOGS PAGE
+   ========================================================= */
+
+.blogs-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  padding: 30px 0;
+}
+
+.blogs-layout {
+  display: flex;
+  transition: margin-left 0.3s ease;
+}
+
+.blogs-content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Collapsed mode */
+.blogs-layout.collapsed .blogs-content {
+  margin-left: 0 !important;
+}
+
+/* Sidebar toggle */
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+}

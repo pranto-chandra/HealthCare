@@ -31,17 +31,31 @@ export const doctorApi = {
     return apiClient.get(`/doctors/${doctorId}/patients`);
   },
 
+  // Search patient by email
+  searchPatientByEmail: (email) => {
+    return apiClient.get(
+      `/doctors/me/search-patient?email=${encodeURIComponent(email)}`,
+    );
+  },
+
+  // Get complete patient record with medical history
+  getPatientRecord: (patientId) => {
+    return apiClient.get(`/doctors/me/patients/${patientId}/record`);
+  },
+
   // Get doctor prescriptions
   getDoctorPrescriptions: (doctorId) => {
     return apiClient.get(`/doctors/${doctorId}/prescriptions`);
   },
 
+  // Get my prescriptions (using JWT)
+  getMyPrescriptions: () => {
+    return apiClient.get(`/doctors/me/prescriptions`);
+  },
+
   // Create prescription
-  createPrescription: (doctorId, prescriptionData) => {
-    return apiClient.post(
-      `/doctors/${doctorId}/prescriptions`,
-      prescriptionData,
-    );
+  createPrescription: (prescriptionData) => {
+    return apiClient.post(`/doctors/me/prescriptions`, prescriptionData);
   },
 
   // Confirm or reject an appointment (using JWT)

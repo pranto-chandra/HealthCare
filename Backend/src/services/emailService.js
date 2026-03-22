@@ -10,6 +10,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendOtpEmail = async (email, otp) => {
+  console.log(`📧 Sending verification code: ${otp} to ${email}`);
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,

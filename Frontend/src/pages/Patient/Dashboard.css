@@ -19,7 +19,7 @@
 .dashboard-content {
   flex: 1;
   padding: 30px;
-  margin-left: 160px; /* width of sidebar */
+  margin-left: 280px; /* width of sidebar */
   transition: margin-left 0.3s ease;
 }
 

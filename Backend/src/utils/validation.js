@@ -28,9 +28,7 @@ export const userValidation = {
     body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
   ],
 
-  resendOtp: [
-    body('email').isEmail().withMessage('Please provide a valid email'),
-  ],
+  resendOtp: [body('email').isEmail().withMessage('Please provide a valid email')],
 };
 
 export const patientValidation = {
@@ -93,6 +91,19 @@ export const appointmentValidation = {
 export const prescriptionValidation = {
   create: [
     body('appointmentId').isUUID().withMessage('Invalid appointment ID'),
+    body('diagnosis').trim().notEmpty().withMessage('Diagnosis is required'),
+    body('description').trim().notEmpty().withMessage('Description is required'),
+    body('medications').isArray().withMessage('Medications must be an array'),
+    body('medications.*.medicationName')
+      .trim()
+      .notEmpty()
+      .withMessage('Medication name is required'),
+    body('medications.*.dosage').trim().notEmpty().withMessage('Dosage is required'),
+    body('medications.*.frequency').trim().notEmpty().withMessage('Frequency is required'),
+    body('medications.*.duration').trim().notEmpty().withMessage('Duration is required'),
+  ],
+  createWithJWT: [
+    body('patientId').isUUID().withMessage('Invalid patient ID'),
     body('diagnosis').trim().notEmpty().withMessage('Diagnosis is required'),
     body('description').trim().notEmpty().withMessage('Description is required'),
     body('medications').isArray().withMessage('Medications must be an array'),

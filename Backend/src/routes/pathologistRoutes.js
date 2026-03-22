@@ -1,10 +1,17 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 import { protect, authorize } from '../middlewares/authMiddleware.js';
 import * as pathologistController from '../controllers/pathologistController.js';
 
 const router = express.Router();
+
+// Ensure uploads directory exists
+const uploadDir = 'uploads/lab-results';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({

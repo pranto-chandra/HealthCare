@@ -21,14 +21,14 @@ justify-content: center;
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-left: 160px; /* width of sidebar */
+  margin-left: 280px; /* width of sidebar */
   transition: margin-left 0.3s ease;
 }
 
 /* Collapsed sidebar */
-/* .editprofile-layout.collapsed .edit-profile-container {
+.editprofile-layout.collapsed .edit-profile-container {
   margin-left: 0 !important;
-} */
+}
 
 /* =========================================================
    SIDEBAR TOGGLE BUTTON

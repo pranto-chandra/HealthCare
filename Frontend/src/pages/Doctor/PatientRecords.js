@@ -1,32 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
-import Navbar from "../../components/Navbar";
+import { AuthContext } from "../../context/AuthContext";
+import { useSearchParams } from "react-router-dom";
+import doctorApi from "../../api/doctorApi";
 import TestReports from "../../components/TestReports";
+import { getErrorMessage } from "../../utils/helpers";
 import "./PatientRecords.css";
 
 export default function PatientRecords() {
+  const { user } = useContext(AuthContext);
+  const [searchParams] = useSearchParams();
+  const patientId = searchParams.get("patientId");
+  const patientEmail = searchParams.get("email");
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
+  const [patient, setPatient] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [medicalHistory, setMedicalHistory] = useState([]);
+  const [labTests, setLabTests] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [healthRecords, setHealthRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [patient, setPatient] = useState({
-    id: "patient-123", // Add patient ID for test reports
-    name: "John Doe",
-    age: 42,
-    gender: "Male",
-    contact: "john.doe@example.com",
-    phone: "+880123456789",
-    history: ["Type 2 Diabetes", "Hypertension", "Allergy to Penicillin"],
-    prescriptions: ["Metformin 850mg - daily", "Lisinopril 10mg - daily"],
-    activity: [
-      "🩺 Appointment with Dr. Rahman on Nov 15",
-      "💊 Prescription updated on Nov 10",
-      "📊 Blood pressure logged on Nov 8",
-    ],
-  });
+  // Fetch patient record
+  useEffect(() => {
+    if (!patientId) {
+      setError("Patient ID not provided. Please search for a patient first.");
+      setLoading(false);
+      return;
+    }
 
-  const handleChange = (field, value) => {
-    setPatient((prev) => ({ ...prev, [field]: value }));
-  };
+    const fetchPatientRecord = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await doctorApi.getPatientRecord(patientId);
+        const data = response?.data?.data;
+
+        setPatient(data?.patient || null);
+        setAppointments(data?.appointments || []);
+        setMedicalHistory(data?.medicalHistory || []);
+        setLabTests(data?.labTests || []);
+        setPrescriptions(data?.prescriptions || []);
+        setHealthRecords(data?.healthRecords?.slice(0, 10) || []);
+      } catch (err) {
+        setError(getErrorMessage(err) || "Failed to load patient record");
+        console.error("Error fetching patient record:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatientRecord();
+  }, [patientId]);
+
+  if (loading) {
+    return (
+      <div className="patient-record-page">
+        <button
+          className="sidebar-toggle"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          ☰
+        </button>
+        <div
+          className={`patient-record-layout ${isSidebarOpen ? "" : "collapsed"}`}
+        >
+          {isSidebarOpen && <Sidebar role="Doctor" />}
+          <main className="patient-record-content">
+            <div className="loading">Loading patient record...</div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="patient-record-page">
@@ -43,96 +92,216 @@ export default function PatientRecords() {
         {isSidebarOpen && <Sidebar role="Doctor" />}
         <main className="patient-record-content">
           <section className="record-header">
-            <h1>Patient Record</h1>
-            <p>Detailed medical profile and history.</p>
-            <button
-              className="edit-toggle"
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              {isEditing ? "Save Changes" : "Edit"}
-            </button>
+            <h1>📋 Patient Medical Record</h1>
+            <p>Complete medical profile and history.</p>
           </section>
 
-          <section className="profile-section">
-            <h2>Profile</h2>
-            {isEditing ? (
-              <>
-                <input
-                  type="text"
-                  value={patient.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                />
-                <input
-                  type="number"
-                  value={patient.age}
-                  onChange={(e) => handleChange("age", e.target.value)}
-                />
-                <input
-                  type="text"
-                  value={patient.gender}
-                  onChange={(e) => handleChange("gender", e.target.value)}
-                />
-                <input
-                  type="email"
-                  value={patient.contact}
-                  onChange={(e) => handleChange("contact", e.target.value)}
-                />
-                <input
-                  type="tel"
-                  value={patient.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
-                />
-              </>
-            ) : (
-              <>
-                <p>
-                  <strong>Name:</strong> {patient.name}
-                </p>
-                <p>
-                  <strong>Age:</strong> {patient.age}
-                </p>
-                <p>
-                  <strong>Gender:</strong> {patient.gender}
-                </p>
-                <p>
-                  <strong>Email:</strong> {patient.contact}
-                </p>
-                <p>
-                  <strong>Phone:</strong> {patient.phone}
-                </p>
-              </>
-            )}
-          </section>
+          {error && <div className="alert alert-danger">{error}</div>}
 
-          <section className="history-section">
-            <h2>Medical History</h2>
-            <ul>
-              {patient.history.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </section>
+          {patient && (
+            <>
+              {/* Patient Profile Card */}
+              <section className="profile-section">
+                <h2>👤 Patient Profile</h2>
+                <div className="profile-card">
+                  <div className="profile-info">
+                    <p>
+                      <strong>Name:</strong> {patient.name}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {patient.user?.email || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Phone:</strong> {patient.phone || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Date of Birth:</strong>{" "}
+                      {patient.dateOfBirth
+                        ? new Date(patient.dateOfBirth).toLocaleDateString()
+                        : "N/A"}
+                    </p>
+                    <p>
+                      <strong>Gender:</strong> {patient.gender || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Blood Group:</strong>{" "}
+                      {patient.bloodGroup || "N/A"}
+                    </p>
+                  </div>
+                </div>
+              </section>
 
-          <section className="prescriptions-section">
-            <h2>Active Prescriptions</h2>
-            <ul>
-              {patient.prescriptions.map((med, index) => (
-                <li key={index}>{med}</li>
-              ))}
-            </ul>
-          </section>
+              {/* Appointments Section */}
+              <section className="appointments-section">
+                <h2>🩺 Appointments ({appointments.length})</h2>
+                {appointments && appointments.length > 0 ? (
+                  <div className="appointments-list">
+                    {appointments.map((apt) => (
+                      <div key={apt.id} className="appointment-card">
+                        <p>
+                          <strong>Date:</strong>{" "}
+                          {new Date(apt.scheduledAt).toLocaleDateString()}
+                        </p>
+                        <p>
+                          <strong>Status:</strong>{" "}
+                          <span className={`status status-${apt.status}`}>
+                            {apt.status}
+                          </span>
+                        </p>
+                        <p>
+                          <strong>Diagnosis:</strong> {apt.diagnosis || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Symptoms:</strong> {apt.symptoms || "N/A"}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-data">No appointments found.</p>
+                )}
+              </section>
 
-          {/* Test Reports Section */}
-          {patient.id && <TestReports patientId={patient.id} />}
+              {/* Medical History Section */}
+              <section className="history-section">
+                <h2>📊 Medical History ({medicalHistory.length})</h2>
+                {medicalHistory && medicalHistory.length > 0 ? (
+                  <div className="history-list">
+                    {medicalHistory.map((hist) => (
+                      <div key={hist.id} className="history-card">
+                        <p>
+                          <strong>Condition:</strong> {hist.condition}
+                        </p>
+                        <p>
+                          <strong>Status:</strong> {hist.status}
+                        </p>
+                        {hist.notes && (
+                          <p>
+                            <strong>Notes:</strong> {hist.notes}
+                          </p>
+                        )}
+                        <p className="timestamp">
+                          {new Date(hist.recordedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-data">No medical history found.</p>
+                )}
+              </section>
 
-          <section className="activity-section">
-            <h2>Recent Activity</h2>
-            <ul>
-              {patient.activity.map((note, index) => (
-                <li key={index}>{note}</li>
-              ))}
-            </ul>
-          </section>
+              {/* Prescriptions Section */}
+              <section className="prescriptions-section">
+                <h2>💊 Prescriptions ({prescriptions.length})</h2>
+                {prescriptions && prescriptions.length > 0 ? (
+                  <div className="prescriptions-list">
+                    {prescriptions.map((rx) => (
+                      <div key={rx.id} className="prescription-card">
+                        <p>
+                          <strong>Diagnosis:</strong> {rx.diagnosis}
+                        </p>
+                        <p>
+                          <strong>Date:</strong>{" "}
+                          {new Date(rx.prescriptionDate).toLocaleDateString()}
+                        </p>
+                        {rx.medications && rx.medications.length > 0 && (
+                          <div className="medications">
+                            <strong>Medications:</strong>
+                            <ul>
+                              {rx.medications.map((med, idx) => (
+                                <li key={idx}>
+                                  {med.medicationName} - {med.dosage} (
+                                  {med.frequency})
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-data">No prescriptions found.</p>
+                )}
+              </section>
+
+              {/* Lab Tests Section */}
+              <section className="lab-tests-section">
+                <h2>🧪 Lab Tests ({labTests.length})</h2>
+                {labTests && labTests.length > 0 ? (
+                  <div className="lab-tests-list">
+                    {labTests.map((test) => (
+                      <div key={test.id} className="lab-test-card">
+                        <p>
+                          <strong>Test Name:</strong> {test.testName}
+                        </p>
+                        <p>
+                          <strong>Status:</strong>{" "}
+                          <span className={`status status-${test.status}`}>
+                            {test.status}
+                          </span>
+                        </p>
+                        <p>
+                          <strong>Description:</strong> {test.description}
+                        </p>
+                        {test.testDate && (
+                          <p>
+                            <strong>Test Date:</strong>{" "}
+                            {new Date(test.testDate).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-data">No lab tests found.</p>
+                )}
+              </section>
+
+              {/* Health Records Section */}
+              <section className="health-records-section">
+                <h2>❤️ Health Monitoring (Last 10 Records)</h2>
+                {healthRecords && healthRecords.length > 0 ? (
+                  <div className="health-records-list">
+                    {healthRecords.map((record) => (
+                      <div key={record.id} className="health-record-card">
+                        {record.heartRate && (
+                          <p>
+                            <strong>Heart Rate:</strong> {record.heartRate} bpm
+                          </p>
+                        )}
+                        {record.temperature && (
+                          <p>
+                            <strong>Temperature:</strong> {record.temperature}°C
+                          </p>
+                        )}
+                        {record.weight && (
+                          <p>
+                            <strong>Weight:</strong> {record.weight} kg
+                          </p>
+                        )}
+                        {record.bloodPressure && (
+                          <p>
+                            <strong>Blood Pressure:</strong>{" "}
+                            {record.bloodPressure}
+                          </p>
+                        )}
+                        <p className="timestamp">
+                          {new Date(record.recordedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-data">No health records found.</p>
+                )}
+              </section>
+
+              {/* Test Reports Section */}
+              {patient.id && <TestReports patientId={patient.id} />}
+            </>
+          )}
         </main>
       </div>
     </div>

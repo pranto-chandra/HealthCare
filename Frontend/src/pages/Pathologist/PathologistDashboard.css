@@ -323,8 +323,11 @@
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   width: 90%;
-  max-width: 500px;
+  max-width: 600px;
+  max-height: 85vh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
@@ -333,6 +336,7 @@
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
@@ -356,8 +360,8 @@
 
 .modal-body {
   padding: 1.5rem;
-  max-height: 400px;
   overflow-y: auto;
+  flex: 1;
 }
 
 .form-group {
@@ -393,6 +397,7 @@
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 /* =========================================================

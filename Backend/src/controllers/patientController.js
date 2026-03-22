@@ -201,3 +201,37 @@ export const getAppointments = async (req, res) => {
     data: appointments,
   });
 };
+
+// Get my prescriptions (using JWT)
+export const getMyPrescriptions = async (req, res) => {
+  // Get patient's profile from JWT
+  const patientProfile = await prisma.patientProfile.findUnique({
+    where: { userId: req.user.id },
+  });
+
+  if (!patientProfile) {
+    throw new NotFoundError('Patient profile not found');
+  }
+
+  const prescriptions = await prisma.prescription.findMany({
+    where: { patientId: patientProfile.id },
+    include: {
+      medications: true,
+      doctor: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: { prescriptionDate: 'desc' },
+  });
+
+  res.json({
+    success: true,
+    data: prescriptions,
+  });
+};

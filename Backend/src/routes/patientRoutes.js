@@ -7,6 +7,7 @@ import {
   getPatientHistory,
   createAppointment,
   getAppointments,
+  getMyPrescriptions,
 } from '../controllers/patientController.js';
 import { protect, authorize } from '../middlewares/authMiddleware.js';
 import { patientValidation, appointmentValidation, validate } from '../utils/validation.js';
@@ -15,6 +16,10 @@ const router = express.Router();
 
 router.use(protect); // All patient routes require authentication
 
+// JWT-based routes (using /me)
+router.get('/me/prescriptions', authorize('PATIENT'), getMyPrescriptions);
+
+// ID-based routes
 router.post('/', protect, patientValidation.create, validate, createPatient);
 router.get('/user/:userId', protect, getPatientByUserId);
 router.get('/:id', protect, getPatient);

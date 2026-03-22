@@ -889,3 +889,221 @@ export const getMyPatients = async (req, res) => {
     data: patients.map((p) => p.patient),
   });
 };
+
+// Search patient by email
+export const searchPatientByEmail = async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    throw new NotFoundError('Email parameter is required');
+  }
+
+  const patient = await prisma.patientProfile.findFirst({
+    where: {
+      user: {
+        email: email.toLowerCase(),
+      },
+    },
+    include: {
+      user: {
+        select: {
+          email: true,
+        },
+      },
+    },
+  });
+
+  if (!patient) {
+    throw new NotFoundError('Patient not found');
+  }
+
+  res.json({
+    success: true,
+    data: patient,
+  });
+};
+
+// Get my patient record (using JWT)
+export const getMyPatientRecord = async (req, res) => {
+  const { patientId } = req.params;
+
+  // Get doctor's profile from JWT
+  const doctorProfile = await prisma.doctorProfile.findUnique({
+    where: { userId: req.user.id },
+  });
+
+  if (!doctorProfile) {
+    throw new NotFoundError('Doctor profile not found');
+  }
+
+  // Get comprehensive patient record with doctor's specific data
+  const patientRecord = await prisma.patientProfile.findUnique({
+    where: { id: patientId },
+    include: {
+      user: {
+        select: {
+          email: true,
+        },
+      },
+      appointments: {
+        where: { doctorId: doctorProfile.id },
+        include: {
+          prescription: {
+            include: {
+              medications: true,
+            },
+          },
+        },
+      },
+      medicalHistory: {
+        where: { doctorId: doctorProfile.id },
+      },
+      healthRecords: {
+        orderBy: { recordedAt: 'desc' },
+        take: 10,
+      },
+      labTests: {
+        where: { doctorId: doctorProfile.id },
+        orderBy: { testDate: 'desc' },
+      },
+    },
+  });
+
+  if (!patientRecord) {
+    throw new NotFoundError('Patient record not found');
+  }
+
+  res.json({
+    success: true,
+    data: {
+      patient: patientRecord,
+      appointments: patientRecord.appointments,
+      medicalHistory: patientRecord.medicalHistory,
+      labTests: patientRecord.labTests,
+      healthRecords: patientRecord.healthRecords,
+      prescriptions: patientRecord.appointments
+        .filter((apt) => apt.prescription)
+        .map((apt) => apt.prescription),
+    },
+  });
+};
+
+// Get my prescriptions (using JWT)
+export const getMyPrescriptions = async (req, res) => {
+  // Get doctor's profile from JWT
+  const doctorProfile = await prisma.doctorProfile.findUnique({
+    where: { userId: req.user.id },
+  });
+
+  if (!doctorProfile) {
+    throw new NotFoundError('Doctor profile not found');
+  }
+
+  const prescriptions = await prisma.prescription.findMany({
+    where: { doctorId: doctorProfile.id },
+    include: {
+      medications: true,
+      patient: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+      doctor: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: { prescriptionDate: 'desc' },
+  });
+
+  res.json({
+    success: true,
+    data: prescriptions,
+  });
+};
+
+// Create prescription (updated for JWT - using patientId and medications from body)
+export const createPrescriptionWithJWT = async (req, res) => {
+  const { patientId, diagnosis, description, medications } = req.body;
+
+  // Get doctor's profile from JWT
+  const doctorProfile = await prisma.doctorProfile.findUnique({
+    where: { userId: req.user.id },
+  });
+
+  if (!doctorProfile) {
+    throw new NotFoundError('Doctor profile not found');
+  }
+
+  // Verify patient exists
+  const patient = await prisma.patientProfile.findUnique({
+    where: { id: patientId },
+  });
+
+  if (!patient) {
+    throw new NotFoundError('Patient not found');
+  }
+
+  // Create prescription with medications using transaction
+  const prescription = await prisma.$transaction(async (prisma) => {
+    const newPrescription = await prisma.prescription.create({
+      data: {
+        doctorId: doctorProfile.id,
+        patientId,
+        prescriptionDate: new Date(),
+        diagnosis,
+        description,
+      },
+    });
+
+    // Create medications if provided
+    if (medications && medications.length > 0) {
+      await prisma.medicationTracking.createMany({
+        data: medications.map((med) => ({
+          prescriptionId: newPrescription.id,
+          medicationName: med.medicationName,
+          dosage: med.dosage,
+          frequency: med.frequency,
+          duration: med.duration,
+        })),
+      });
+    }
+
+    return newPrescription;
+  });
+
+  // Fetch complete prescription with medications and patient details
+  const prescriptionWithDetails = await prisma.prescription.findUnique({
+    where: { id: prescription.id },
+    include: {
+      medications: true,
+      patient: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+      doctor: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  res.status(201).json({
+    success: true,
+    message: 'Prescription created successfully',
+    data: prescriptionWithDetails,
+  });
+};

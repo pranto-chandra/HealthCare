@@ -13,12 +13,12 @@
 .book-content {
   flex: 1;
   padding: 0px;
-  margin-left: 170px;
+  margin-left: 280px;
   transition: margin-left 0.3s ease;
 }
 
 .sidebar-open .book-content {
-  margin-left: 300px; /* Adjust based on sidebar width */
+  margin-left: 280px;
 }
 
 .book-layout.collapsed .book-content {

@@ -9,7 +9,7 @@
 }
 
 .dashboard-content {
-  margin-left: 180px; /* matches sidebar width */
+  margin-left: 280px; /* matches sidebar width */
   padding: 0px;
   flex: 1;
 }

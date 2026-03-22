@@ -66,12 +66,13 @@ async function main() {
     const adminPassword = await hashPassword('admin123');
     const adminUser = await prisma.user.upsert({
       where: { email: 'admin@healthcare.com' },
-      update: {},
+      update: { isEmailVerified: true },
       create: {
         email: 'admin@healthcare.com',
         password: adminPassword,
         role: 'ADMIN',
         isProfileComplete: true,
+        isEmailVerified: true,
       },
     });
 
@@ -95,12 +96,13 @@ async function main() {
 
       const user = await prisma.user.upsert({
         where: { email },
-        update: {},
+        update: { isEmailVerified: true },
         create: {
           email,
           password: doctorPassword,
           role: 'DOCTOR',
           isProfileComplete: true,
+          isEmailVerified: true,
         },
       });
 
@@ -155,12 +157,13 @@ async function main() {
     const pathologistPassword = await hashPassword('pathologist123');
     const pathologistUser = await prisma.user.upsert({
       where: { email: 'pathologist@healthcare.com' },
-      update: {},
+      update: { isEmailVerified: true },
       create: {
         email: 'pathologist@healthcare.com',
         password: pathologistPassword,
         role: 'PATHOLOGIST',
         isProfileComplete: true,
+        isEmailVerified: true,
       },
     });
 
@@ -182,12 +185,13 @@ async function main() {
     const patientPassword = await hashPassword('patient123');
     const patientUser = await prisma.user.upsert({
       where: { email: 'patient@healthcare.com' },
-      update: {},
+      update: { isEmailVerified: true },
       create: {
         email: 'patient@healthcare.com',
         password: patientPassword,
         role: 'PATIENT',
         isProfileComplete: true,
+        isEmailVerified: true,
       },
     });
 

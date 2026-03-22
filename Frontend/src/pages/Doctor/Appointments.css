@@ -18,7 +18,7 @@
 .doctor-appointments-content {
   flex: 1;
   padding: 0px;
-  margin-left: 185px; /* Matches sidebar width */
+  margin-left: 280px; /* Matches sidebar width */
   transition: margin-left 0.3s ease;
 }
 

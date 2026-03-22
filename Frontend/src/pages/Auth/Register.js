@@ -16,9 +16,9 @@ export default function Register() {
     try {
       const res = await register({ email, password, role });
       setLoading(false);
-      if (res && res.status === 201) {
-        alert("Registration successful. Please login.");
-        navigate("/login");
+      if (res && res.status === 200) {
+        alert("✅ Verification code sent to your email!");
+        navigate("/verify-email", { state: { email } });
       } else {
         alert("Registration submitted. Check backend response.");
       }
@@ -35,7 +35,10 @@ export default function Register() {
     <div className="register-page">
       <div className="register-container">
         <h1>Create Account</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col justify-center items-center"
+        >
           <input
             type="email"
             placeholder="Email"
