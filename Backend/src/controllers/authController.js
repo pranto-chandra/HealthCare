@@ -2,30 +2,106 @@ import { prisma } from '../config/db.js';
 import { hashPassword, comparePassword } from '../utils/password.js';
 import { generateToken, generateRefreshToken } from '../utils/jwt.js';
 import { BadRequestError, UnauthorizedError } from '../utils/errors.js';
+import { sendOtpEmail } from '../services/emailService.js';
 import crypto from 'crypto';
+import otpGenerator from 'otp-generator';
 
 export const register = async (req, res) => {
   const { email, password, role } = req.body;
 
-  // Check if user exists
-  const userExists = await prisma.user.findUnique({ where: { email } });
-  if (userExists) {
+  // Check if user exists and is verified
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  if (existingUser && existingUser.isEmailVerified) {
     throw new BadRequestError('User already exists');
   }
+
+  // Generate OTP
+  const otp = otpGenerator.generate(6, {
+    digits: true,
+    lowerCaseAlphabets: false,
+    upperCaseAlphabets: false,
+    specialChars: false,
+  });
 
   // Hash password
   const hashedPassword = await hashPassword(password);
 
-  // Create user
-  const user = await prisma.user.create({
-    data: {
+  // Set OTP expiry to 10 minutes from now
+  const otpExpiry = new Date(Date.now() + 600000);
+
+  if (existingUser && !existingUser.isEmailVerified) {
+    // Update existing unverified user
+    await prisma.user.update({
+      where: { email },
+      data: {
+        password: hashedPassword,
+        role,
+        emailVerificationOtp: otp,
+        emailVerificationOtpExpiry: otpExpiry,
+      },
+    });
+  } else {
+    // Create new user
+    await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        role,
+        emailVerificationOtp: otp,
+        emailVerificationOtpExpiry: otpExpiry,
+        isEmailVerified: false,
+      },
+    });
+  }
+
+  // Send OTP email
+  try {
+    await sendOtpEmail(email, otp);
+  } catch (error) {
+    // If email fails, delete the user if newly created
+    if (!existingUser) {
+      await prisma.user.delete({ where: { email } });
+    }
+    throw new BadRequestError('Failed to send verification email');
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'OTP sent to your email. Please verify to complete registration.',
+  });
+};
+
+export const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  // Find user with matching email and valid OTP
+  const user = await prisma.user.findFirst({
+    where: {
       email,
-      password: hashedPassword,
-      role,
+      emailVerificationOtp: otp,
+      emailVerificationOtpExpiry: {
+        gt: new Date(),
+      },
+      isEmailVerified: false,
+    },
+  });
+
+  if (!user) {
+    throw new BadRequestError('Invalid or expired OTP');
+  }
+
+  // Mark email as verified and clear OTP
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      isEmailVerified: true,
+      emailVerificationOtp: null,
+      emailVerificationOtpExpiry: null,
     },
   });
 
   // Create role-specific profile
+  const { role } = user;
   if (role === 'PATIENT') {
     await prisma.patientProfile.create({
       data: {
@@ -73,8 +149,9 @@ export const register = async (req, res) => {
   const accessToken = generateToken(user.id);
   const refreshToken = generateRefreshToken(user.id);
 
-  res.status(201).json({
+  res.status(200).json({
     success: true,
+    message: 'Email verified successfully. Registration complete.',
     data: {
       user: {
         id: user.id,
@@ -90,6 +167,54 @@ export const register = async (req, res) => {
   });
 };
 
+export const resendOtp = async (req, res) => {
+  const { email } = req.body;
+
+  // Find unverified user
+  const user = await prisma.user.findFirst({
+    where: {
+      email,
+      isEmailVerified: false,
+    },
+  });
+
+  if (!user) {
+    throw new BadRequestError('No unverified account found with this email');
+  }
+
+  // Generate new OTP
+  const otp = otpGenerator.generate(6, {
+    digits: true,
+    alphabets: false,
+    upperCase: false,
+    specialChars: false,
+  });
+
+  // Set OTP expiry to 10 minutes from now
+  const otpExpiry = new Date(Date.now() + 600000);
+
+  // Update OTP
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      emailVerificationOtp: otp,
+      emailVerificationOtpExpiry: otpExpiry,
+    },
+  });
+
+  // Send OTP email
+  try {
+    await sendOtpEmail(email, otp);
+  } catch (error) {
+    throw new BadRequestError('Failed to send verification email');
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'OTP resent to your email.',
+  });
+};
+
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -97,6 +222,11 @@ export const login = async (req, res) => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
     throw new UnauthorizedError('Invalid credentials');
+  }
+
+  // Check if email is verified
+  if (!user.isEmailVerified) {
+    throw new UnauthorizedError('Please verify your email before logging in');
   }
 
   // Verify password
