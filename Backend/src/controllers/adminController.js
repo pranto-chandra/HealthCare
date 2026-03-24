@@ -1,5 +1,7 @@
 import { prisma } from '../config/db.js';
-import { NotFoundError } from '../utils/errors.js';
+import { NotFoundError, BadRequestError } from '../utils/errors.js';
+import { hashPassword } from '../utils/password.js';
+import { sendCredentialsEmail } from '../services/emailService.js';
 
 export const getAllUsers = async (req, res) => {
   const users = await prisma.user.findMany({
@@ -36,6 +38,49 @@ export const getAllUsers = async (req, res) => {
   res.json({
     success: true,
     data: users
+  });
+};
+
+export const createUser = async (req, res) => {
+  const { email, password, role } = req.body;
+
+  // Check if user already exists
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  if (existingUser) {
+    throw new BadRequestError('User already exists');
+  }
+
+  // Hash password
+  const hashedPassword = await hashPassword(password);
+
+  // Create new user as verified
+  const user = await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      role,
+      isEmailVerified: true,
+    },
+  });
+
+  // Send credentials email
+  try {
+    await sendCredentialsEmail(email, password, role);
+  } catch (emailError) {
+    console.error('Failed to send credentials email:', emailError);
+    // Don't fail the user creation if email fails, but log it
+    // You might want to implement a retry mechanism or notification to admin
+  }
+
+  res.json({
+    success: true,
+    message: 'User created successfully. Credentials have been sent to the user\'s email.',
+    data: {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt
+    }
   });
 };
 

@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import otpGenerator from 'otp-generator';
 
 export const register = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
 
   // Check if user exists and is verified
   const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -29,6 +29,8 @@ export const register = async (req, res) => {
 
   // Set OTP expiry to 10 minutes from now
   const otpExpiry = new Date(Date.now() + 600000);
+
+  const role = 'PATIENT'; // Hardcode role as PATIENT for registration
 
   if (existingUser && !existingUser.isEmailVerified) {
     // Update existing unverified user

@@ -15,7 +15,6 @@ export const userValidation = {
     body('password')
       .isLength({ min: 6 })
       .withMessage('Password must be at least 6 characters long'),
-    body('role').isIn(['ADMIN', 'DOCTOR', 'PATIENT', 'PATHOLOGIST']).withMessage('Invalid role'),
   ],
 
   login: [
@@ -29,6 +28,16 @@ export const userValidation = {
   ],
 
   resendOtp: [body('email').isEmail().withMessage('Please provide a valid email')],
+};
+
+export const adminValidation = {
+  createUser: [
+    body('email').isEmail().withMessage('Please provide a valid email'),
+    body('password')
+      .isLength({ min: 6 })
+      .withMessage('Password must be at least 6 characters long'),
+    body('role').isIn(['ADMIN', 'DOCTOR', 'PATIENT', 'PATHOLOGIST']).withMessage('Invalid role'),
+  ],
 };
 
 export const patientValidation = {

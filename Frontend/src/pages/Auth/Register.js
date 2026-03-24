@@ -6,7 +6,6 @@ import { register } from "../../api/authApi";
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("PATIENT");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -14,7 +13,7 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await register({ email, password, role });
+      const res = await register({ email, password });
       setLoading(false);
       if (res && res.status === 200) {
         alert("✅ Verification code sent to your email!");
@@ -54,35 +53,6 @@ export default function Register() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <br />
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="
-            px-4 py-2
-            rounded-lg
-            border border-gray-300
-            bg-white
-            text-gray-700
-            focus:outline-none
-            focus:ring-2 focus:ring-purple-500
-            focus:border-purple-500
-            transition
-            duration-200
-            cursor-pointer
-            padding-2
-            flex
-            justify-center items-center
-            hover:bg-purple-100
-            w-4/12
-            font-semibold
-        "
-          >
-            <option value="PATIENT">Patient</option>
-            <option value="DOCTOR">Doctor</option>
-            <option value="ADMIN">Admin</option>
-          </select>
-
           <br />
           <button type="submit" disabled={loading}>
             {loading ? "Registering..." : "Register"}
