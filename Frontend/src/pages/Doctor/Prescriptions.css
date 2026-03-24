@@ -74,18 +74,25 @@
   margin: 8px 0;
   padding: 10px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 2px solid #ccc;
   font-size: 0.95rem;
 }
 
 .prescription-form button {
-  margin-top: 10px;
-  padding: 10px 16px;
-  background-color: #00796b;
-  color: white;
-  border: none;
+  padding: 10px 20px;
+  background-color: #e4f2f0;
+  color: #00796b;
+  border: 2px solid #adddd3;
   border-radius: 6px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s;
+}
+
+.prescription-form button:hover {
+  background-color: #d8ece8;
+  color: #167162;
+  transform: translateY(-2px);
 }
 
 .prescription-list {
@@ -94,7 +101,7 @@
 }
 
 .prescription-layout.collapsed .prescription-list {
-  margin-left: 10px !important;
+  margin-left: 0px !important;
 }
 
 .prescription-card {
@@ -109,3 +116,68 @@
 .prescription-layout.collapsed .prescription-card {
   margin-left: 10px !important;
 }
+
+.search-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.search-input-group input {
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-family: inherit;
+}
+
+.search-input-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-btn {
+  padding: 10px 20px;
+  background-color: #e8eaf6;
+  color: #1a237e;
+  border: 2px solid #c5cae9;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.search-btn:hover {
+  background-color: #c5cae9;
+  color: #0d47a1;
+  transform: translateY(-2px);
+}
+
+.patient-info-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 12px;
+  
+}
+
+.patient-info-card h1 {
+  font-size: x-large;
+  font-weight: 700;
+  color: #004d40;
+}
+
+.patient-info{
+  border: 2px solid #e0e0e0;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+  margin-bottom: 8px;
+}
+

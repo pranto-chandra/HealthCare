@@ -37,14 +37,16 @@
   transition: all 0.3s ease;
 }
 
-.doctor-test-results-layout.collapsed {
-  margin-left: 0;
+.doctor-test-results-layout.collapsed .test-results-content {
+  margin-left: 0 !important;
 }
 
 .test-results-content {
   flex: 1;
   padding: 40px;
   overflow-y: auto;
+  margin-left: 250px;
+  transition: all 0.3s ease;
 }
 
 /* Header */

@@ -45,6 +45,7 @@ export default function Landing() {
         </button>
       )}
        {shouldShowSidebar && isSidebarOpen && <Sidebar role={normalizedRole} />}
+      <div className={`main-content ${isSidebarOpen && shouldShowSidebar ? 'sidebar-open' : ''}`}>
       {/* --- Hero Section --- */}
       <section className="hero">
         <div className="hero-content">
@@ -251,6 +252,7 @@ export default function Landing() {
       <footer className="footer">
         <p>© 2025 Organic Healthcare. All rights reserved.</p>
       </footer>
+      </div>
     </div>
   );
 }

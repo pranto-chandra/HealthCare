@@ -186,3 +186,140 @@
   color: white;
   transform: translateX(5px);
 }
+
+/* --- SIDEBAR TOGGLE BUTTON --- */
+.sidebar-toggle {
+   position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 3000;
+  background-color: #004d40;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #00695c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
+}
+
+/* --- MAIN CONTENT CONTAINER --- */
+.main-content {
+  transition: margin-left 0.3s ease;
+  margin-left: 0;
+}
+
+.main-content.sidebar-open {
+  margin-left: 280px;
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 1024px) {
+  .hero {
+    padding: 80px 30px 50px 30px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .departments {
+    padding: 50px 30px;
+  }
+
+  .hero-buttons button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .main-content.sidebar-open {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-toggle {
+    top: 10px;
+    left: 10px;
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+
+  .hero {
+    padding: 60px 20px 40px 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .hero-buttons {
+    margin-top: 20px;
+  }
+
+  .hero-buttons button {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+    margin: 5px;
+  }
+
+  .departments {
+    padding: 40px 15px;
+  }
+
+  .departments h2 {
+    font-size: 1.5rem;
+  }
+
+  .dept-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .dept-card {
+    max-width: 100%;
+  }
+
+  .chairman {
+    padding: 40px 15px;
+  }
+
+  .chaimanimg {
+    width: 80%;
+  }
+
+  .main-content.sidebar-open {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-buttons button {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    margin: 3px;
+  }
+
+  .departments h2 {
+    font-size: 1.2rem;
+  }
+
+  .dept-grid {
+    grid-template-columns: 1fr;
+  }
+}

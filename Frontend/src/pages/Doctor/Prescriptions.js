@@ -19,9 +19,7 @@ export default function DoctorPrescriptions() {
   const [newPrescription, setNewPrescription] = useState({
     diagnosis: "",
     description: "",
-    medications: [
-      { medicationName: "", dosage: "", frequency: "", duration: "" },
-    ],
+    medications: [],
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -186,8 +184,7 @@ export default function DoctorPrescriptions() {
           </section>
 
           {/* Search Patient Section */}
-          <section className="search-patient-section">
-            <h2>Step 1: Find Patient</h2>
+          <section className="search-patient-section mb-10 flex flex-col justify-center items-center">
             <form onSubmit={handleSearchPatient} className="search-form">
               <div className="search-input-group">
                 <input
@@ -212,9 +209,9 @@ export default function DoctorPrescriptions() {
             </form>
 
             {searchedPatient && (
-              <div className="patient-info-card">
-                <h3>✓ Patient Found</h3>
-                <div className="patient-info">
+              <div className="patient-info-card flex flex-col items-center justify-center w-full max-w-2xl mt-2">
+                <h1>Patient Information</h1>
+                <div className="patient-info mt-2">
                   <p>
                     <strong>Name:</strong> {searchedPatient.name}
                   </p>
@@ -237,7 +234,7 @@ export default function DoctorPrescriptions() {
                 </div>
                 <button
                   type="button"
-                  className="btn-secondary"
+                  className="search-btn"
                   onClick={() => {
                     setSearchedPatient(null);
                     setSearchEmail("");
@@ -252,7 +249,7 @@ export default function DoctorPrescriptions() {
           {/* Prescription Form Section */}
           {searchedPatient && (
             <section className="prescription-form-section">
-              <h2>Step 2: Create Prescription</h2>
+              
               <form
                 onSubmit={handleSubmitPrescription}
                 className="prescription-form"
@@ -269,7 +266,7 @@ export default function DoctorPrescriptions() {
                   <input
                     id="diagnosis"
                     type="text"
-                    placeholder="e.g., Type 2 Diabetes"
+                    placeholder="Diagnosis for the patient..."
                     value={newPrescription.diagnosis}
                     onChange={(e) =>
                       handlePrescriptionChange("diagnosis", e.target.value)
@@ -392,7 +389,7 @@ export default function DoctorPrescriptions() {
                         </div>
                       </div>
 
-                      {newPrescription.medications.length > 1 && (
+                      {newPrescription.medications.length > 0 && (
                         <button
                           type="button"
                           onClick={() => handleRemoveMedication(index)}
@@ -426,18 +423,31 @@ export default function DoctorPrescriptions() {
                   <button
                     type="button"
                     onClick={() => {
-                      setNewPrescription({
-                        diagnosis: "",
-                        description: "",
-                        medications: [
-                          {
+                      if (newPrescription.medications.length === 0) {
+                        // 👉 No medication → clear diagnosis section only
+                        setNewPrescription((prev) => ({
+                          ...prev,
+                          diagnosis: "",
+                          description: "",
+                        }));
+                      } else {
+                        // 👉 Medication exists → clear medication fields only (KEEP forms)
+                        const clearedMeds = newPrescription.medications.map(
+                          () => ({
                             medicationName: "",
                             dosage: "",
                             frequency: "",
                             duration: "",
-                          },
-                        ],
-                      });
+                          }),
+                        );
+
+                        setNewPrescription((prev) => ({
+                          ...prev,
+                          diagnosis: "",
+                          description: "",
+                          medications: clearedMeds,
+                        }));
+                      }
                     }}
                     className="btn-reset"
                   >

@@ -44,6 +44,8 @@
 
 .sidebar-toggle:hover {
   background-color: #00695c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
 }
 
 /* =========================================================
