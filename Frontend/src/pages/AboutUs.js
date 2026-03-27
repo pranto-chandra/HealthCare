@@ -31,7 +31,7 @@ export default function AboutUs() {
         )}
         <main className="about-us-content">
           {/* Hero Section */}
-          <section className="bg-teal-700 text-white py-20 text-center ">
+          <section className="bg-teal-700 text-white py-10 text-center mt-0">
             <h1 className="text-4xl font-bold mb-4">About Us</h1>
             <p className="max-w-2xl mx-auto text-lg text-teal-100">
               Delivering trusted healthcare through innovation, compassion, and
