@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import "./side.css";
 
 export default function Location() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useContext(AuthContext);
 
   // Only show sidebar for logged-in users

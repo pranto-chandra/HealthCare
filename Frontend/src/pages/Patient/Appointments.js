@@ -85,8 +85,8 @@ export default function Appointments() {
 
   // Get doctor name
   const getDoctorName = (doctor) => {
-    if (doctor?.user?.firstName && doctor?.user?.lastName) {
-      return `Dr. ${doctor.user.firstName} ${doctor.user.lastName}`;
+    if (doctor?.name) {
+      return `Dr. ${doctor.name}`;
     }
     return doctor?.user?.email || "Unknown Doctor";
   };

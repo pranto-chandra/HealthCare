@@ -100,6 +100,12 @@ export const updatePatient = async (req, res) => {
     },
   });
 
+  // Ensure profile is marked as complete if updating
+  await prisma.user.update({
+    where: { id: patient.userId },
+    data: { isProfileComplete: true },
+  });
+
   res.json({
     success: true,
     data: patient,

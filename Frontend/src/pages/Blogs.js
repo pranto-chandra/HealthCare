@@ -9,7 +9,7 @@ import blog2 from "./images/blog-brain.jpg";
 import blog3 from "./images/blog-lifestyle.jpg";
 
 export default function Blogs() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useContext(AuthContext);
 
   // Only show sidebar for logged-in users

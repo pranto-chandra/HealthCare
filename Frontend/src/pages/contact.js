@@ -8,7 +8,7 @@ import twitterImage from "./images/x.png";
 import linkedinImage from "./images/linkedin.png";
 
 export default function Contact() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState( false);
   const { user } = useContext(AuthContext);
   
   // Only show sidebar for logged-in users
@@ -61,16 +61,16 @@ export default function Contact() {
             <div className="mt-6 text-center">
                 <h3 className="text-lg font-semibold text-teal-700">Follow Us</h3>
                 <div className="flex justify-center items-center space-x-4 mt-2">
-                  <a href="https://www.facebook.com" target="_blank" className="text-teal-600 hover:text-teal-800">
+                  <a href="https://www.facebook.com" target="_blank" rel="noreferrer" className="text-teal-600 hover:text-teal-800">
                     <img src={facebookImage} alt="Facebook" className="w-8 h-8" />
                   </a>
-                  <a href="https://www.twitter.com" target="_blank" className="text-teal-600 hover:text-teal-800">
+                  <a href="https://www.twitter.com" target="_blank" rel="noreferrer" className="text-teal-600 hover:text-teal-800">
                     <img src={twitterImage} alt="Twitter" className="w-6 h-6" />
                   </a>
-                  <a href="https://www.instagram.com" target="_blank" className="text-teal-600 hover:text-teal-800">
+                  <a href="https://www.instagram.com" target="_blank" rel="noreferrer" className="text-teal-600 hover:text-teal-800">
                     <img src={instaImage} alt="Instagram" className="w-8 h-8" />
                   </a>
-                  <a href="https://www.linkedin.com" target="_blank" className="text-teal-600 hover:text-teal-800">
+                  <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" className="text-teal-600 hover:text-teal-800">
                     <img src={linkedinImage} alt="LinkedIn" className="w-6 h-6" />
                   </a>
                 </div>

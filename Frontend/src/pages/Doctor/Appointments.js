@@ -4,6 +4,8 @@ import { AuthContext } from "../../context/AuthContext";
 import doctorApi from "../../api/doctorApi";
 import RecommendTest from "./RecommendTest";
 import { getErrorMessage } from "../../utils/helpers";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
 import "./Appointments.css";
 
 export default function Appointments() {
@@ -11,6 +13,8 @@ export default function Appointments() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // Per-appointment error state for confirmation
+  const [confirmErrors, setConfirmErrors] = useState({});
   const [filterStatus, setFilterStatus] = useState("All");
   const [selectedDate, setSelectedDate] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -48,8 +52,18 @@ export default function Appointments() {
   const handleConfirmAppointment = async (appointmentId, status) => {
     // For CONFIRMED status, time is required
     if (status === "CONFIRMED" && !appointmentTimes[appointmentId]) {
-      alert("Please select a time for this appointment");
+      setConfirmErrors((prev) => ({
+        ...prev,
+        [appointmentId]:
+          "Please select a time before confirming the appointment.",
+      }));
       return;
+    } else {
+      setConfirmErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[appointmentId];
+        return newErrors;
+      });
     }
 
     try {
@@ -197,7 +211,14 @@ export default function Appointments() {
             </div>
           </section>
 
-          {error && <div className="error-message">{error}</div>}
+          {/* Global error (not per-appointment) */}
+          {error && (
+            <Stack sx={{ width: "100%" }} spacing={2}>
+              <Alert severity="error" onClose={() => setError("")}>
+                {error}
+              </Alert>
+            </Stack>
+          )}
 
           {loading && <div className="loading">Loading appointments...</div>}
 
@@ -280,6 +301,26 @@ export default function Appointments() {
                                 : "Reject"}
                             </button>
                           </div>
+                          {/* Per-appointment error message */}
+                          {confirmErrors[app.id] && (
+                            <Stack
+                              sx={{ width: "100%", marginTop: 1 }}
+                              spacing={1}
+                            >
+                              <Alert
+                                severity="error"
+                                onClose={() =>
+                                  setConfirmErrors((prev) => {
+                                    const n = { ...prev };
+                                    delete n[app.id];
+                                    return n;
+                                  })
+                                }
+                              >
+                                {confirmErrors[app.id]}
+                              </Alert>
+                            </Stack>
+                          )}
                         </div>
                       )}
 

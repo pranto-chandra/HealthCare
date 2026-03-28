@@ -41,7 +41,7 @@ export default function BookAppointment() {
   const [appointmentType, setAppointmentType] = useState("ONLINE");
   const [isBooking, setIsBooking] = useState(false);
 
-  // Check if user is logged in
+  // Check if user is logged in and profile is complete
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -51,6 +51,14 @@ export default function BookAppointment() {
     // Only allow patients to book appointments
     if (user.role !== "PATIENT") {
       setError("Only patients can book appointments");
+      return;
+    }
+
+    // Check if patient profile is complete
+    if (!user.isProfileComplete) {
+      setError(
+        "Please complete your profile before booking an appointment. Visit the edit profile page to get started.",
+      );
       return;
     }
 
@@ -190,6 +198,23 @@ export default function BookAppointment() {
         <div className="error-container">
           <p>Only logged in patient can book appointments.</p>
           <button onClick={() => navigate("/login")}>Go to Login</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Prevent booking if profile is not complete
+  if (!user.isProfileComplete) {
+    return (
+      <div className="book-appointment-page">
+        <div className="error-container">
+          <p>
+            Your profile is incomplete. Please complete your profile before
+            booking an appointment.
+          </p>
+          <button onClick={() => navigate("/patient/editprofile")}>
+            Complete Your Profile
+          </button>
         </div>
       </div>
     );

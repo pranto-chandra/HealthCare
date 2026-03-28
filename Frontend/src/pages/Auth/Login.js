@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 // import Button from '@mui/material/Button';
 import Navbar from "../../components/Navbar";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import "./Login.css";
 
 export default function Login() {
@@ -10,6 +12,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,23 +76,33 @@ export default function Login() {
           <label>Password</label>
           <div className="input-group">
             <input
-              type="password"
-              placeholder="********"
+              type={showPassword ? "text" : "password"}
+              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              disabled={loading}
               required
             />
-            <span className="icon">👁️</span>
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={loading}
+            >
+              {showPassword ? (
+                <VisibilityOffOutlinedIcon />
+              ) : (
+                <VisibilityOutlinedIcon />
+              )}
+            </button>
           </div>
 
           <div className="forgot">
             <Link to="/forgot-password">Forgot Password?</Link>
           </div>
 
-
-         <button className="login-btn">
-            Log In
-          </button>
+          <button className="login-btn">Log In</button>
 
           <p className="signup-text">
             Don’t have an account?{" "}
