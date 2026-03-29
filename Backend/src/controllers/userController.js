@@ -128,13 +128,18 @@ export const updateUserProfile = async (req, res) => {
     });
   }
 
+  // Update password if provided
+  const updateUserData = { isProfileComplete: true };
+  
   if (password) {
     const hashedPassword = await hashPassword(password);
-    await prisma.user.update({
-      where: { id },
-      data: { password: hashedPassword },
-    });
+    updateUserData.password = hashedPassword;
   }
+
+  await prisma.user.update({
+    where: { id },
+    data: updateUserData,
+  });
 
   const updatedUser = await prisma.user.findUnique({
     where: { id },
