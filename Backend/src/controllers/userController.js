@@ -1,5 +1,6 @@
 import { prisma } from '../config/db.js';
 import { UnauthorizedError, NotFoundError, BadRequestError } from '../utils/errors.js';
+import { hashPassword } from '../utils/password.js';
 
 export const getUserProfile = async (req, res) => {
   const { id } = req.params;
@@ -20,6 +21,7 @@ export const getUserProfile = async (req, res) => {
       patientProfile: true,
       doctorProfile: true,
       adminProfile: true,
+      pathologistProfile: true,
     }
   });
 
@@ -35,7 +37,7 @@ export const getUserProfile = async (req, res) => {
 
 export const updateUserProfile = async (req, res) => {
   const { id } = req.params;
-  const { name, phone, dateOfBirth, gender, bloodGroup } = req.body;
+  const { name, phone, dateOfBirth, gender, bloodGroup, licenseNumber, labName, qualification, password } = req.body;
 
   // Check if user is authorized
   if (req.user.id !== id && req.user.role !== 'ADMIN') {
@@ -71,6 +73,19 @@ export const updateUserProfile = async (req, res) => {
       where: { userId: id },
       data: updateData,
     });
+  } else if (user.role === 'PATHOLOGIST') {
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (phone) updateData.phone = phone;
+    if (dateOfBirth) updateData.dateOfBirth = new Date(dateOfBirth);
+    if (licenseNumber) updateData.licenseNumber = licenseNumber;
+    if (labName) updateData.labName = labName;
+    if (qualification) updateData.qualification = qualification;
+
+    await prisma.pathologistProfile.update({
+      where: { userId: id },
+      data: updateData,
+    });
   } else if (user.role === 'ADMIN') {
     const updateData = {};
     if (name) updateData.name = name;
@@ -79,6 +94,14 @@ export const updateUserProfile = async (req, res) => {
     await prisma.adminProfile.update({
       where: { userId: id },
       data: updateData,
+    });
+  }
+
+  if (password) {
+    const hashedPassword = await hashPassword(password);
+    await prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword },
     });
   }
 
@@ -115,6 +138,7 @@ export const getCurrentUser = async (req, res) => {
       patientProfile: true,
       doctorProfile: true,
       adminProfile: true,
+      pathologistProfile: true,
     }
   });
 

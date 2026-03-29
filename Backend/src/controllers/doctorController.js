@@ -1,5 +1,6 @@
 import { prisma } from '../config/db.js';
 import { NotFoundError, UnauthorizedError } from '../utils/errors.js';
+import { hashPassword } from '../utils/password.js';
 
 export const getDoctorAppointments = async (req, res) => {
   const appointments = await prisma.appointment.findMany({
@@ -403,6 +404,7 @@ export const updateDoctorProfile = async (req, res) => {
     consultationFee,
     experienceYears,
     specialties,
+    password,
   } = req.body;
 
   // Check if user is authorized
@@ -442,11 +444,19 @@ export const updateDoctorProfile = async (req, res) => {
     });
   }
 
-  // Mark user profile as complete
-  await prisma.user.update({
-    where: { id },
-    data: { isProfileComplete: true },
-  });
+  // Mark user profile as complete and update password if provided
+  if (password) {
+    const hashedPassword = await hashPassword(password);
+    await prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword, isProfileComplete: true },
+    });
+  } else {
+    await prisma.user.update({
+      where: { id },
+      data: { isProfileComplete: true },
+    });
+  }
 
   // Fetch the updated doctor profile with all relationships
   const updatedDoctor = await prisma.doctorProfile.findUnique({

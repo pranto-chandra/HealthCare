@@ -11,7 +11,7 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 export default function EditProfile() {
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const { user, updateUser } = useContext(AuthContext);
+  const { user, updateUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -147,8 +147,15 @@ export default function EditProfile() {
         updateData.password = newPassword;
       }
 
-      const res = await userApi.updateProfile(user.id, formData);
+      const res = await userApi.updateProfile(user.id, updateData);
       const updatedUser = res?.data?.data;
+
+      if (newPassword) {
+        await logout();
+        navigate("/login");
+        return;
+      }
+
       setSuccess("Profile updated successfully!");
       setIsEditing(false);
 

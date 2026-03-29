@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 import authApi from "../../api/authApi";
 import { getErrorMessage } from "../../utils/helpers";
 import "./ResetPassword.css";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
@@ -77,6 +79,11 @@ export default function ResetPassword() {
 
       if (response?.data?.success) {
         setSuccess(true);
+        try {
+          await logout();
+        } catch (logoutError) {
+          // Ignore logout errors, just clear client state
+        }
         setTimeout(() => {
           navigate("/login");
         }, 2000);
