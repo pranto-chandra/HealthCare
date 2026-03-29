@@ -63,13 +63,59 @@ export const createUser = async (req, res) => {
     },
   });
 
+  // Create the corresponding profile based on role
+  if (role === 'PATIENT') {
+    await prisma.patientProfile.create({
+      data: {
+        userId: user.id,
+        name: '',
+        phone: '',
+        dateOfBirth: new Date('2000-01-01'),
+        gender: 'OTHER',
+        bloodGroup: 'O_POSITIVE',
+      },
+    });
+  } else if (role === 'DOCTOR') {
+    await prisma.doctorProfile.create({
+      data: {
+        userId: user.id,
+        name: '',
+        phone: '',
+        dateOfBirth: new Date('2000-01-01'),
+        locationDiv: 'DHAKA',
+        licenseNumber: 'N/A',
+        consultationFee: 0,
+        experienceYears: 0,
+      },
+    });
+  } else if (role === 'ADMIN') {
+    await prisma.adminProfile.create({
+      data: {
+        userId: user.id,
+        name: 'Admin',
+        phone: '',
+      },
+    });
+  } else if (role === 'PATHOLOGIST') {
+    await prisma.pathologistProfile.create({
+      data: {
+        userId: user.id,
+        name: 'Pathologist',
+        phone: '',
+        licenseNumber: 'N/A',
+      },
+    });
+  }
+
   // Send credentials email
   try {
     await sendCredentialsEmail(email, password, role);
+    console.log(`✅ Credentials email sent successfully to ${email}`);
   } catch (emailError) {
-    console.error('Failed to send credentials email:', emailError);
-    // Don't fail the user creation if email fails, but log it
-    // You might want to implement a retry mechanism or notification to admin
+    console.error('❌ Failed to send credentials email to ' + email);
+    console.error('Error details:', emailError.message);
+    console.error('Full error:', emailError);
+    // Log for debugging but don't fail the user creation
   }
 
   res.json({

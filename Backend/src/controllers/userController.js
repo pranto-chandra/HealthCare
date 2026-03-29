@@ -59,9 +59,17 @@ export const updateUserProfile = async (req, res) => {
     if (gender) updateData.gender = gender;
     if (bloodGroup) updateData.bloodGroup = bloodGroup;
 
-    await prisma.patientProfile.update({
+    await prisma.patientProfile.upsert({
       where: { userId: id },
-      data: updateData,
+      update: updateData,
+      create: {
+        userId: id,
+        name: name || '',
+        phone: phone || '',
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : new Date('2000-01-01'),
+        gender: gender || 'OTHER',
+        bloodGroup: bloodGroup || 'O_POSITIVE',
+      },
     });
   } else if (user.role === 'DOCTOR') {
     const updateData = {};
@@ -69,9 +77,19 @@ export const updateUserProfile = async (req, res) => {
     if (phone) updateData.phone = phone;
     if (dateOfBirth) updateData.dateOfBirth = new Date(dateOfBirth);
 
-    await prisma.doctorProfile.update({
+    await prisma.doctorProfile.upsert({
       where: { userId: id },
-      data: updateData,
+      update: updateData,
+      create: {
+        userId: id,
+        name: name || '',
+        phone: phone || '',
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : new Date('2000-01-01'),
+        locationDiv: 'DHAKA',
+        licenseNumber: 'N/A',
+        consultationFee: 0,
+        experienceYears: 0,
+      },
     });
   } else if (user.role === 'PATHOLOGIST') {
     const updateData = {};
@@ -82,18 +100,31 @@ export const updateUserProfile = async (req, res) => {
     if (labName) updateData.labName = labName;
     if (qualification) updateData.qualification = qualification;
 
-    await prisma.pathologistProfile.update({
+    await prisma.pathologistProfile.upsert({
       where: { userId: id },
-      data: updateData,
+      update: updateData,
+      create: {
+        userId: id,
+        name: name || 'Pathologist',
+        phone: phone || '',
+        licenseNumber: licenseNumber || 'N/A',
+        labName: labName || null,
+        qualification: qualification || null,
+      },
     });
   } else if (user.role === 'ADMIN') {
     const updateData = {};
     if (name) updateData.name = name;
     if (phone) updateData.phone = phone;
 
-    await prisma.adminProfile.update({
+    await prisma.adminProfile.upsert({
       where: { userId: id },
-      data: updateData,
+      update: updateData,
+      create: {
+        userId: id,
+        name: name || 'Admin',
+        phone: phone || '',
+      },
     });
   }
 
