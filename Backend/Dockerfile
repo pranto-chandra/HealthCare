@@ -1,7 +1,7 @@
 # Backend Dockerfile - Multi-stage build for optimization
 
 # Stage 1: Build stage
-FROM node:20-alpine AS builder
+FROM node:20-bullseye AS builder
 
 WORKDIR /app
 
@@ -16,13 +16,15 @@ COPY prisma ./prisma
 RUN npm run prisma:generate
 
 # Stage 2: Production stage
-FROM node:20-alpine
+FROM node:20-bullseye
 
 WORKDIR /app
 
-# Install dumb-init and OpenSSL 1.1 compatibility for Prisma on Alpine
-# openssl1.1-compat provides libssl.so.1.1 required by Prisma's query engine
-RUN apk add --no-cache dumb-init openssl1.1-compat ca-certificates
+# Install dumb-init and OpenSSL 1.1 compatibility for Prisma
+# libssl1.1 provides libssl.so.1.1 required by Prisma's query engine
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends dumb-init libssl1.1 ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 # Copy from builder stage
 COPY --from=builder /app/node_modules ./node_modules
