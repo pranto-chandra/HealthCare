@@ -290,7 +290,15 @@ export default function Appointments() {
                       ) : app.videoLink ? (
                         <p>
                           <strong>Video link:</strong>{" "}
-                          <a href={app.videoLink?.startsWith('http') ? app.videoLink : `https://${app.videoLink}`} target="_blank" rel="noreferrer">
+                          <a
+                            href={
+                              app.videoLink?.startsWith("http")
+                                ? app.videoLink
+                                : `https://${app.videoLink}`
+                            }
+                            target="_blank"
+                            rel="noreferrer"
+                          >
                             Join call
                           </a>
                         </p>
@@ -336,7 +344,9 @@ export default function Appointments() {
                                 id={`videoLink-${app.id}`}
                                 type="url"
                                 placeholder="https://meet.example.com/..."
-                                value={videoLinks[app.id] || app.videoLink || ""}
+                                value={
+                                  videoLinks[app.id] || app.videoLink || ""
+                                }
                                 onChange={(e) =>
                                   setVideoLinks((prev) => ({
                                     ...prev,
@@ -400,7 +410,11 @@ export default function Appointments() {
                             <div className="confirmed-video-link">
                               <strong>Video link:</strong>{" "}
                               <a
-                                href={app.videoLink?.startsWith('http') ? app.videoLink : `https://${app.videoLink}`}
+                                href={
+                                  app.videoLink?.startsWith("http")
+                                    ? app.videoLink
+                                    : `https://${app.videoLink}`
+                                }
                                 target="_blank"
                                 rel="noreferrer"
                               >
