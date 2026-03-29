@@ -426,6 +426,12 @@ export default function BookAppointment() {
                     <option value="ONLINE">Online</option>
                     <option value="OFFLINE">Offline</option>
                   </select>
+                  {appointmentType === "ONLINE" && (
+                    <p className="help-text">
+                      For online appointments, the doctor will send a video link
+                      after confirmation.
+                    </p>
+                  )}
                 </div>
 
                 <div className="modal-actions">

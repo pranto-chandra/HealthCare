@@ -59,10 +59,13 @@ export const doctorApi = {
   },
 
   // Confirm or reject an appointment (using JWT)
-  confirmAppointment: (appointmentId, status, time) => {
+  confirmAppointment: (appointmentId, status, time, videoLink) => {
     const payload = { status };
     if (time) {
       payload.time = time;
+    }
+    if (videoLink) {
+      payload.videoLink = videoLink;
     }
     return apiClient.post(
       `/doctors/me/appointments/${appointmentId}/confirm`,

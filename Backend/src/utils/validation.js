@@ -94,6 +94,10 @@ export const appointmentValidation = {
         }
         return true;
       }),
+    body('videoLink')
+      .optional()
+      .isURL()
+      .withMessage('Video link must be a valid URL'),
   ],
 };
 

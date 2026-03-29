@@ -20,6 +20,7 @@ export default function Appointments() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [confirmingId, setConfirmingId] = useState(null);
   const [appointmentTimes, setAppointmentTimes] = useState({}); // Track time for each appointment
+  const [videoLinks, setVideoLinks] = useState({}); // Track video links for each appointment
   const [completingId, setCompletingId] = useState(null); // Track which appointment is being completed
   const [showTestForm, setShowTestForm] = useState(null); // Track which appointment to recommend test for
 
@@ -50,6 +51,9 @@ export default function Appointments() {
 
   // Handle appointment confirmation
   const handleConfirmAppointment = async (appointmentId, status) => {
+    const appointment = appointments.find((app) => app.id === appointmentId);
+    const videoLink = videoLinks[appointmentId]?.trim();
+
     // For CONFIRMED status, time is required
     if (status === "CONFIRMED" && !appointmentTimes[appointmentId]) {
       setConfirmErrors((prev) => ({
@@ -58,42 +62,73 @@ export default function Appointments() {
           "Please select a time before confirming the appointment.",
       }));
       return;
-    } else {
-      setConfirmErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[appointmentId];
-        return newErrors;
-      });
     }
+
+    // For online appointments, require a video link when confirming
+    if (
+      status === "CONFIRMED" &&
+      appointment?.type === "ONLINE" &&
+      !videoLink
+    ) {
+      setConfirmErrors((prev) => ({
+        ...prev,
+        [appointmentId]:
+          "Please provide a video link before confirming the online appointment.",
+      }));
+      return;
+    }
+
+    setConfirmErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[appointmentId];
+      return newErrors;
+    });
 
     try {
       setConfirmingId(appointmentId);
       const confirmData = { status };
 
-      // Add time if confirming
       if (status === "CONFIRMED") {
         confirmData.time = appointmentTimes[appointmentId];
+      }
+
+      if (status === "CONFIRMED" && videoLink) {
+        confirmData.videoLink = videoLink;
       }
 
       await doctorApi.confirmAppointment(
         appointmentId,
         confirmData.status,
         confirmData.time,
+        confirmData.videoLink,
       );
 
-      // Update local state
       setAppointments((prev) =>
         prev.map((app) =>
-          app.id === appointmentId ? { ...app, status } : app,
+          app.id === appointmentId
+            ? {
+                ...app,
+                status,
+                scheduledAt: app.scheduledAt,
+                videoLink: confirmData.videoLink || app.videoLink,
+              }
+            : app,
         ),
       );
 
-      // Clear the time input for this appointment
       setAppointmentTimes((prev) => {
         const newTimes = { ...prev };
         delete newTimes[appointmentId];
         return newTimes;
       });
+
+      if (videoLink) {
+        setVideoLinks((prev) => {
+          const newLinks = { ...prev };
+          delete newLinks[appointmentId];
+          return newLinks;
+        });
+      }
     } catch (err) {
       alert(getErrorMessage(err));
       console.error("Error confirming appointment:", err);
@@ -115,7 +150,9 @@ export default function Appointments() {
       // Update local state
       setAppointments((prev) =>
         prev.map((app) =>
-          app.id === appointmentId ? { ...app, status: "COMPLETED" } : app,
+          app.id === appointmentId
+            ? { ...app, status: "COMPLETED", videoLink: null }
+            : app,
         ),
       );
     } catch (err) {
@@ -245,6 +282,18 @@ export default function Appointments() {
                       <p>
                         <strong>Type:</strong> {app.type}
                       </p>
+                      {app.status === "COMPLETED" ? (
+                        <p>
+                          <strong>Note:</strong> Appointment is over.
+                        </p>
+                      ) : app.videoLink ? (
+                        <p>
+                          <strong>Video link:</strong>{" "}
+                          <a href={app.videoLink} target="_blank" rel="noreferrer">
+                            Join call
+                          </a>
+                        </p>
+                      ) : null}
                       {app.symptoms && (
                         <p>
                           <strong>Symptoms:</strong> {app.symptoms}
@@ -277,6 +326,26 @@ export default function Appointments() {
                               className="time-input"
                             />
                           </div>
+                          {app.type === "ONLINE" && (
+                            <div className="video-link-input-group">
+                              <label htmlFor={`videoLink-${app.id}`}>
+                                Video call link:
+                              </label>
+                              <input
+                                id={`videoLink-${app.id}`}
+                                type="url"
+                                placeholder="https://meet.example.com/..."
+                                value={videoLinks[app.id] || app.videoLink || ""}
+                                onChange={(e) =>
+                                  setVideoLinks((prev) => ({
+                                    ...prev,
+                                    [app.id]: e.target.value,
+                                  }))
+                                }
+                                className="video-link-input"
+                              />
+                            </div>
+                          )}
                           <div className="action-buttons">
                             <button
                               className="confirm-btn"
@@ -326,6 +395,18 @@ export default function Appointments() {
 
                       {app.status === "CONFIRMED" && (
                         <div className="confirmed-actions">
+                          {app.type === "ONLINE" && app.videoLink && (
+                            <div className="confirmed-video-link">
+                              <strong>Video link:</strong>{" "}
+                              <a
+                                href={app.videoLink}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Join call
+                              </a>
+                            </div>
+                          )}
                           <button
                             className="complete-btn"
                             onClick={() => handleCompleteAppointment(app.id)}
@@ -340,6 +421,9 @@ export default function Appointments() {
 
                       {app.status === "COMPLETED" && (
                         <div className="completed-actions">
+                          <p className="appointment-over-text">
+                            Appointment is over.
+                          </p>
                           <button
                             className="prescribe-test-btn"
                             onClick={() => setShowTestForm(app.id)}

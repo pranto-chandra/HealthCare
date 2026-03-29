@@ -128,7 +128,7 @@ export const getDoctorPrescriptions = async (req, res) => {
 
 export const confirmAppointment = async (req, res) => {
   const { appointmentId } = req.params;
-  const { status, time } = req.body; // status: CONFIRMED or CANCELLED, time: HH:mm (required for CONFIRMED)
+  const { status, time, videoLink } = req.body; // status: CONFIRMED or CANCELLED, time: HH:mm (required for CONFIRMED), videoLink: optional URL for online visits
 
   if (!['CONFIRMED', 'CANCELLED'].includes(status)) {
     return res.status(400).json({
@@ -190,10 +190,19 @@ export const confirmAppointment = async (req, res) => {
     });
   }
 
+  // Require video link when confirming an online appointment
+  if (status === 'CONFIRMED' && appointment.type === 'ONLINE' && !videoLink) {
+    return res.status(400).json({
+      success: false,
+      message: 'Video link is required for online appointments when confirming',
+    });
+  }
+
   // Prepare update data
   const updateData = {
     status: status,
     ...(status === 'CANCELLED' && { cancelledAt: new Date() }),
+    ...(status === 'CONFIRMED' && videoLink ? { videoLink } : {}),
   };
 
   // If confirming, update the scheduled time
@@ -274,6 +283,7 @@ export const completeAppointment = async (req, res) => {
     data: {
       status: 'COMPLETED',
       completedAt: new Date(),
+      videoLink: null,
     },
     include: {
       patient: {

@@ -139,6 +139,18 @@ export default function Appointments() {
                     <p>
                       <strong>Type:</strong> {upcomingAppointment.type}
                     </p>
+                    {upcomingAppointment.videoLink && (
+                      <p>
+                        <strong>Video Link:</strong>{" "}
+                        <a
+                          href={upcomingAppointment.videoLink}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Join Call
+                        </a>
+                      </p>
+                    )}
                     <span
                       className={`status ${getStatusClass(
                         upcomingAppointment.status,
@@ -166,6 +178,7 @@ export default function Appointments() {
                         <th>Date</th>
                         <th>Time</th>
                         <th>Type</th>
+                        <th>Video Link</th>
                         <th>Status</th>
                       </tr>
                     </thead>
@@ -179,6 +192,17 @@ export default function Appointments() {
                             <td>{date}</td>
                             <td>{time}</td>
                             <td>{app.type}</td>
+                            <td>
+                              {app.status === "COMPLETED" ? (
+                                "Appointment over"
+                              ) : app.videoLink ? (
+                                <a href={app.videoLink} target="_blank" rel="noreferrer">
+                                  Join
+                                </a>
+                              ) : (
+                                "—"
+                              )}
+                            </td>
                             <td>
                               <span
                                 className={`status ${getStatusClass(
