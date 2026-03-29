@@ -5,6 +5,8 @@ import userApi from "../../api/userApi";
 import { getErrorMessage } from "../../utils/helpers";
 import "./EditProfile.css";
 import Sidebar from "../../components/Sidebar";
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 
 export default function EditProfile() {
   
@@ -21,6 +23,11 @@ export default function EditProfile() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  // Password change states
+      const [newPassword, setNewPassword] = useState("");
+      const [confirmPassword, setConfirmPassword] = useState("");
+      const [showPassword, setShowPassword] = useState(false);
+      const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -63,7 +70,19 @@ export default function EditProfile() {
     console.log("isEditing state changed to:", isEditing);
     setError("");
     setSuccess("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   }, [isEditing]);
+
+  const validatePassword = (pwd) => {
+    const errors = [];
+    if (pwd.length < 6) errors.push("Password must be at least 6 characters");
+    if (!/[A-Z]/.test(pwd)) errors.push("Must contain an uppercase letter");
+    if (!/[0-9]/.test(pwd)) errors.push("Must contain a number");
+    return errors;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,9 +115,38 @@ export default function EditProfile() {
       return;
     }
 
+      // Validate password if provided
+    if (newPassword || confirmPassword) {
+      if (!newPassword || !confirmPassword) {
+        setError("Please fill in both password fields");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+
+      const passwordErrors = validatePassword(newPassword);
+      if (passwordErrors.length > 0) {
+        setError(passwordErrors.join(". "));
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
+
+       const updateData = {
+        ...formData,
+      };
+
+      // Include password if provided
+      if (newPassword) {
+        updateData.password = newPassword;
+      }
+
       const res = await userApi.updateProfile(user.id, formData);
       const updatedUser = res?.data?.data;
       setSuccess("Profile updated successfully!");
@@ -128,6 +176,11 @@ export default function EditProfile() {
       name: user.adminProfile?.name || "",
       phone: user.adminProfile?.phone || "",
     });
+
+    setNewPassword("");
+    setConfirmPassword("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
   // const handleLogout = async () => {
@@ -208,8 +261,84 @@ export default function EditProfile() {
             <div className="user-role">
               <label>Account Type</label>
               <p className="role-badge">{user.role}</p>
+              </div>
+              
+               {isEditing && (
+              <div className="form-section">
+                <h2>Change Password (Optional)</h2>
+                <p className="section-info">Leave blank to keep current password</p>
+
+                <div className="form-group">
+                  <label htmlFor="newPassword">New Password</label>
+                  <div className="password-input-wrapper">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="newPassword"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="toggle-password"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={loading}
+                    >
+                      {showPassword ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+                    </button>
+                  </div>
+                  {newPassword && (
+                    <div className="password-hints">
+                      <p>Password must contain:</p>
+                      <ul>
+                        <li className={newPassword.length >= 6 ? "valid" : ""}>
+                          At least 6 characters
+                        </li>
+                        <li className={/[A-Z]/.test(newPassword) ? "valid" : ""}>
+                          One uppercase letter
+                        </li>
+                        <li className={/[0-9]/.test(newPassword) ? "valid" : ""}>
+                          One number
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="confirmPassword">Confirm Password</label>
+                  <div className="password-input-wrapper">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      id="confirmPassword"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="toggle-password"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={loading}
+                    >
+                      {showConfirmPassword ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+                    </button>
+                  </div>
+                  {confirmPassword && newPassword === confirmPassword && (
+                    <p className="match-indicator valid">✓ Passwords match</p>
+                  )}
+                  {confirmPassword && newPassword !== confirmPassword && (
+                    <p className="match-indicator invalid">
+                      ✗ Passwords do not match
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
             </div>
-          </div>
+            
 
           <div className="form-actions">
             {!isEditing ? (

@@ -235,7 +235,7 @@ export default function Appointments() {
                 <div key={app.id} className="appointment-card">
                   <div className="appointment-info">
                     <div className="patient-info">
-                      <h3>Patient: {app.patient?.user?.email}</h3>
+                      <h3>Patient: {app.patient?.name}</h3>
                       <p>
                         <strong>Date:</strong> {date}
                       </p>
