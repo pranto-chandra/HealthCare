@@ -99,6 +99,21 @@ export const updateUserRole = async (req, res) => {
   });
 };
 
+export const updateUserStatus = async (req, res) => {
+  const { isProfileComplete } = req.body;
+  const { id } = req.params;
+
+  const user = await prisma.user.update({
+    where: { id },
+    data: { isProfileComplete },
+  });
+
+  res.json({
+    success: true,
+    data: user,
+  });
+};
+
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
 

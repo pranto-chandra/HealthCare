@@ -12,6 +12,10 @@ export async function updateUserRole(userId, role) {
   return API.put(`/admin/users/${userId}/role`, { role });
 }
 
+export async function updateUserStatus(userId, isProfileComplete) {
+  return API.put(`/admin/users/${userId}/status`, { isProfileComplete });
+}
+
 export async function deleteUser(userId) {
   return API.delete(`/admin/users/${userId}`);
 }

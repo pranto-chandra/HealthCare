@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
-import { createUser, getAllUsers, updateUserRole, deleteUser } from "../../api/adminApi";
+import { createUser, getAllUsers, updateUserStatus, deleteUser } from "../../api/adminApi";
 import "./ManageUsers.css";
 
 export default function ManageUsers() {
@@ -28,10 +28,11 @@ export default function ManageUsers() {
         const transformedUsers = response.data.data.map(user => ({
           id: user.id,
           name: getUserName(user),
-          role: user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase(),
-          email: user.email,
-          status: user.isProfileComplete ? "Active" : "Pending",
-          createdAt: new Date(user.createdAt).toLocaleDateString()
+        role: user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase(),
+        email: user.email,
+        status: user.isProfileComplete ? "Active" : "Pending",
+        isProfileComplete: user.isProfileComplete,
+        createdAt: new Date(user.createdAt).toLocaleDateString()
         }));
         setUsers(transformedUsers);
       } else {
@@ -117,6 +118,43 @@ export default function ManageUsers() {
     }));
   };
 
+  const handleDeleteUser = async (userId) => {
+    const confirmed = window.confirm("Are you sure you want to delete this user?");
+    if (!confirmed) return;
+
+    try {
+      setUsersLoading(true);
+      setError(null);
+      await deleteUser(userId);
+      await fetchUsers();
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      setError(err?.response?.data?.message || err.message || "Failed to delete user");
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const handleToggleStatus = async (user) => {
+    const newStatus = user.isProfileComplete ? "Pending" : "Active";
+    const confirmed = window.confirm(
+      `Change status of ${user.name} from ${user.status} to ${newStatus}?`
+    );
+    if (!confirmed) return;
+
+    try {
+      setUsersLoading(true);
+      setError(null);
+      await updateUserStatus(user.id, !user.isProfileComplete);
+      await fetchUsers();
+    } catch (err) {
+      console.error("Error updating user status:", err);
+      setError(err?.response?.data?.message || err.message || "Failed to update user status");
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
   return (
     <div className="admin-users-page">
       {/* Sidebar Toggle */}
@@ -197,8 +235,18 @@ export default function ManageUsers() {
                         </td>
                         <td>{user.createdAt}</td>
                         <td className="actions">
-                          <button className="edit-btn">Edit</button>
-                          <button className="delete-btn">Delete</button>
+                          <button
+                            className="edit-btn"
+                            onClick={() => handleToggleStatus(user)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))
