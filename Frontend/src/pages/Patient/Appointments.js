@@ -5,6 +5,7 @@ import appointmentApi from "../../api/appointmentApi";
 import patientApi from "../../api/patientApi";
 import { getErrorMessage } from "../../utils/helpers";
 import "./Appointments.css";
+import Button from "@mui/material/Button";
 
 export default function Appointments() {
   const { user } = useContext(AuthContext);
@@ -143,11 +144,13 @@ export default function Appointments() {
                       <p>
                         <strong>Video Link:</strong>{" "}
                         <a
-                          href={upcomingAppointment.videoLink}
+                          href={upcomingAppointment.videoLink?.startsWith('http') ? upcomingAppointment.videoLink : `https://${upcomingAppointment.videoLink}`}
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Join Call
+                          <Button variant="outlined" color="primary">
+                            Join Call
+                          </Button>
                         </a>
                       </p>
                     )}
@@ -196,8 +199,10 @@ export default function Appointments() {
                               {app.status === "COMPLETED" ? (
                                 "Appointment over"
                               ) : app.videoLink ? (
-                                <a href={app.videoLink} target="_blank" rel="noreferrer">
-                                  Join
+                                <a href={app.videoLink?.startsWith('http') ? app.videoLink : `https://${app.videoLink}`} target="_blank" rel="noreferrer">
+                                  <Button variant="outlined" color="primary">
+                                    Join
+                                  </Button>
                                 </a>
                               ) : (
                                 "—"

@@ -182,12 +182,12 @@ export default function PatientRecords() {
               </section>
 
               {/* Appointments Section */}
-              <section className="appointments-section">
+              <section className="prescriptions-section">
                 <h2>🩺 Appointments ({appointments.length})</h2>
                 {appointments && appointments.length > 0 ? (
-                  <div className="appointments-list">
+                  <div className="prescriptions-list">
                     {appointments.map((apt) => (
-                      <div key={apt.id} className="appointment-card">
+                      <div key={apt.id} className="prescriptions-card">
                         <p>
                           <strong>Date:</strong>{" "}
                           {new Date(apt.scheduledAt).toLocaleDateString()}
@@ -279,12 +279,12 @@ export default function PatientRecords() {
               
 
               {/* Health Records Section */}
-              <section className="health-records-section">
+              <section className="prescriptions-section">
                 <h2>❤️ Health Monitoring (Last 10 Records)</h2>
                 {healthRecords && healthRecords.length > 0 ? (
-                  <div className="health-records-list">
+                  <div className="prescriptions-list">
                     {healthRecords.map((record) => (
-                      <div key={record.id} className="health-record-card">
+                      <div key={record.id} className="prescriptions-card">
                         {record.heartRate && (
                           <p>
                             <strong>Heart Rate:</strong> {record.heartRate} bpm

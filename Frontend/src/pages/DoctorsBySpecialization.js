@@ -166,7 +166,7 @@ export default function DoctorsBySpecialization() {
 
       const appointmentData = {
         doctorId: doctor.id,
-        scheduledAt: new Date(appointmentDate).toISOString(),
+        requestedDate: appointmentDate,
         type: appointmentType,
       };
 
@@ -363,10 +363,10 @@ export default function DoctorsBySpecialization() {
                   <label htmlFor="date">Appointment Date</label>
                   <input
                     id="date"
-                    type="datetime-local"
+                    type="date"
                     value={appointmentDate}
                     onChange={(e) => setAppointmentDate(e.target.value)}
-                    min={new Date().toISOString().slice(0, 16)}
+                    min={new Date().toISOString().split("T")[0]}
                     className="form-input"
                   />
                 </div>

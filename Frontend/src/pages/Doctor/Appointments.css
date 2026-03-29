@@ -328,3 +328,24 @@
   box-shadow: 0 0 5px rgba(0, 109, 92, 0.3);
   background-color: white;
 }
+
+.video-link-input-group{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  color: #004d40;
+}
+
+.video-link-input{
+  outline: none;
+  border: 2px solid #00695c;
+  border-color: #004d40;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.confirmed-video-link strong{
+  color: #004d40;
+  margin-right: 4px;
+}

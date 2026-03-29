@@ -7,6 +7,7 @@ import { getErrorMessage } from "../../utils/helpers";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import "./Appointments.css";
+import Button from "@mui/material/Button";
 
 export default function Appointments() {
   const { user } = useContext(AuthContext);
@@ -289,7 +290,7 @@ export default function Appointments() {
                       ) : app.videoLink ? (
                         <p>
                           <strong>Video link:</strong>{" "}
-                          <a href={app.videoLink} target="_blank" rel="noreferrer">
+                          <a href={app.videoLink?.startsWith('http') ? app.videoLink : `https://${app.videoLink}`} target="_blank" rel="noreferrer">
                             Join call
                           </a>
                         </p>
@@ -399,11 +400,13 @@ export default function Appointments() {
                             <div className="confirmed-video-link">
                               <strong>Video link:</strong>{" "}
                               <a
-                                href={app.videoLink}
+                                href={app.videoLink?.startsWith('http') ? app.videoLink : `https://${app.videoLink}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                Join call
+                                <Button variant="outlined" color="primary">
+                                  Join call
+                                </Button>
                               </a>
                             </div>
                           )}
