@@ -1,2 +1,2 @@
 # .gitignore
-.env
+# .env is intentionally committed for the current Azure VM deployment flow.

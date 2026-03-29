@@ -47,6 +47,8 @@ jobs:
           context: ./Frontend
           push: true
           tags: ${{ env.REGISTRY }}/healthcare-frontend:latest
+          build-args: |
+            REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
