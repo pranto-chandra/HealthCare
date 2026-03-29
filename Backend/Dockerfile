@@ -43,8 +43,8 @@ ENV NODE_ENV=production
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD node -e "require('http').get('http://localhost:5000/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
-# Use dumb-init to properly handle signals
-ENTRYPOINT ["/usr/sbin/dumb-init", "--"]
+# Use dumb-init to properly handle signals (use PATH-resolved binary)
+ENTRYPOINT ["dumb-init", "--"]
 
 # Start the application
 CMD ["node", "server.js"]
