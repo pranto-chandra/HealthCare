@@ -3,11 +3,23 @@ import { login as apiLogin, logout as apiLogout } from "../api/authApi";
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
+function readStoredUser() {
+  try {
     const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : null;
-  });
+    if (!saved) return null;
+    return JSON.parse(saved);
+  } catch (error) {
+    console.warn("Ignoring invalid stored user payload", error);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    return null;
+  }
+}
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(() => readStoredUser());
 
   const login = async (email, password) => {
     try {

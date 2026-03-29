@@ -1,24 +1,39 @@
 import nodemailer from 'nodemailer';
 
-// Create transporter
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const emailEnabled = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+export { emailEnabled };
 
-// Verify transporter connection
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('❌ Email transporter configuration error:', error.message);
-  } else {
-    console.log('✅ Email transporter is ready to send messages');
+// Create transporter only when credentials exist.
+const transporter = emailEnabled
+  ? nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    })
+  : null;
+
+if (transporter) {
+  transporter.verify((error) => {
+    if (error) {
+      console.error('❌ Email transporter configuration error:', error.message);
+    } else {
+      console.log('✅ Email transporter is ready to send messages');
+    }
+  });
+} else {
+  console.log('ℹ️ Email is disabled because EMAIL_USER / EMAIL_PASS are not configured');
+}
+
+function requireTransporter() {
+  if (!transporter) {
+    throw new Error('Email is not configured on this deployment.');
   }
-});
+  return transporter;
+}
 
 export const sendOtpEmail = async (email, otp) => {
   console.log(`📧 Sending verification code: ${otp} to ${email}`);
@@ -63,7 +78,7 @@ export const sendOtpEmail = async (email, otp) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await requireTransporter().sendMail(mailOptions);
     console.log(`OTP email sent successfully to ${email}`);
   } catch (error) {
     console.error('Error sending OTP email:', error);
@@ -121,7 +136,7 @@ export const sendCredentialsEmail = async (email, password, role) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await requireTransporter().sendMail(mailOptions);
     console.log(`Credentials email sent successfully to ${email}`);
   } catch (error) {
     console.error('Error sending credentials email:', error);

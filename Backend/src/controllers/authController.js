@@ -2,9 +2,83 @@ import { prisma } from '../config/db.js';
 import { hashPassword, comparePassword } from '../utils/password.js';
 import { generateToken, generateRefreshToken } from '../utils/jwt.js';
 import { BadRequestError, UnauthorizedError } from '../utils/errors.js';
-import { sendOtpEmail } from '../services/emailService.js';
+import { emailEnabled, sendOtpEmail } from '../services/emailService.js';
 import crypto from 'crypto';
 import otpGenerator from 'otp-generator';
+
+async function ensureRoleProfile(user) {
+  if (user.role === 'PATIENT') {
+    const existing = await prisma.patientProfile.findUnique({
+      where: { userId: user.id },
+    });
+    if (!existing) {
+      await prisma.patientProfile.create({
+        data: {
+          userId: user.id,
+          name: 'Patient',
+          phone: '',
+          dateOfBirth: new Date('2000-01-01'),
+          gender: 'OTHER',
+          bloodGroup: 'O_POSITIVE',
+        },
+      });
+    }
+    return;
+  }
+
+  if (user.role === 'DOCTOR') {
+    const existing = await prisma.doctorProfile.findUnique({
+      where: { userId: user.id },
+    });
+    if (!existing) {
+      await prisma.doctorProfile.create({
+        data: {
+          userId: user.id,
+          name: 'Doctor',
+          phone: '',
+          dateOfBirth: new Date('2000-01-01'),
+          locationDiv: 'DHAKA',
+          licenseNumber: `TEMP-${user.id.slice(0, 8)}`,
+          consultationFee: 0,
+          experienceYears: 0,
+        },
+      });
+    }
+    return;
+  }
+
+  if (user.role === 'ADMIN') {
+    const existing = await prisma.adminProfile.findUnique({
+      where: { userId: user.id },
+    });
+    if (!existing) {
+      await prisma.adminProfile.create({
+        data: {
+          userId: user.id,
+          name: 'Admin',
+          phone: '',
+        },
+      });
+    }
+    return;
+  }
+
+  if (user.role === 'PATHOLOGIST') {
+    const existing = await prisma.pathologistProfile.findUnique({
+      where: { userId: user.id },
+    });
+    if (!existing) {
+      await prisma.pathologistProfile.create({
+        data: {
+          userId: user.id,
+          name: 'Pathologist',
+          phone: '',
+          licenseNumber: `TEMP-${user.id.slice(0, 8)}`,
+        },
+      });
+    }
+  }
+}
 
 export const register = async (req, res) => {
   const { email, password } = req.body;
@@ -27,10 +101,70 @@ export const register = async (req, res) => {
   // Hash password
   const hashedPassword = await hashPassword(password);
 
+  const role = 'PATIENT'; // Hardcode role as PATIENT for registration
+
+  if (!emailEnabled) {
+    let user;
+
+    if (existingUser && !existingUser.isEmailVerified) {
+      user = await prisma.user.update({
+        where: { email },
+        data: {
+          password: hashedPassword,
+          role,
+          isEmailVerified: true,
+          emailVerificationOtp: null,
+          emailVerificationOtpExpiry: null,
+        },
+      });
+    } else {
+      user = await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          role,
+          isEmailVerified: true,
+          emailVerificationOtp: null,
+          emailVerificationOtpExpiry: null,
+        },
+      });
+    }
+
+    await ensureRoleProfile(user);
+
+    const completeUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        isProfileComplete: true,
+        patientProfile: true,
+        doctorProfile: true,
+        adminProfile: true,
+        pathologistProfile: true,
+      },
+    });
+
+    const accessToken = generateToken(user.id);
+    const refreshToken = generateRefreshToken(user.id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Registration completed. Email verification is temporarily disabled.',
+      data: {
+        emailVerificationRequired: false,
+        user: completeUser,
+        tokens: {
+          accessToken,
+          refreshToken,
+        },
+      },
+    });
+  }
+
   // Set OTP expiry to 10 minutes from now
   const otpExpiry = new Date(Date.now() + 600000);
-
-  const role = 'PATIENT'; // Hardcode role as PATIENT for registration
 
   if (existingUser && !existingUser.isEmailVerified) {
     // Update existing unverified user
@@ -71,6 +205,9 @@ export const register = async (req, res) => {
   res.status(200).json({
     success: true,
     message: 'OTP sent to your email. Please verify to complete registration.',
+    data: {
+      emailVerificationRequired: true,
+    },
   });
 };
 
@@ -124,50 +261,7 @@ export const verifyOtp = async (req, res) => {
     },
   });
 
-  // Create role-specific profile
-  const { role } = verifiedUser;
-  if (role === 'PATIENT') {
-    await prisma.patientProfile.create({
-      data: {
-        userId: verifiedUser.id,
-        name: 'Patient',
-        phone: '',
-        dateOfBirth: new Date('2000-01-01'),
-        gender: 'OTHER',
-        bloodGroup: 'O_POSITIVE',
-      },
-    });
-  } else if (role === 'DOCTOR') {
-    await prisma.doctorProfile.create({
-      data: {
-        userId: verifiedUser.id,
-        name: 'Doctor',
-        phone: '',
-        dateOfBirth: new Date('2000-01-01'),
-        locationDiv: 'DHAKA',
-        licenseNumber: 'N/A',
-        consultationFee: 0,
-        experienceYears: 0,
-      },
-    });
-  } else if (role === 'ADMIN') {
-    await prisma.adminProfile.create({
-      data: {
-        userId: verifiedUser.id,
-        name: 'Admin',
-        phone: '',
-      },
-    });
-  } else if (role === 'PATHOLOGIST') {
-    await prisma.pathologistProfile.create({
-      data: {
-        userId: verifiedUser.id,
-        name: 'Pathologist',
-        phone: '',
-        licenseNumber: 'N/A',
-      },
-    });
-  }
+  await ensureRoleProfile(verifiedUser);
 
   // Generate tokens
   const accessToken = generateToken(verifiedUser.id);
@@ -193,6 +287,14 @@ export const verifyOtp = async (req, res) => {
 
 export const resendOtp = async (req, res) => {
   const { email } = req.body;
+
+  if (!emailEnabled) {
+    res.status(200).json({
+      success: true,
+      message: 'Email verification is currently disabled.',
+    });
+    return;
+  }
 
   // Find unverified user
   const user = await prisma.user.findFirst({

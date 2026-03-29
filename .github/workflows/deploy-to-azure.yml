@@ -48,7 +48,7 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/healthcare-frontend:latest
           build-args: |
-            REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
+            REACT_APP_API_URL=/api
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -76,17 +76,17 @@ jobs:
             docker pull mysql:8.0
             
             # Stop and remove old containers
-            docker-compose down || true
+            docker compose --env-file .env.docker down || true
             
             # Start containers with new images
-            docker-compose up -d
+            docker compose --env-file .env.docker up -d
             
             # Run database migrations
-            docker-compose exec -T backend npm run prisma:migrate -- --skip-generate || true
+            docker compose --env-file .env.docker run --rm prisma-migrate || true
             
             # Output status
             echo "Deployment completed successfully!"
-            docker-compose ps
+            docker compose --env-file .env.docker ps
 
   notify:
     needs: build-and-deploy

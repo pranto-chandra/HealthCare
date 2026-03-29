@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `appointment` ADD COLUMN `videoLink` VARCHAR(191) NULL;
+ALTER TABLE `Appointment` ADD COLUMN `videoLink` VARCHAR(191) NULL;

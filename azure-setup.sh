@@ -62,7 +62,7 @@ fi
 
 # Start containers
 echo -e "${YELLOW}Starting Docker containers...${NC}"
-docker-compose up -d
+docker compose --env-file .env.docker up -d
 
 # Wait for services to be ready
 echo -e "${YELLOW}Waiting for services to be healthy...${NC}"
@@ -70,11 +70,11 @@ sleep 15
 
 # Run database migrations
 echo -e "${YELLOW}Running database migrations...${NC}"
-docker-compose exec -T backend npm run prisma:migrate -- --skip-generate || true
+docker compose --env-file .env.docker run --rm prisma-migrate || true
 
 # Check status
 echo -e "${GREEN}✓ Setup completed!${NC}\n"
-docker-compose ps
+docker compose --env-file .env.docker ps
 echo ""
 echo -e "${GREEN}Your application is running at:${NC}"
 echo -e "  Frontend: http://$(hostname -I | awk '{print $1}'):3000"

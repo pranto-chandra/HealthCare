@@ -2,7 +2,6 @@ services:
   # MySQL Database Service - Production Optimized
   mysql:
     image: mysql:8.0
-    container_name: healthcare-mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -32,7 +31,6 @@ services:
 
   mysql-setup:
     image: mysql:8.0
-    container_name: healthcare-mysql-setup
     restart: "no"
     depends_on:
       mysql:
@@ -56,12 +54,28 @@ services:
     networks:
       - healthcare-network
 
+  prisma-migrate:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    restart: "no"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
+      PORT: 5000
+      JWT_SECRET: ${JWT_SECRET}
+    command: ["npm", "run", "prisma:deploy"]
+    depends_on:
+      mysql-setup:
+        condition: service_completed_successfully
+    networks:
+      - healthcare-network
+
   # Backend API Service - Production
   backend:
     build:
       context: ./Backend
       dockerfile: Dockerfile
-    container_name: healthcare-backend
     restart: always
     environment:
       NODE_ENV: production
@@ -71,15 +85,15 @@ services:
       JWT_EXPIRE: ${JWT_EXPIRE:-7d}
       EMAIL_USER: ${EMAIL_USER}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD}
-      CLIENT_URL: ${CLIENT_URL}
-      API_URL: ${API_URL}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost}
+      API_URL: ${API_URL:-http://localhost/api}
     ports:
       - "5000:5000"
     volumes:
       - ./Backend/uploads:/app/uploads
       - ./Backend/logs:/app/logs
     depends_on:
-      mysql-setup:
+      prisma-migrate:
         condition: service_completed_successfully
     networks:
       - healthcare-network
@@ -101,12 +115,11 @@ services:
       context: ./Frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL}
-    container_name: healthcare-frontend
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-/api}
     restart: always
     environment:
       NODE_ENV: production
-      REACT_APP_API_URL: ${REACT_APP_API_URL}
+      REACT_APP_API_URL: ${REACT_APP_API_URL:-/api}
     ports:
       - "3000:3000"
     depends_on:

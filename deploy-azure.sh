@@ -52,10 +52,11 @@ EMAIL_PASSWORD=givn_yspg_hpru_toxu
 # Azure VM IP Configuration
 CLIENT_URL=http://$AZURE_IP
 API_URL=http://$AZURE_IP/api
-REACT_APP_API_URL=http://$AZURE_IP/api
+REACT_APP_API_URL=/api
 
 # Frontend
 FRONTEND_PORT=3000
+NGINX_PORT=80
 
 # Database Connection String
 DATABASE_URL=mysql://healthcare_user:userpassword123@mysql:3306/healthcare_db
@@ -67,17 +68,21 @@ echo ""
 echo "[STEP 3] Building Docker containers..."
 echo "This may take 5-10 minutes..."
 echo ""
-docker-compose build
+docker compose --env-file .env.docker build
 echo ""
 echo "✓ Docker containers built successfully"
 echo ""
 
 # STEP 4: Start all services
 echo "[STEP 4] Starting all services..."
-docker-compose --env-file .env.docker up -d
+docker compose --env-file .env.docker up -d
 echo ""
 echo "Waiting for services to start (30 seconds)..."
 sleep 30
+echo ""
+
+echo "[STEP 4.5] Running database migrations..."
+docker compose --env-file .env.docker run --rm prisma-migrate || true
 echo ""
 
 # STEP 5: Verify services

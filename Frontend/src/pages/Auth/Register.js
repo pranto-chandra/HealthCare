@@ -58,6 +58,18 @@ export default function Register() {
       setLoading(false);
       if (res && res.status === 200) {
         setSuccess(true);
+        const verificationRequired =
+          res?.data?.data?.emailVerificationRequired !== false;
+
+        if (!verificationRequired && res?.data?.data?.user && res?.data?.data?.tokens) {
+          localStorage.setItem("user", JSON.stringify(res.data.data.user));
+          localStorage.setItem("accessToken", res.data.data.tokens.accessToken);
+          localStorage.setItem("refreshToken", res.data.data.tokens.refreshToken);
+          alert("✅ Registration complete. Email verification is temporarily disabled.");
+          navigate("/patient/dashboard");
+          return;
+        }
+
         alert("✅ Verification code sent to your email!");
         navigate("/verify-email", { state: { email } });
       } else {

@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `labtest` ADD COLUMN `completedAt` DATETIME(3) NULL,
+ALTER TABLE `LabTest` ADD COLUMN `completedAt` DATETIME(3) NULL,
     ADD COLUMN `pathologistId` VARCHAR(191) NULL,
     ADD COLUMN `recommendedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     ADD COLUMN `reportNotes` TEXT NULL,
@@ -7,7 +7,7 @@ ALTER TABLE `labtest` ADD COLUMN `completedAt` DATETIME(3) NULL,
     MODIFY `testDate` DATETIME(3) NULL;
 
 -- AlterTable
-ALTER TABLE `user` MODIFY `role` ENUM('ADMIN', 'PATIENT', 'DOCTOR', 'PATHOLOGIST') NOT NULL;
+ALTER TABLE `User` MODIFY `role` ENUM('ADMIN', 'PATIENT', 'DOCTOR', 'PATHOLOGIST') NOT NULL;
 
 -- CreateTable
 CREATE TABLE `PathologistProfile` (

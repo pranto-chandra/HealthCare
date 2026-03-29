@@ -21,8 +21,14 @@ export default function Login() {
       const ok = await login(email, password); // from AuthContext
       if (ok) {
         // Get user from localStorage to check role
-        const userStr = localStorage.getItem("user");
-        const user = userStr ? JSON.parse(userStr) : null;
+        let user = null;
+        try {
+          const userStr = localStorage.getItem("user");
+          user = userStr ? JSON.parse(userStr) : null;
+        } catch (error) {
+          console.warn("Stored user payload was invalid after login", error);
+          localStorage.removeItem("user");
+        }
         const role = user?.role?.toUpperCase();
 
         // Redirect based on role

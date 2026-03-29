@@ -20,52 +20,52 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `admin` DROP FOREIGN KEY `Admin_userId_fkey`;
+ALTER TABLE `Admin` DROP FOREIGN KEY `Admin_userId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `appointment` DROP FOREIGN KEY `Appointment_doctorId_fkey`;
+ALTER TABLE `Appointment` DROP FOREIGN KEY `Appointment_doctorId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `appointment` DROP FOREIGN KEY `Appointment_patientId_fkey`;
+ALTER TABLE `Appointment` DROP FOREIGN KEY `Appointment_patientId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `doctor` DROP FOREIGN KEY `Doctor_userId_fkey`;
+ALTER TABLE `Doctor` DROP FOREIGN KEY `Doctor_userId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `healthmonitoring` DROP FOREIGN KEY `HealthMonitoring_patientId_fkey`;
+ALTER TABLE `HealthMonitoring` DROP FOREIGN KEY `HealthMonitoring_patientId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `labtest` DROP FOREIGN KEY `LabTest_doctorId_fkey`;
+ALTER TABLE `LabTest` DROP FOREIGN KEY `LabTest_doctorId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `labtest` DROP FOREIGN KEY `LabTest_patientId_fkey`;
+ALTER TABLE `LabTest` DROP FOREIGN KEY `LabTest_patientId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `medicalhistory` DROP FOREIGN KEY `MedicalHistory_doctorId_fkey`;
+ALTER TABLE `MedicalHistory` DROP FOREIGN KEY `MedicalHistory_doctorId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `medicalhistory` DROP FOREIGN KEY `MedicalHistory_patientId_fkey`;
+ALTER TABLE `MedicalHistory` DROP FOREIGN KEY `MedicalHistory_patientId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `medicationtracking` DROP FOREIGN KEY `MedicationTracking_prescriptionId_fkey`;
+ALTER TABLE `MedicationTracking` DROP FOREIGN KEY `MedicationTracking_prescriptionId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `patient` DROP FOREIGN KEY `Patient_userId_fkey`;
+ALTER TABLE `Patient` DROP FOREIGN KEY `Patient_userId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `prescription` DROP FOREIGN KEY `Prescription_doctorId_fkey`;
+ALTER TABLE `Prescription` DROP FOREIGN KEY `Prescription_doctorId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `prescription` DROP FOREIGN KEY `Prescription_patientId_fkey`;
+ALTER TABLE `Prescription` DROP FOREIGN KEY `Prescription_patientId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `reminder` DROP FOREIGN KEY `Reminder_medicationId_fkey`;
+ALTER TABLE `Reminder` DROP FOREIGN KEY `Reminder_medicationId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `reminder` DROP FOREIGN KEY `Reminder_patientId_fkey`;
+ALTER TABLE `Reminder` DROP FOREIGN KEY `Reminder_patientId_fkey`;
 
 -- AlterTable
-ALTER TABLE `appointment` DROP COLUMN `appointmentDate`,
+ALTER TABLE `Appointment` DROP COLUMN `appointmentDate`,
     DROP COLUMN `appointmentType`,
     DROP COLUMN `createdAt`,
     DROP COLUMN `updatedAt`,
@@ -81,12 +81,12 @@ ALTER TABLE `appointment` DROP COLUMN `appointmentDate`,
     MODIFY `status` ENUM('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED') NOT NULL DEFAULT 'PENDING';
 
 -- AlterTable
-ALTER TABLE `labtest` DROP COLUMN `filePath`,
+ALTER TABLE `LabTest` DROP COLUMN `filePath`,
     ADD COLUMN `appointmentId` VARCHAR(191) NULL,
     ADD COLUMN `resultFile` VARCHAR(191) NULL;
 
 -- AlterTable
-ALTER TABLE `user` DROP COLUMN `dateOfBirth`,
+ALTER TABLE `User` DROP COLUMN `dateOfBirth`,
     DROP COLUMN `firstName`,
     DROP COLUMN `lastName`,
     DROP COLUMN `phone`,
@@ -94,16 +94,16 @@ ALTER TABLE `user` DROP COLUMN `dateOfBirth`,
     MODIFY `role` ENUM('ADMIN', 'PATIENT', 'DOCTOR') NOT NULL;
 
 -- DropTable
-DROP TABLE `admin`;
+DROP TABLE `Admin`;
 
 -- DropTable
-DROP TABLE `doctor`;
+DROP TABLE `Doctor`;
 
 -- DropTable
-DROP TABLE `patient`;
+DROP TABLE `Patient`;
 
 -- DropTable
-DROP TABLE `reminder`;
+DROP TABLE `Reminder`;
 
 -- CreateTable
 CREATE TABLE `AdminProfile` (
