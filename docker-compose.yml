@@ -41,6 +41,7 @@ services:
       JWT_EXPIRE: ${JWT_EXPIRE:-7d}
       EMAIL_USER: ${EMAIL_USER:-your-email@gmail.com}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD:-your-app-password}
+      EMAIL_PASS: ${EMAIL_PASS:-${EMAIL_PASSWORD:-your-app-password}}
       CLIENT_URL: ${CLIENT_URL:-http://localhost:3000}
       API_URL: ${API_URL:-http://localhost:5000}
     ports:
