@@ -2,11 +2,11 @@
 
 # Healthcare Management System - Docker Deployment Script
 # For Azure VM Deployment
-# IP: 135.235.137.34
+# IP: 103.135.253.215
 
 set -e  # Exit on error
 
-AZURE_IP="135.235.137.34"
+AZURE_IP="103.135.253.215"
 PROJECT_NAME="Healthcare"
 
 echo "=========================================="
@@ -113,7 +113,7 @@ echo ""
 echo "Application URL: http://$AZURE_IP"
 echo ""
 echo "Access your application at:"
-echo "  http://135.235.137.34"
+echo "  http://103.135.253.215"
 echo ""
 echo "Check logs:"
 echo "  docker-compose logs -f"
