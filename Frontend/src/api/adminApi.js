@@ -1,11 +1,11 @@
-import API from './apiClient';
+import API from "./apiClient";
 
 export async function createUser(userData) {
-  return API.post('/admin/users', userData);
+  return API.post("/admin/users", userData);
 }
 
 export async function getAllUsers() {
-  return API.get('/admin/users');
+  return API.get("/admin/users");
 }
 
 export async function updateUserRole(userId, role) {
@@ -17,5 +17,13 @@ export async function deleteUser(userId) {
 }
 
 export async function getAnalytics() {
-  return API.get('/admin/analytics');
+  return API.get("/admin/analytics");
+}
+
+export async function getAllDoctors() {
+  return API.get("/doctors");
+}
+
+export async function getAllPatients() {
+  return API.get("/admin/users");
 }

@@ -10,8 +10,7 @@ import "./PatientRecords.css";
 export default function PatientRecords() {
   const { user } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
-  const patientId = searchParams.get("patientId");
-  const patientEmail = searchParams.get("email");
+  const urlPatientId = searchParams.get("patientId");
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [patient, setPatient] = useState(null);
@@ -20,14 +19,44 @@ export default function PatientRecords() {
   const [labTests, setLabTests] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
   const [healthRecords, setHealthRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [searchError, setSearchError] = useState("");
+  const [searchEmail, setSearchEmail] = useState("");
+  const [patientId, setPatientId] = useState(urlPatientId || null);
+
+  // Search for patient by email
+  const handleSearchPatient = async (e) => {
+    e.preventDefault();
+    if (!searchEmail.trim()) {
+      setSearchError("Please enter a patient email");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setSearchError("");
+
+      const response = await doctorApi.searchPatientByEmail(searchEmail);
+      const foundPatient = response?.data?.data;
+
+      if (foundPatient?.id) {
+        setPatientId(foundPatient.id);
+        setSearchEmail("");
+      } else {
+        setSearchError("Patient not found");
+      }
+    } catch (err) {
+      setSearchError(getErrorMessage(err) || "Failed to search patient");
+      console.error("Error searching patient:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch patient record
   useEffect(() => {
     if (!patientId) {
-      setError("Patient ID not provided. Please search for a patient first.");
-      setLoading(false);
       return;
     }
 
@@ -56,7 +85,7 @@ export default function PatientRecords() {
     fetchPatientRecord();
   }, [patientId]);
 
-  if (loading) {
+  if (loading && patientId) {
     return (
       <div className="patient-record-page">
         <button
@@ -93,10 +122,31 @@ export default function PatientRecords() {
         <main className="patient-record-content">
           <section className="record-header">
             <h1>📋 Patient Medical Record</h1>
-            <p>Complete medical profile and history.</p>
+            <p>Search for a patient to view their complete medical profile.</p>
           </section>
 
           {error && <div className="alert alert-danger">{error}</div>}
+
+          {/* Patient Search Form */}
+          {!patient && (
+            <section className="search-section">
+              <h2>🔍 Search Patient</h2>
+              <form onSubmit={handleSearchPatient} className="search-form">
+                <input
+                  type="email"
+                  value={searchEmail}
+                  onChange={(e) => setSearchEmail(e.target.value)}
+                  placeholder="Enter patient email address"
+                  disabled={loading}
+                  required
+                />
+                <button type="submit" disabled={loading}>
+                  {loading ? "Searching..." : "Search Patient"}
+                </button>
+              </form>
+              {searchError && <div className="search-error">{searchError}</div>}
+            </section>
+          )}
 
           {patient && (
             <>
@@ -226,38 +276,7 @@ export default function PatientRecords() {
                 )}
               </section>
 
-              {/* Lab Tests Section */}
-              <section className="lab-tests-section">
-                <h2>🧪 Lab Tests ({labTests.length})</h2>
-                {labTests && labTests.length > 0 ? (
-                  <div className="lab-tests-list">
-                    {labTests.map((test) => (
-                      <div key={test.id} className="lab-test-card">
-                        <p>
-                          <strong>Test Name:</strong> {test.testName}
-                        </p>
-                        <p>
-                          <strong>Status:</strong>{" "}
-                          <span className={`status status-${test.status}`}>
-                            {test.status}
-                          </span>
-                        </p>
-                        <p>
-                          <strong>Description:</strong> {test.description}
-                        </p>
-                        {test.testDate && (
-                          <p>
-                            <strong>Test Date:</strong>{" "}
-                            {new Date(test.testDate).toLocaleDateString()}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="no-data">No lab tests found.</p>
-                )}
-              </section>
+              
 
               {/* Health Records Section */}
               <section className="health-records-section">

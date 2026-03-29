@@ -959,7 +959,7 @@ export const getMyPatientRecord = async (req, res) => {
         where: { doctorId: doctorProfile.id },
       },
       healthRecords: {
-        orderBy: { recordedAt: 'desc' },
+        orderBy: { recordDate: 'desc' },
         take: 10,
       },
       labTests: {
@@ -973,6 +973,20 @@ export const getMyPatientRecord = async (req, res) => {
     throw new NotFoundError('Patient record not found');
   }
 
+  // Fetch prescriptions separately (not just from appointments)
+  const prescriptions = await prisma.prescription.findMany({
+    where: {
+      patientId: patientId,
+      doctorId: doctorProfile.id,
+    },
+    include: {
+      medications: true,
+    },
+    orderBy: {
+      prescriptionDate: 'desc',
+    },
+  });
+
   res.json({
     success: true,
     data: {
@@ -981,9 +995,7 @@ export const getMyPatientRecord = async (req, res) => {
       medicalHistory: patientRecord.medicalHistory,
       labTests: patientRecord.labTests,
       healthRecords: patientRecord.healthRecords,
-      prescriptions: patientRecord.appointments
-        .filter((apt) => apt.prescription)
-        .map((apt) => apt.prescription),
+      prescriptions: prescriptions,
     },
   });
 };

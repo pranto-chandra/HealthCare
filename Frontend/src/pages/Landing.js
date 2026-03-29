@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import Sidebar from "../components/Sidebar";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./Landing.css";
@@ -52,13 +53,16 @@ export default function Landing() {
         {/* --- Hero Section --- */}
         <section className="hero">
           <div className="hero-content">
-            <h1>Your Health, Our Priority —</h1>
-            <h1>Anytime, Anywhere.</h1>
-            <p>I am looking for</p>
+            <h1>Hello. I am Baymax, </h1>
+            <h1>Your personal healthcare companion</h1>
 
             <div className="hero-buttons">
-              <button>Yours More</button>
-              <button>Lorem Ipsum Simp Do!</button>
+              <Link to="/about">
+                <button>Learn More</button>
+              </Link>
+              <Link to="/contact">
+                <button>Contact Us</button>
+              </Link>
             </div>
           </div>
         </section>
@@ -249,6 +253,8 @@ export default function Landing() {
             )}
           </div>
         </section>
+        
+        
 
         {/* --- Footer Section --- */}
         <footer className="footer">

@@ -16,28 +16,28 @@ export const getAllUsers = async (req, res) => {
           id: true,
           name: true,
           bloodGroup: true,
-          gender: true
-        }
+          gender: true,
+        },
       },
       doctorProfile: {
         select: {
           id: true,
           name: true,
-          licenseNumber: true
-        }
+          licenseNumber: true,
+        },
       },
       adminProfile: {
         select: {
           id: true,
           name: true,
-        }
-      }
-    }
+        },
+      },
+    },
   });
 
   res.json({
     success: true,
-    data: users
+    data: users,
   });
 };
 
@@ -74,13 +74,13 @@ export const createUser = async (req, res) => {
 
   res.json({
     success: true,
-    message: 'User created successfully. Credentials have been sent to the user\'s email.',
+    message: "User created successfully. Credentials have been sent to the user's email.",
     data: {
       id: user.id,
       email: user.email,
       role: user.role,
-      createdAt: user.createdAt
-    }
+      createdAt: user.createdAt,
+    },
   });
 };
 
@@ -90,12 +90,12 @@ export const updateUserRole = async (req, res) => {
 
   const user = await prisma.user.update({
     where: { id },
-    data: { role }
+    data: { role },
   });
 
   res.json({
     success: true,
-    data: user
+    data: user,
   });
 };
 
@@ -103,65 +103,108 @@ export const deleteUser = async (req, res) => {
   const { id } = req.params;
 
   await prisma.user.delete({
-    where: { id }
+    where: { id },
   });
 
   res.json({
     success: true,
-    message: 'User deleted successfully'
+    message: 'User deleted successfully',
   });
 };
 
 export const getAnalytics = async (req, res) => {
-  // Get various analytics data
-  const [
-    totalUsers,
-    totalPatients,
-    totalDoctors,
-    totalAppointments,
-    recentAppointments
-  ] = await Promise.all([
-    prisma.user.count(),
-    prisma.patientProfile.count(),
-    prisma.doctorProfile.count(),
-    prisma.appointment.count(),
-    prisma.appointment.findMany({
-      take: 10,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        patient: {
+  try {
+    // Get various analytics data - simpler approach
+    const totalUsers = await prisma.user.count();
+    const totalPatients = await prisma.patientProfile.count();
+    const totalDoctors = await prisma.doctorProfile.count();
+    const totalPathologists = await prisma.pathologistProfile.count();
+    const totalAppointments = await prisma.appointment.count();
+    const totalLabTestsCompleted = await prisma.labTest.count({
+      where: { status: 'REPORT_ADDED' },
+    });
+
+    // Get all specialties with their doctor counts
+    const doctorsBySpecialty = await prisma.speciality.findMany({
+      select: {
+        id: true,
+        name: true,
+        _count: {
           select: {
-            name: true
-          }
+            doctors: true,
+          },
         },
-        doctor: {
-          select: {
-            name: true
-          }
-        }
-      }
-    })
-  ]);
-
-  // Get appointment statistics by status
-  const appointmentStats = await prisma.appointment.groupBy({
-    by: ['status'],
-    _count: true
-  });
-
-  res.json({
-    success: true,
-    data: {
-      counts: {
-        users: totalUsers,
-        patients: totalPatients,
-        doctors: totalDoctors,
-        appointments: totalAppointments
       },
-      appointmentStats,
-      recentAppointments
+    });
+
+    // Get appointment statistics by status
+    const appointmentStats = await prisma.appointment.groupBy({
+      by: ['status'],
+      _count: {
+        _all: true,
+      },
+    });
+
+    // Format appointment stats for frontend
+    const formattedStats = appointmentStats.map((stat) => ({
+      status: stat.status,
+      _count: stat._count._all,
+    }));
+
+    // Get recent appointments with patient and doctor details
+    let recentAppointments = [];
+    try {
+      const appointments = await prisma.appointment.findMany({
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          status: true,
+          createdAt: true,
+          scheduledAt: true,
+          patient: {
+            select: {
+              name: true,
+            },
+          },
+          doctor: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+      recentAppointments = appointments;
+    } catch (appointmentError) {
+      console.error('Error fetching recent appointments:', appointmentError);
+      // Continue without recent appointments data
+      recentAppointments = [];
     }
-  });
+
+    res.json({
+      success: true,
+      data: {
+        counts: {
+          users: totalUsers,
+          patients: totalPatients,
+          doctors: totalDoctors,
+          pathologists: totalPathologists,
+          appointments: totalAppointments,
+          labTestsCompleted: totalLabTestsCompleted,
+        },
+        appointmentStats: formattedStats,
+        recentAppointments,
+        doctorsBySpecialty,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching analytics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch analytics',
+      error: error.message,
+    });
+  }
 };
 
 export const manageHospitalDetails = async (req, res) => {
@@ -169,6 +212,6 @@ export const manageHospitalDetails = async (req, res) => {
   // For now, we'll return a placeholder response
   res.json({
     success: true,
-    message: 'Hospital details updated successfully'
+    message: 'Hospital details updated successfully',
   });
 };

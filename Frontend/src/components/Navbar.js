@@ -14,6 +14,8 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
+import hero1 from "../pages/images/hero1.png";
+import hero2 from "../pages/images/hero2.png";
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
@@ -29,10 +31,9 @@ export default function Navbar() {
   return (
     <header className="navbar font-semibold">
       <div className="navbar__logo">
-        <Link to="/" className="hover:no-underline">
-          <h2>
-            ORGANIC<span> HEALTHCARE</span>
-          </h2>
+        <Link to="/" className="hover:no-underline flex justify-center items-center gap-2">
+          <img src={hero1} alt="Logo" className="h-10 w-10" />
+          <img src={hero2} alt="Logo" className="h-5 w-20" />
         </Link>
       </div>
 
