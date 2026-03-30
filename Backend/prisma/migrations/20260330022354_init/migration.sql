@@ -1,109 +1,21 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE `User` (
+    `id` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NOT NULL,
+    `role` ENUM('ADMIN', 'PATIENT', 'DOCTOR', 'PATHOLOGIST') NOT NULL,
+    `isProfileComplete` BOOLEAN NOT NULL DEFAULT false,
+    `passwordResetToken` VARCHAR(191) NULL,
+    `passwordResetTokenExpiry` DATETIME(3) NULL,
+    `emailVerificationOtp` VARCHAR(191) NULL,
+    `emailVerificationOtpExpiry` DATETIME(3) NULL,
+    `isEmailVerified` BOOLEAN NOT NULL DEFAULT false,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
-  - You are about to drop the column `appointmentDate` on the `appointment` table. All the data in the column will be lost.
-  - You are about to drop the column `appointmentType` on the `appointment` table. All the data in the column will be lost.
-  - You are about to drop the column `createdAt` on the `appointment` table. All the data in the column will be lost.
-  - You are about to drop the column `updatedAt` on the `appointment` table. All the data in the column will be lost.
-  - You are about to alter the column `status` on the `appointment` table. The data in that column could be lost. The data in that column will be cast from `Enum(EnumId(2))` to `Enum(EnumId(4))`.
-  - You are about to drop the column `filePath` on the `labtest` table. All the data in the column will be lost.
-  - You are about to drop the column `dateOfBirth` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the column `firstName` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the column `lastName` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the column `phone` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the `admin` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `doctor` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `patient` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `reminder` table. If the table is not empty, all the data it contains will be lost.
-  - Added the required column `scheduledAt` to the `Appointment` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `type` to the `Appointment` table without a default value. This is not possible if the table is not empty.
-
-*/
--- DropForeignKey
-ALTER TABLE `admin` DROP FOREIGN KEY `Admin_userId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `appointment` DROP FOREIGN KEY `Appointment_doctorId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `appointment` DROP FOREIGN KEY `Appointment_patientId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `doctor` DROP FOREIGN KEY `Doctor_userId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `healthmonitoring` DROP FOREIGN KEY `HealthMonitoring_patientId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `labtest` DROP FOREIGN KEY `LabTest_doctorId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `labtest` DROP FOREIGN KEY `LabTest_patientId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `medicalhistory` DROP FOREIGN KEY `MedicalHistory_doctorId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `medicalhistory` DROP FOREIGN KEY `MedicalHistory_patientId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `medicationtracking` DROP FOREIGN KEY `MedicationTracking_prescriptionId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `patient` DROP FOREIGN KEY `Patient_userId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `prescription` DROP FOREIGN KEY `Prescription_doctorId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `prescription` DROP FOREIGN KEY `Prescription_patientId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `reminder` DROP FOREIGN KEY `Reminder_medicationId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `reminder` DROP FOREIGN KEY `Reminder_patientId_fkey`;
-
--- AlterTable
-ALTER TABLE `appointment` DROP COLUMN `appointmentDate`,
-    DROP COLUMN `appointmentType`,
-    DROP COLUMN `createdAt`,
-    DROP COLUMN `updatedAt`,
-    ADD COLUMN `bookedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    ADD COLUMN `cancelReason` VARCHAR(191) NULL,
-    ADD COLUMN `cancelledAt` DATETIME(3) NULL,
-    ADD COLUMN `completedAt` DATETIME(3) NULL,
-    ADD COLUMN `diagnosis` TEXT NULL,
-    ADD COLUMN `notes` TEXT NULL,
-    ADD COLUMN `scheduledAt` DATETIME(3) NOT NULL,
-    ADD COLUMN `symptoms` TEXT NULL,
-    ADD COLUMN `type` ENUM('ONLINE', 'OFFLINE') NOT NULL,
-    MODIFY `status` ENUM('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED') NOT NULL DEFAULT 'PENDING';
-
--- AlterTable
-ALTER TABLE `labtest` DROP COLUMN `filePath`,
-    ADD COLUMN `appointmentId` VARCHAR(191) NULL,
-    ADD COLUMN `resultFile` VARCHAR(191) NULL;
-
--- AlterTable
-ALTER TABLE `user` DROP COLUMN `dateOfBirth`,
-    DROP COLUMN `firstName`,
-    DROP COLUMN `lastName`,
-    DROP COLUMN `phone`,
-    ADD COLUMN `isProfileComplete` BOOLEAN NOT NULL DEFAULT false,
-    MODIFY `role` ENUM('ADMIN', 'PATIENT', 'DOCTOR') NOT NULL;
-
--- DropTable
-DROP TABLE `admin`;
-
--- DropTable
-DROP TABLE `doctor`;
-
--- DropTable
-DROP TABLE `patient`;
-
--- DropTable
-DROP TABLE `reminder`;
+    UNIQUE INDEX `User_email_key`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `AdminProfile` (
@@ -113,6 +25,21 @@ CREATE TABLE `AdminProfile` (
     `phone` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `AdminProfile_userId_key`(`userId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PathologistProfile` (
+    `id` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `phone` VARCHAR(191) NOT NULL,
+    `licenseNumber` VARCHAR(191) NOT NULL,
+    `labName` VARCHAR(191) NULL,
+    `qualification` VARCHAR(191) NULL,
+
+    UNIQUE INDEX `PathologistProfile_userId_key`(`userId`),
+    UNIQUE INDEX `PathologistProfile_licenseNumber_key`(`licenseNumber`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -185,17 +112,115 @@ CREATE TABLE `DoctorSpeciality` (
     PRIMARY KEY (`doctorId`, `specialityId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateIndex
-CREATE INDEX `Appointment_patientId_scheduledAt_idx` ON `Appointment`(`patientId`, `scheduledAt`);
+-- CreateTable
+CREATE TABLE `Appointment` (
+    `id` VARCHAR(191) NOT NULL,
+    `patientId` VARCHAR(191) NOT NULL,
+    `doctorId` VARCHAR(191) NOT NULL,
+    `scheduledAt` DATETIME(3) NOT NULL,
+    `status` ENUM('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
+    `type` ENUM('ONLINE', 'OFFLINE') NOT NULL,
+    `videoLink` VARCHAR(191) NULL,
+    `symptoms` TEXT NULL,
+    `diagnosis` TEXT NULL,
+    `notes` TEXT NULL,
+    `bookedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `completedAt` DATETIME(3) NULL,
+    `cancelledAt` DATETIME(3) NULL,
+    `cancelReason` VARCHAR(191) NULL,
 
--- CreateIndex
-CREATE INDEX `Appointment_doctorId_scheduledAt_idx` ON `Appointment`(`doctorId`, `scheduledAt`);
+    INDEX `Appointment_patientId_scheduledAt_idx`(`patientId`, `scheduledAt`),
+    INDEX `Appointment_doctorId_scheduledAt_idx`(`doctorId`, `scheduledAt`),
+    INDEX `Appointment_status_idx`(`status`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateIndex
-CREATE INDEX `Appointment_status_idx` ON `Appointment`(`status`);
+-- CreateTable
+CREATE TABLE `Prescription` (
+    `id` VARCHAR(191) NOT NULL,
+    `appointmentId` VARCHAR(191) NULL,
+    `patientId` VARCHAR(191) NOT NULL,
+    `doctorId` VARCHAR(191) NOT NULL,
+    `prescriptionDate` DATETIME(3) NOT NULL,
+    `diagnosis` VARCHAR(191) NOT NULL,
+    `description` TEXT NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `Prescription_appointmentId_key`(`appointmentId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `MedicationTracking` (
+    `id` VARCHAR(191) NOT NULL,
+    `prescriptionId` VARCHAR(191) NOT NULL,
+    `medicationName` VARCHAR(191) NOT NULL,
+    `dosage` VARCHAR(191) NOT NULL,
+    `frequency` VARCHAR(191) NOT NULL,
+    `duration` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `LabTest` (
+    `id` VARCHAR(191) NOT NULL,
+    `patientId` VARCHAR(191) NOT NULL,
+    `doctorId` VARCHAR(191) NOT NULL,
+    `appointmentId` VARCHAR(191) NULL,
+    `pathologistId` VARCHAR(191) NULL,
+    `testName` VARCHAR(191) NOT NULL,
+    `testDate` DATETIME(3) NULL,
+    `description` TEXT NOT NULL,
+    `resultFile` VARCHAR(191) NULL,
+    `reportNotes` TEXT NULL,
+    `status` ENUM('RECOMMENDED', 'PENDING', 'COMPLETED', 'REPORT_ADDED') NOT NULL DEFAULT 'RECOMMENDED',
+    `recommendedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `completedAt` DATETIME(3) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `MedicalHistory` (
+    `id` VARCHAR(191) NOT NULL,
+    `patientId` VARCHAR(191) NOT NULL,
+    `doctorId` VARCHAR(191) NOT NULL,
+    `diagnosis` VARCHAR(191) NOT NULL,
+    `treatment` TEXT NOT NULL,
+    `allergies` TEXT NULL,
+    `symptoms` TEXT NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `HealthMonitoring` (
+    `id` VARCHAR(191) NOT NULL,
+    `patientId` VARCHAR(191) NOT NULL,
+    `heartRate` INTEGER NULL,
+    `temperature` DECIMAL(65, 30) NULL,
+    `weight` DECIMAL(65, 30) NULL,
+    `bloodPressure` VARCHAR(191) NULL,
+    `recordDate` DATETIME(3) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `AdminProfile` ADD CONSTRAINT `AdminProfile_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PathologistProfile` ADD CONSTRAINT `PathologistProfile_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `PatientProfile` ADD CONSTRAINT `PatientProfile_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -222,6 +247,9 @@ ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_patientId_fkey` FOREIGN KE
 ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_doctorId_fkey` FOREIGN KEY (`doctorId`) REFERENCES `DoctorProfile`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Prescription` ADD CONSTRAINT `Prescription_appointmentId_fkey` FOREIGN KEY (`appointmentId`) REFERENCES `Appointment`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Prescription` ADD CONSTRAINT `Prescription_doctorId_fkey` FOREIGN KEY (`doctorId`) REFERENCES `DoctorProfile`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -238,6 +266,9 @@ ALTER TABLE `LabTest` ADD CONSTRAINT `LabTest_doctorId_fkey` FOREIGN KEY (`docto
 
 -- AddForeignKey
 ALTER TABLE `LabTest` ADD CONSTRAINT `LabTest_appointmentId_fkey` FOREIGN KEY (`appointmentId`) REFERENCES `Appointment`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `LabTest` ADD CONSTRAINT `LabTest_pathologistId_fkey` FOREIGN KEY (`pathologistId`) REFERENCES `PathologistProfile`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `MedicalHistory` ADD CONSTRAINT `MedicalHistory_patientId_fkey` FOREIGN KEY (`patientId`) REFERENCES `PatientProfile`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
